@@ -11,11 +11,11 @@ clean:
 
 $(BUILD_DIR)/$(RES_DIR)/%: $(RES_DIR)/%
 	mkdir -p $(dir $@)
-	cp $^ $@
+	cp $< $@
 
-$(BUILD_DIR)/%.html: templates/%.html
+$(BUILD_DIR)/%.html: templates/%.html templates/base.html ./build_page.py
 	mkdir -p $(dir $@)
-	./build_page.py $^ $@
+	./build_page.py $< $@
 
 .PHONY: clean
 
