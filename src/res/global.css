@@ -26,7 +26,8 @@ body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, dl, dd, ol, ul, figure
 }
 .nav-ul > li > a:hover
 {
-		color: #215786;
+		color: #51687B;
+		border-bottom: #cccccc 2px solid;
 }
 
 .nav-li-home
