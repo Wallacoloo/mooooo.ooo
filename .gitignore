@@ -1,0 +1,6 @@
+# Directory in which compiled html is stored
+build/
+
+# Editor files
+*~
+
