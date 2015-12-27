@@ -1,0 +1,40 @@
+/* Reset basic elements */
+body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, dl, dd, ol, ul, figure
+{
+	margin: 0;
+	padding: 0;
+}
+
+.nav-header
+{
+	margin-left: 16.67%;
+	width: 66.67%;	
+}
+
+.nav-ul > li
+{
+		/* stack horizontally, not vertically */
+		display: table-cell;
+		width: 1%;
+		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+		font-size: 26px;
+}
+.nav-ul > li > a
+{
+		text-decoration: none;
+		color: #337AB7;
+}
+.nav-ul > li > a:hover
+{
+		color: #215786;
+}
+
+.nav-li-home
+{
+		text-align: left;
+}
+
+.nav-li-about
+{
+		text-align: right;
+}
