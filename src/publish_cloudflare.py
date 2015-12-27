@@ -14,7 +14,11 @@
 
 import json, requests, sys
 
-site_name = "mooooo.ooo"
+# Cloudflare Name for the website (this might not be the DOMAIN name)
+zone_name = "mooooo.ooo"
+# Cloudflare Name for the DNS TXT entry that we wish to link to IPFS
+ipfs_subdomain = "ipfs.mooooo.ooo"
+
 user_email = "wallacoloo@gmail.com"
 
 def api_call(api_key, api_path, params=None, method="GET", data=None):
@@ -26,7 +30,6 @@ def api_call(api_key, api_path, params=None, method="GET", data=None):
             'X-Auth-Key': api_key,
             'Content-Type': 'application/json'
     }
-    print(headers)
     r = requests.request(method, "https://api.cloudflare.com/client/v4" + api_path, params=params, headers=headers, data=json.dumps(data) if data else None)
     print(r.text)
     return json.loads(r.text)
@@ -53,8 +56,8 @@ if __name__ == "__main__":
     api_key = sys.argv[1]
     ipfs_id = sys.argv[2]
     
-    zone_id = get_zone_id(api_key, site_name)
-    dns_entry = get_dns_txt_info(api_key, zone_id, "ipfs." + site_name)
+    zone_id = get_zone_id(api_key, zone_name)
+    dns_entry = get_dns_txt_info(api_key, zone_id, ipfs_subdomain)
 
     dns_entry["content"] = "dnslink=%s" %ipfs_id
 
