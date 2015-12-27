@@ -1,3 +1,6 @@
+# Optional API keys
+cloudflare_apikey
+
 # Directory in which compiled html is stored
 build/
 
