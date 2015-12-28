@@ -80,6 +80,7 @@ h1
 		padding: 30px 10%;
 		/* push the footer to the bottom */
 		min-height: calc(100% - 240px);
+		text-align: justify;
 }
 
 
@@ -87,14 +88,14 @@ h1
 .glob-footer
 {
 		border-top: 1px solid #D8D8D8;
-		padding: 30px 10%;
+		padding: 20px 10% 8px 11%;
 }
 .footer-social
 {
-		width: 50%;
+		width: 25%;
+		min-width: 40px;
 		float: left;
 		list-style: outside none none;
-		margin-left: 0px;
 }
 
 .footer-social > a.fa
@@ -103,21 +104,30 @@ h1
 		text-decoration: none;
 		text-align: center;
 		vertical-align: middle;
-		width: 30px;
-		height: 30px;
-		font-size: 20px;
-		line-height: 26px;
-		margin-left: 2px;
-		margin-right: 2px;
+		width: 32px;
+		height: 32px;
+		line-height: 28px;
+		margin: 2px;
 }
 .footer-social > a.round
 {
 		border-radius: 100%;
 		border: 2px #B0B0B0 solid;
+		font-size: 22px;
 }
+/* Styling for logos that weren't originally rounded
+ * (this just forces the icon smaller so that the circle encloses it more nicely)
+ */
+.footer-social > a.force-round
+{
+		border-radius: 100%;
+		border: 2px #B0B0B0 solid;
+		font-size: 18px;
+}
+
 .footer-legal
 {
-		width: 50%;
+		width: 75%;
 		float: right;
 }
 
