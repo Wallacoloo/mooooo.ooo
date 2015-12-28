@@ -14,8 +14,9 @@ html, body
 /* Global site-header links */
 .nav-header
 {
-	margin-left: 16.67%;
-	width: 66.67%;	
+	margin-left: 10%;
+	margin-right: 10%;
+	border-bottom: 1px solid #B0B0B0;
 }
 
 .nav-ul > li
@@ -25,6 +26,7 @@ html, body
 		width: 1%;
 		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 		font-size: 26px;
+		padding-bottom: 1px;
 }
 .nav-ul > li > a
 {
@@ -41,12 +43,27 @@ html, body
 {
 		text-align: left;
 }
+.nav-li-home > a
+{
+		padding-left: 6.67%;
+		padding-right: 20%;
+}
+.nav-li-about > a
+{
+		padding-left: 20%;
+		padding-right: 6.67%;
+}
 
 .nav-li-about
 {
 		text-align: right;
 }
 
+.nav-ul > li.active > a
+{
+		/* The nav link of the page we're on gets a special underline highlight */
+		border-bottom: 2px solid #307AB0;
+}
 
 .page-content
 {
@@ -73,4 +90,12 @@ html, body
 {
 		width: 50%;
 		float: right;
+}
+
+
+
+/* A vertically-spaced list wherein each item is intended to fit on one line */
+.list-single-lines
+{
+		padding-left: 80px;
 }

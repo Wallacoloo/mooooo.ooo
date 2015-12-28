@@ -1,5 +1,8 @@
 {% extends 'base.html' %}
+{# Mark the 'about' navigation link as active #}
+{% block nav_about_class %} active{% endblock %}
 {% block title %}About MOOOOOooo{% endblock %}
+
 {% block content %}
 <h1>About this Website</h1>
 <p>
@@ -15,7 +18,7 @@ The source code for the website can be found <a href="https://github.com/Wallaco
 My name is Colin Wallace. I am an artist who creates music and drawings, as well as an avid programmer and contributor to open source coding projects.
 I am currently working towards a BS EE degree at the University of Washington in Seattle, WA.
 Some notable projects to which I have contributed include:
-<ul>
+<ul class="list-single-lines">
 		<li>
 				<a href="https://www.rust-lang.org/">Rust</a> - a systems programming language
 		</li>

@@ -3,11 +3,20 @@
 import sys
 
 from jinja2 import Environment, PackageLoader
+import json
+
+
+# Read configuration details from file (contact accounts, etc)
+config = json.loads(open("config.json", "r").read())
 
 def render_page(in_path):
     env = Environment(loader=PackageLoader("__main__", 'templates'))
     template = env.get_template(in_path)
-    return template.render()
+    
+    params = config
+
+    return template.render(**params)
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
