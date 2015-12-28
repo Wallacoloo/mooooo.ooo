@@ -4,6 +4,10 @@
 				"contact_email": "wallace.colin.a@gmail.com",
 				"github_url": "https://github.com/wallacoloo",
 				"twitter_url": "https://twitter.com/walacoloo"
+		},
+		"ipfs":
+		{
+				"ipns_id": "<IPNS_ID>"
 		}
 }
 

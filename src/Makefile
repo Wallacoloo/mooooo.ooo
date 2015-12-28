@@ -1,7 +1,12 @@
+BUILD_ROOT=../build
 # Directory in which to create the static website
-BUILD_DIR=../build/mooooo
+BUILD_DIR=$(BUILD_ROOT)/mooooo
 # Directory where static resources are kept
 RES_DIR=res
+
+IPFSID_FILE=$(BUILD_ROOT)/mooooo.ipfsid
+IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
+
 
 # Which types of files to copy out of the resource directory
 # (don't want to accidentally copy editor backups, etc)
@@ -16,13 +21,28 @@ all: $(PUB_TARGETS)
 clean:
 	rm -rf $(BUILD_DIR)
 
-# Publish the site to IPFS / mooooo.ooo
-publish: $(PUB_TARGETS)
+# Create a file that contains the constant IPNS key that we associate with the website
+$(IPNSID_FILE):
+	ipfs id --format="<id>" > $@
+
+$(BUILD_ROOT)/config.json: config.json $(IPNSID_FILE)
+	sed  "s:<IPNS_ID>:$(shell cat $(IPNSID_FILE)):" $< > $@
+
+# Publish the site to IPFS
+publish-ipfs: $(PUB_TARGETS)
 	ipfs add -r -q $(BUILD_DIR) | tail -1 > $(BUILD_DIR)/../mooooo.ipfsid
 
+# Update the IPNS link to point to the newest version of the website
+publish-ipns: publish-ipfs
+	ipfs name publish /ipfs/$(shell cat $(IPFSID_FILE))
+
 # Update the DNS records for a cloudflare server
-publish-cf: publish
-	./publish_cloudflare.py `cat ../cloudflare_apikey` `cat $(BUILD_DIR)/../mooooo.ipfsid`
+publish-cf: publish-ipfs
+	./publish_cloudflare.py $(shell cat ../cloudflare_apikey) $(shell cat $(IPFSID_FILE))
+
+# Publish the site everywhere
+publish: publish-ipfs publish-cf publish-ipns 
+	true
 
 # Copy static resources into the build directory
 $(BUILD_DIR)/$(RES_DIR)/%: $(RES_DIR)/%
@@ -30,9 +50,9 @@ $(BUILD_DIR)/$(RES_DIR)/%: $(RES_DIR)/%
 	cp $< $@
 
 # Turn any templates into actual pages
-$(BUILD_DIR)/%.html: templates/%.html templates/base.html ./build_page.py
+$(BUILD_DIR)/%.html: templates/%.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
 	mkdir -p $(dir $@)
-	./build_page.py $< $@
+	./build_page.py $< $(BUILD_ROOT)/config.json $@
 
-.PHONY: clean publish
+.PHONY: clean publish-ipfs publish-ipns publish-cf publish
 
