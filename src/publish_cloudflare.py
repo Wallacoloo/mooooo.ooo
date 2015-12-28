@@ -59,7 +59,7 @@ if __name__ == "__main__":
     zone_id = get_zone_id(api_key, zone_name)
     dns_entry = get_dns_txt_info(api_key, zone_id, ipfs_subdomain)
 
-    dns_entry["content"] = "dnslink=%s" %ipfs_id
+    dns_entry["content"] = "dnslink=/ipfs/%s" %ipfs_id
 
     update_txt_record(api_key, zone_id, dns_entry)
 
