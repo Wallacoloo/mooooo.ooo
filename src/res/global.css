@@ -80,6 +80,10 @@ h1
 		padding: 30px 10%;
 		/* push the footer to the bottom */
 		min-height: calc(100% - 240px);
+		font-size: 15pt;
+}
+.page-content > p
+{
 		text-align: justify;
 }
 
@@ -88,7 +92,7 @@ h1
 .glob-footer
 {
 		border-top: 1px solid #D8D8D8;
-		padding: 20px 10% 8px 11%;
+		padding: 12px 10% 8px 11%;
 }
 .footer-social
 {
@@ -96,6 +100,7 @@ h1
 		min-width: 40px;
 		float: left;
 		list-style: outside none none;
+		padding-bottom: 8px;
 }
 
 .footer-social > a.fa
@@ -129,6 +134,7 @@ h1
 {
 		width: 75%;
 		float: right;
+		padding-bottom: 8px;
 }
 
 
