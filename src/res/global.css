@@ -95,7 +95,18 @@ html, body
 
 
 /* A vertically-spaced list wherein each item is intended to fit on one line */
+.list-single-lines > li:before
+{
+		content: "◉";
+		text-align: right;
+		font-size: 0.8em;
+		width: 10%;
+		min-width: 20px;
+		max-width: 80px;
+		display: inline-block;
+}
+
 .list-single-lines
 {
-		padding-left: 80px;
+		list-style: inside none none;
 }
