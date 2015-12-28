@@ -16,7 +16,7 @@ html, body
 {
 	margin-left: 10%;
 	margin-right: 10%;
-	border-bottom: 1px solid #B0B0B0;
+	border-bottom: 1px solid #D8D8D8;
 }
 
 .nav-ul > li
@@ -76,7 +76,7 @@ html, body
 /* Site-wide footer styling */
 .glob-footer
 {
-		border-top: 1px solid #E0E0E0;
+		border-top: 1px solid #D8D8D8;
 		padding: 30px 10%;
 }
 .footer-social
