@@ -11,6 +11,11 @@ html, body
 		height: 100%;
 }
 
+h1
+{
+	margin: 1em 0px 0px 0px;
+}
+
 /* Global site-header links */
 .nav-header
 {
@@ -94,6 +99,11 @@ html, body
 
 
 
+.no-top-spacing
+{
+		margin-top: 0px;
+}
+
 /* A vertically-spaced list wherein each item is intended to fit on one line */
 .list-single-lines > li:before
 {
@@ -108,5 +118,7 @@ html, body
 
 .list-single-lines
 {
+		margin: 0.5em 0px;
 		list-style: inside none none;
 }
+
