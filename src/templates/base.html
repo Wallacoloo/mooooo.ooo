@@ -11,15 +11,32 @@
 			<header class="nav-header">
 					<ul class="nav-ul">
 						<li class="nav-li-home">
-								<a href="www.mooooo.ooo">MOOOOOooo</a>
+								<a href="./index.html">MOOOOOooo</a>
 						</li>
 						<li class="nav-li-about">
-								<a href="./about">About</a>
+								<a href="./about.html">About</a>
 						</li>
 					</ul>
 			</header>
-			<div>
-					{{ content }}
+			<div class="page-content">
+					{% block content %}{% endblock %}
 			</div>
+			<footer class="glob-footer">
+					<ul class="footer-social">
+							<li>
+									<a href="mailto:wallace.colin.a@gmail.com">wallace.colin.a@gmail.com</a>
+							</li>
+							<li>
+									<a href="https://github.com/wallacoloo">wallacoloo</a>
+							</li>
+							<li>
+									<a href="https://twitter.com/wallacoloo">wallacoloo</a>
+							</li>
+					</ul>
+					<p class="footer-legal">
+							Unless otherwise stated, all code snippets, artwork or writings hosted on this website are released into the public domain.
+							They may freely be used elsewhere with or with attribution to the original author.
+					</p>
+			</footer>
 		</body>
 </html>

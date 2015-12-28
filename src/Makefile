@@ -9,7 +9,7 @@ RES_TYPES=*.css
 RESOURCES=$(wildcard $(addprefix $(RES_DIR)/**/,$(RES_TYPES)) $(addprefix $(RES_DIR)/,$(RES_TYPES))) 
 
 # All targets that should be publically visible when published
-PUB_TARGETS=$(addprefix $(BUILD_DIR)/,index.html $(RESOURCES))
+PUB_TARGETS=$(addprefix $(BUILD_DIR)/,index.html about.html $(RESOURCES))
 
 all: $(PUB_TARGETS)
 

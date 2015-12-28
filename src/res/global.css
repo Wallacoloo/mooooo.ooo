@@ -5,6 +5,13 @@ body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, dl, dd, ol, ul, figure
 	padding: 0;
 }
 
+/* Always allocate 100% of the page to allow for pushing the footer to the bottom, etc */
+html, body
+{
+		height: 100%;
+}
+
+/* Global site-header links */
 .nav-header
 {
 	margin-left: 16.67%;
@@ -13,7 +20,7 @@ body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, dl, dd, ol, ul, figure
 
 .nav-ul > li
 {
-		/* stack horizontally, not vertically */
+		/* stack each navigation link horizontally, not vertically */
 		display: table-cell;
 		width: 1%;
 		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -38,4 +45,32 @@ body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, dl, dd, ol, ul, figure
 .nav-li-about
 {
 		text-align: right;
+}
+
+
+.page-content
+{
+		padding: 30px 10%;
+		/* push the footer to the bottom */
+		min-height: calc(100% - 240px);
+}
+
+
+/* Site-wide footer styling */
+.glob-footer
+{
+		border-top: 1px solid #E0E0E0;
+		padding: 30px 10%;
+}
+.footer-social
+{
+		width: 50%;
+		float: left;
+		list-style: outside none none;
+		margin-left: 0px;
+}
+.footer-legal
+{
+		width: 50%;
+		float: right;
 }
