@@ -5,6 +5,11 @@ body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, dl, dd, ol, ul, figure
 	padding: 0;
 }
 
+*
+{
+		box-sizing: border-box;
+}
+
 /* Always allocate 100% of the page to allow for pushing the footer to the bottom, etc */
 html, body
 {
@@ -90,6 +95,25 @@ h1
 		float: left;
 		list-style: outside none none;
 		margin-left: 0px;
+}
+
+.footer-social > a.fa
+{
+		color: #307AB0;
+		text-decoration: none;
+		text-align: center;
+		vertical-align: middle;
+		width: 30px;
+		height: 30px;
+		font-size: 20px;
+		line-height: 26px;
+		margin-left: 2px;
+		margin-right: 2px;
+}
+.footer-social > a.round
+{
+		border-radius: 100%;
+		border: 2px #B0B0B0 solid;
 }
 .footer-legal
 {
