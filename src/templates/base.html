@@ -2,7 +2,7 @@
 {% macro anchored_header(text, class="") %}
 <a class="anchored-header" href="#{{ text|into_tag }}">
 		<h1 id="{{ text|into_tag }}" class="{{ class }}">
-				<span class="fa fa-paragraph"></span>
+				<span class="fa fa-paragraph" title="Permalink to this headline"></span>
 				{{ text }}
 		</h1>
 </a>
