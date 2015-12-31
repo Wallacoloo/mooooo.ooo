@@ -114,7 +114,7 @@ h1
 		color: #337AB7;
 		font-family: Quicksand,"Helvetica Neue",Helvetica,Arial,sans-serif;
 		font-weight: bold;
-		border-bottom: #ffffff 2px solid;
+		border-bottom: rgba(216,216,216,0) 2px solid;
 		transition: all 0.15s ease 0s;
 }
 .nav-ul > li > a:hover
