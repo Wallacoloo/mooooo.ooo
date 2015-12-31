@@ -8,12 +8,12 @@ import json
 
 
 def render_page(config, in_path):
-    env = Environment(loader=PackageLoader("__main__", 'templates'))
+    env = Environment(loader=PackageLoader("__main__", 'templates'), trim_blocks=True, lstrip_blocks=True)
     template = env.get_template(in_path)
     
-    params = config
+    env.globals.update(config)
 
-    return template.render(**params)
+    return template.render()
 
 
 if __name__ == "__main__":

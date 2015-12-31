@@ -10,18 +10,15 @@
 		</head>
 		<body>
 			<header class="nav-header">
+					{# Derivative templates are expected to
+						{% set is_page_xxx = True %} for at least one page #}
 					<ul class="nav-ul">
-							{#
-							to mark one of the pages as active, add
-							`{% block nav_xxxx_class%} active{% endblock %}`
-							to a derivative template.
-							#}
-						<li class="nav-li-home{% block nav_blog_class %}{% endblock %}">
-								<a href="./index.html">Blog</a>
-						</li>
-						<li class="nav-li-about{% block nav_about_class %}{% endblock %}">
-								<a href="./about.html">About</a>
-						</li>
+							<li class="nav-li-home{{ " active" if is_page_blog else ""}}">
+									<a href="./index.html">Blog</a>
+							</li>
+							<li class="nav-li-about{{ " active" if is_page_about else "" }}">
+									<a href="./about.html">About</a>
+							</li>
 					</ul>
 			</header>
 			<div class="page-content">
