@@ -123,11 +123,11 @@ h1
 		border-bottom: #cccccc 2px solid;
 }
 
-.nav-li-home
+.nav-li-blog
 {
 		text-align: left;
 }
-.nav-li-home > a
+.nav-li-blog > a
 {
 		padding-left: 6.67%;
 		padding-right: 20%;
