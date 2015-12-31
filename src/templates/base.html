@@ -1,3 +1,8 @@
+{# Provide some common macros #}
+{% macro anchored_header(text, class="") %}
+<h1 id="{{text|lower|replace("/", "-and-")|replace(" ", "-")}}"{{ ' class="{{ class }}"' if class else "" }}>{{ text }}</h1>
+{% endmacro %}
+
 <!DOCTYPE html>
 <html>
 		<head>
@@ -32,7 +37,7 @@
 					</div>
 					<p class="footer-legal">
 							Unless otherwise stated, all code snippets, artwork or writings hosted on this website are released into the public domain.
-							<a href="./about.html#license-and-attributions">More info</a>.
+							<a href="./about.html#license--and--attributions">More info</a>.
 					</p>
 			</footer>
 		</body>
