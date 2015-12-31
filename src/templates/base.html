@@ -1,6 +1,11 @@
 {# Provide some common macros #}
 {% macro anchored_header(text, class="") %}
-<h1 id="{{text|lower|replace("/", "-and-")|replace(" ", "-")}}"{{ ' class="{{ class }}"' if class else "" }}>{{ text }}</h1>
+<a class="anchored-header" href="#{{ text|lower|replace("/", "-and-")|replace(" ", "-") }}">
+		<h1 id="{{ text|lower|replace("/", "-and-")|replace(" ", "-") }}" class="{{ class }}">
+				<span class="fa fa-paragraph"></span>
+				{{ text }}
+		</h1>
+</a>
 {% endmacro %}
 
 <!DOCTYPE html>
