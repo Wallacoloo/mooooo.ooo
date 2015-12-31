@@ -113,13 +113,35 @@ h1
 		height: 32px;
 		line-height: 28px;
 		margin: 2px;
+		/* Upon hover of the social media icons, we have color transitions.
+		 * These should be smoothed. */
+		transition: all 0.2s ease 0s;
 }
+
+.footer-social > .email:hover
+{
+		color: #DDA036;
+}
+.footer-social > .github:hover
+{
+		color: #101010;
+}
+.footer-social > .twitter:hover
+{
+		color: #4099ff;
+}
+
 .footer-social > a.round
 {
 		border-radius: 100%;
 		border: 2px #B0B0B0 solid;
 		font-size: 22px;
 }
+.footer-social > a.round:hover
+{
+		border: 2px #909090 solid;
+}
+
 /* Styling for logos that weren't originally rounded
  * (this just forces the icon smaller so that the circle encloses it more nicely)
  */
@@ -128,6 +150,10 @@ h1
 		border-radius: 100%;
 		border: 2px #B0B0B0 solid;
 		font-size: 18px;
+}
+.footer-social > a.force-round:hover
+{
+		border: 2px #909090 solid;
 }
 
 .footer-legal
