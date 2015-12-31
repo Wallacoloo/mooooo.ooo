@@ -1,3 +1,39 @@
+/* Fonts */
+/* QuickSand font:
+ * source: http://www.fontsquirrel.com/fonts/Quicksand
+ *       : https://www.google.com/fonts/specimen/Quicksand
+ * License: SIL Open Font License 1.1
+ * Author: Andrew Paglinawan
+ * Thanks for such a beautiful font, Andrew!
+ */
+@font-face
+{
+		font-family: "Quicksand";
+		src: local('Quicksand'), url('quicksand/Quicksand-Regular.otf');
+		font-weight: normal;
+		font-style: normal;
+}
+@font-face
+{
+		font-family: "Quicksand";
+		src: local('Quicksand Bold'), url('quicksand/Quicksand-Bold.otf');
+		font-weight: bold;
+		font-style: normal;
+}
+
+/* Raleway font:
+ * source: http://www.fontsquirrel.com/fonts/Raleway
+ *       : https://www.google.com/fonts/specimen/Raleway
+ * License: SIL Open Font License 1.1
+ * Author: Multiple (The League of Moveable Type)
+ */
+@font-face
+{
+		font-family: 'Raleway';
+		font-style: normal;
+		font-weight: normal;
+		src: local('Raleway'), url('raleway/Raleway-Regular.ttf');
+}
 /* Reset basic elements */
 body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, dl, dd, ol, ul, figure
 {
@@ -8,6 +44,7 @@ body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, dl, dd, ol, ul, figure
 *
 {
 		box-sizing: border-box;
+		font-family: Raleway,"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 /* Always allocate 100% of the page to allow for pushing the footer to the bottom, etc */
@@ -19,6 +56,8 @@ html, body
 h1
 {
 	margin: 1em 0px 0px 0px;
+	font-family: "Quicksand","Helvetica Neue",Arial,sans-serif;
+	font-weight: bold;
 }
 
 /* Global site-header links */
@@ -40,8 +79,11 @@ h1
 }
 .nav-ul > li > a
 {
+		padding-bottom: 2px;
 		text-decoration: none;
 		color: #337AB7;
+		font-family: Quicksand,"Helvetica Neue",Helvetica,Arial,sans-serif;
+		font-weight: bold;
 }
 .nav-ul > li > a:hover
 {

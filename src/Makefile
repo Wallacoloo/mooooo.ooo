@@ -10,7 +10,7 @@ IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 
 # Which types of files to copy out of the resource directory
 # (don't want to accidentally copy editor backups, etc)
-RES_TYPES=*.css *.eot *.svg *.ttf *.woff *.woff2
+RES_TYPES=*.css *.eot *.otf *.svg *.ttf *.woff *.woff2
 RESOURCES=$(shell find res -name . $(addprefix -o -name ,$(RES_TYPES))) 
 
 # All targets that should be publically visible when published
