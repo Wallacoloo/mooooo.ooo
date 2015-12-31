@@ -205,29 +205,22 @@ h1
 		color: #4099ff;
 }
 
-.footer-social > a.round
+.footer-social > a
 {
 		border-radius: 100%;
 		border: 2px #B0B0B0 solid;
 		font-size: 22px;
 }
-.footer-social > a.round:hover
+.footer-social > a:hover
 {
 		border: 2px #909090 solid;
 }
 
-/* Styling for logos that weren't originally rounded
- * (this just forces the icon smaller so that the circle encloses it more nicely)
- */
-.footer-social > a.force-round
+/* The email icon needs a smaller font size to look natural when enclosed in a
+ * circle */
+.footer-social > a.email
 {
-		border-radius: 100%;
-		border: 2px #B0B0B0 solid;
 		font-size: 18px;
-}
-.footer-social > a.force-round:hover
-{
-		border: 2px #909090 solid;
 }
 
 .footer-legal
