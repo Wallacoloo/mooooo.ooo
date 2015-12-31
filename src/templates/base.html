@@ -1,7 +1,7 @@
 {# Provide some common macros #}
 {% macro anchored_header(text, class="") %}
-<a class="anchored-header" href="#{{ text|lower|replace("/", "-and-")|replace(" ", "-") }}">
-		<h1 id="{{ text|lower|replace("/", "-and-")|replace(" ", "-") }}" class="{{ class }}">
+<a class="anchored-header" href="#{{ text|into_tag }}">
+		<h1 id="{{ text|into_tag }}" class="{{ class }}">
 				<span class="fa fa-paragraph"></span>
 				{{ text }}
 		</h1>
@@ -42,7 +42,7 @@
 					</div>
 					<p class="footer-legal">
 							Unless otherwise stated, all code snippets, artwork or writings hosted on this website are released into the public domain.
-							<a href="./about.html#license--and--attributions">More info</a>.
+							<a href="./about.html#{{ "License / Attributions"|into_tag }}">More info</a>.
 					</p>
 			</footer>
 		</body>

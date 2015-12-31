@@ -5,13 +5,33 @@ import sys
 from jinja2 import Environment, PackageLoader
 import json
 
+def filter_into_tag(value):
+    """Given some text, this returns a human-readable tag that closely
+    corresponds to the text but is safe to use in a URL.
+    Example:
+    >>> filter_into_tag("Hello, This is Arnold")
+    "hello-this-is-arnold"
+    """
+    # Replace punctuation with hyphens
+    value = value.replace(" ", "-").replace("/", "-").replace(",", "-") \
+        .replace(".", "-").replace("!", "-").replace(";", "-") \
+        .replace(":", "-").strip()
+    # Preserve only alphanumerics and hyphens
+    value = "".join(char.lower() for char in value if char.lower() in "abcdefghijklmnopqrstuvwxyz0123456789-")
+    # Squash pairs of hyphens
+    while len(value) != len(value.replace("--", "-")):
+            value = value.replace("--", "-")
+
+    return value
 
 
 def render_page(config, in_path):
     env = Environment(loader=PackageLoader("__main__", 'templates'), trim_blocks=True, lstrip_blocks=True)
     template = env.get_template(in_path)
     
+    # Populate template global variables & filters
     env.globals.update(config)
+    env.filters["into_tag"] = filter_into_tag
 
     return template.render()
 
