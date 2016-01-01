@@ -53,7 +53,10 @@ def render_page(config, in_path, out_path):
     def to_rel_path(abs_path):
         print(out_path)
         prefix = "../"*out_path.count("/")
-        return os.path.join(prefix, abs_path)
+        rel = os.path.join(prefix, abs_path)
+        if rel.endswith("index.html") and config["omit_index_from_url"]:
+            rel = rel[:-len("index.html")]
+        return rel
 
     env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True)
     #template = env.get_template(in_path)
