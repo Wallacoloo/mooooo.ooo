@@ -58,11 +58,9 @@ $(BUILD_DIR)/index.html: pages/index.html templates/base.html $(BUILD_ROOT)/conf
 $(BUILD_DIR)/pages/%/index.html: pages/%/index.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
 	mkdir -p $(dir $@)
 	./build_page.py $< $(BUILD_ROOT)/config.json $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
-	ln -sf $(subst /index.html,,$<) $(subst pages/,,$(subst /index.html,,$@))
 $(BUILD_DIR)/blog_entries/%/index.html: blog_entries/%/index.html templates/blog_entry.html $(BUILD_ROOT)/config.json ./build_page.py
 	mkdir -p $(dir $@)
 	./build_page.py $< $(BUILD_ROOT)/config.json $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
-	ln -sf $(subst /index.html,,$<) $(subst blog_entries/,,$(subst /index.html,,$@))
 
 .PHONY: clean publish-ipfs publish-ipns publish-cf publish
 
