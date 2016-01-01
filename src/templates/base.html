@@ -1,4 +1,5 @@
 {# Provide some common macros #}
+
 {% macro anchored_header(text, class="") %}
 <a class="anchored-header" href="#{{ text|into_tag }}">
 		<h1 id="{{ text|into_tag }}" class="{{ class }}">
@@ -14,9 +15,10 @@
 			<meta charset="utf-8">
 			<meta name="viewport" content="width=device-width initial-scale=1" />
 			<meta name="description" content="Weblog/homepage for an artist/developer/engineer. DIY build logs, opinions and artwork" />
-			<link rel="stylesheet" href="res/global.css">
-			<link rel="stylesheet" href="res/font-awesome/css/font-awesome.min.css">
+			<link rel="stylesheet" href="{{ "res/global.css"|to_rel_path }}">
+			<link rel="stylesheet" href="{{ "res/font-awesome/css/font-awesome.min.css"|to_rel_path }}">
 			<title>{% block title %}MOOOOO.ooo - DIY Builds, Opinions & Artwork{% endblock %}</title>
+			{{ page_path }}
 		</head>
 		<body>
 			<header class="nav-header">
@@ -24,15 +26,15 @@
 						{% set is_page_xxx = True %} for at least one page #}
 					<ul class="nav-ul">
 							<li class="nav-li-blog{{ " active" if is_page_blog else ""}}">
-									<a href="./index.html">Blog</a>
+									<a href="{{ pages["index"].path|to_rel_path }}">Blog</a>
 							</li>
 							<li class="nav-li-about{{ " active" if is_page_about else "" }}">
-									<a href="./about.html">About</a>
+									<a href="{{ pages["about"].path|to_rel_path }}">About</a>
 							</li>
 					</ul>
 			</header>
 			<div class="page-content">
-					{% block content %}{% endblock %}
+					{% block page_content %}{% endblock %}
 			</div>
 			<footer class="glob-footer">
 					<div class="footer-social">

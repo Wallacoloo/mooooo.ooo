@@ -14,8 +14,10 @@ RES_TYPES=*.css *.eot *.otf *.svg *.ttf *.woff *.woff2
 RESOURCES=$(shell find res -name . $(addprefix -o -name ,$(RES_TYPES))) 
 
 # All targets that should be publically visible when published
-PUB_TARGETS=$(addprefix $(BUILD_DIR)/,index.html about.html $(RESOURCES))
-
+PUB_TARGETS:=$(RESOURCES) index.html
+PUB_TARGETS:=$(PUB_TARGETS) $(shell find pages/*/index.html)
+PUB_TARGETS:=$(PUB_TARGETS) $(shell find blog_entries/*/index.html)
+PUB_TARGETS:=$(addprefix $(BUILD_DIR)/,$(PUB_TARGETS))
 all: $(PUB_TARGETS)
 
 clean:
@@ -50,9 +52,17 @@ $(BUILD_DIR)/$(RES_DIR)/%: $(RES_DIR)/%
 	cp $< $@
 
 # Turn any templates into actual pages
-$(BUILD_DIR)/%.html: templates/%.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
+$(BUILD_DIR)/index.html: pages/index.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
 	mkdir -p $(dir $@)
-	./build_page.py $< $(BUILD_ROOT)/config.json $@
+	./build_page.py $< $(BUILD_ROOT)/config.json $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
+$(BUILD_DIR)/pages/%/index.html: pages/%/index.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
+	mkdir -p $(dir $@)
+	./build_page.py $< $(BUILD_ROOT)/config.json $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
+	ln -sf $(subst /index.html,,$<) $(subst pages/,,$(subst /index.html,,$@))
+$(BUILD_DIR)/blog_entries/%/index.html: blog_entries/%/index.html templates/blog_entry.html $(BUILD_ROOT)/config.json ./build_page.py
+	mkdir -p $(dir $@)
+	./build_page.py $< $(BUILD_ROOT)/config.json $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
+	ln -sf $(subst /index.html,,$<) $(subst blog_entries/,,$(subst /index.html,,$@))
 
 .PHONY: clean publish-ipfs publish-ipns publish-cf publish
 

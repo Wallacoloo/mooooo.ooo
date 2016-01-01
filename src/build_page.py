@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
 
-import sys
+import json, os, sys
 
 from jinja2 import Environment, PackageLoader
-import json
+
+
+# Directory in which blog entries are stored
+BLOG_ENTRY_DIR="blog_entries"
+# Directory in which Jinja2 templates are stored
+TEMPLATE_DIR="templates"
 
 def filter_into_tag(value):
     """Given some text, this returns a human-readable tag that closely
@@ -24,30 +29,55 @@ def filter_into_tag(value):
 
     return value
 
+class Page(object):
+    def __init__(self, path):
+        self.path = path
 
-def render_page(config, in_path):
-    env = Environment(loader=PackageLoader("__main__", 'templates'), trim_blocks=True, lstrip_blocks=True)
-    template = env.get_template(in_path)
-    
+class BlogEntry(Page):
+    def __init__(self, out_path, template):
+        super().__init__(out_path)
+        self._template = template
+
+    @property
+    def title(self):
+        return self._template.render(title_only=True).strip()
+
+
+def get_blog_objects(env):
+    blogs = [BlogEntry(os.path.join(BLOG_ENTRY_DIR, path, "index.html"), env.from_string( \
+            open(os.path.join(BLOG_ENTRY_DIR, path, "index.html")).read() \
+        )) for path in os.listdir("blog_entries")]
+    return blogs
+
+def render_page(config, in_path, out_path):
+    def to_rel_path(abs_path):
+        print(out_path)
+        prefix = "../"*out_path.count("/")
+        return os.path.join(prefix, abs_path)
+
+    env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True)
+    #template = env.get_template(in_path)
+    template = env.from_string(open(in_path).read())
+
     # Populate template global variables & filters
     env.globals.update(config)
+    env.globals["blog_entries"] = get_blog_objects(env)
+    env.globals["pages"] = { "index": Page("index.html"), "about": Page("pages/about/index.html")}
     env.filters["into_tag"] = filter_into_tag
+    env.filters["to_rel_path"] = to_rel_path
 
     return template.render()
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 4:
-        print("Usage: %s <input html template> <config file path> <output path>" %(sys.argv[0] if len(sys.argv) else "build_page.py"))
+    if len(sys.argv) != 5:
+        print("Usage: %s <input html template> <config file path> <root build dir> <output path>" %(sys.argv[0] if len(sys.argv) else "build_page.py"))
         sys.exit(1)
 
-    in_path, config_path, out_path = sys.argv[1:]
-    # Remove the assumed 'templates/' path prefix.
-    if in_path.startswith("templates/"):
-        in_path = in_path[len("templates/"):]
+    in_path, config_path, build_dir, out_path = sys.argv[1:]
 
     config = json.loads(open(config_path, "r").read())
 
-    data = render_page(config, in_path)
-    f = open(out_path, "w")
+    data = render_page(config, in_path, out_path)
+    f = open(os.path.join(build_dir, out_path), "w")
     f.write(data)

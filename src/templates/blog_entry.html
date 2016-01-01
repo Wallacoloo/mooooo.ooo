@@ -1,0 +1,16 @@
+{% if title_only %}
+
+{{ blog_title }}
+
+{% else %}
+
+	{% extends 'base.html' %}
+
+	{% block title %}{{ blog_title }}{% endblock %}
+
+	{% block page_content %}
+	{# Provide a block for the blog entry to render its main content into #}
+		{% block entry_content %}{% endblock %}
+	{% endblock %}
+{% endif %}
+

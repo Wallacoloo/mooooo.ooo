@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% set is_page_blog = True %}
+
+{% block page_content %}
+{% for entry in blog_entries %}
+<a href="{{ entry.path }}">{{ entry.title }}</a>
+{% endfor %}
+{% endblock %}
+
