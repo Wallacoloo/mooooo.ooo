@@ -51,7 +51,6 @@ def get_blog_objects(env):
 
 def render_page(config, in_path, out_path):
     def to_rel_path(abs_path):
-        print(out_path)
         prefix = "../"*out_path.count("/")
         rel = os.path.join(prefix, abs_path)
         if rel.endswith("index.html") and config["omit_index_from_url"]:
@@ -59,8 +58,6 @@ def render_page(config, in_path, out_path):
         return rel
 
     env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True)
-    #template = env.get_template(in_path)
-    template = env.from_string(open(in_path).read())
 
     # Populate template global variables & filters
     env.globals.update(config)
@@ -69,6 +66,7 @@ def render_page(config, in_path, out_path):
     env.filters["into_tag"] = filter_into_tag
     env.filters["to_rel_path"] = to_rel_path
 
+    template = env.from_string(open(in_path).read())
     return template.render()
 
 

@@ -3,7 +3,7 @@
 
 {% block page_content %}
 {% for entry in blog_entries %}
-<a href="{{ entry.path }}">{{ entry.title }}</a>
+<a href="{{ entry.path|to_rel_path }}">{{ entry.title }}</a>
 {% endfor %}
 {% endblock %}
 
