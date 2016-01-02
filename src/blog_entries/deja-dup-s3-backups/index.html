@@ -1,0 +1,59 @@
+First, go sign up for an amazon AWS account <0.png>.
+
+Follow the prompts, and you'll be deposited at the AWS landing page <1.png> (you can return here at any time by clicking the AWS box icon in the top left).
+
+<h1>Configuring a User</h1>
+
+First thing to do is set up permissions / access keys. Click on the "Identity & Access Management" (A.K.A "IAM") link, under the "Security & Identity" header. This takes you here: <2.png>
+
+From here, click 'Users' <3.png>.
+
+Then click "Create New Users", enter the name for your user: <4.png> and click "create".
+
+Expand the "Show User Security Credentials" dropdown and note the Access Key ID - this will be needed later. <5.png>
+
+Now return to the IAM homepage and again click on 'Users'. You should see your new user: <6.png>
+
+Click on the row that contains your user, and then click the "Permissions" tab: <7.png>
+
+Next, click "Attach Policy" and in the filter, type "S3" and select the "AmazonS3FullAccess" policy: <8.png>
+
+Finally, click "Attach Policy". Now you have a user with read/write access to S3 services.
+
+
+<h1>Configuring an S3 Bucket</h1>
+Now return to the Console Home (or click on the "Services" dropdown at the top of the page) and click on "S3": <9.png>
+
+Next, click on "Create Bucket", fill in the form with your bucket name <10.png> and click "Create".
+
+<h2>Optional: Switching to Lower-Cost Infrequent Access Storage</h2>
+Since you won't be needing a speedy CDN for your backup, you can change some settings to decrease your AWS bill.
+
+Click on "Properties" to see something like the following: <11.png>
+
+Expand the "Lifecycle" section, and then click "Add rule": <12.png>
+
+Stick with the defaults for step 1 (i.e. apply to the whole bucket) and click "Configure Rule".
+
+Check the "Transition to the Standard - Infrequent Access Storage Class" box and stick with the 30 days default (which is the minimum). You could instead check the "Archive to the Glacier Storage Class" option, which offers even cheaper storage but at the additional cost of 3-5 hours of latency and a significantly higher read cost. <13.png>
+
+After completing the above, click "Review", give the rule some name <14.png> and then click "Create and Activate Rule". Don't forget to click "Save"! <15.png>
+
+<h1>Configuring Deja-Dup</h1>
+You'll first have to install Deja Dup. This is included in most linux distributions. However, you'll also need to install the `python2-boto` package for Amazon S3 support. Example (Arch Linux): `# pacman -S deja-dup python2-boto`.
+
+Note that if you're using a Gnome environment, the application will probably be labeled "Backups" instead of "Deja-Dup".
+
+Launch the application: <16.png>
+
+Go ahead and configure the folders you want to save and ignore (note: dot-prefixed folders are *not* ignored by default. You might want to think about ignoring redundant folders like `~/.cache` to save space and bandwidth).
+
+Next, click the "Storage Location" section and configure it for Amazon S3. Use the S3 Access Key you noted previously. <17.png>
+
+Return to the overview and click "Back Up Now..." to initiate the backup process. Here you'll have to enter the Secret Access Key as well <18.png>.
+
+If the permissions were correctly configured, you should be prompted to choose an optional passphrase with which to encrypt your backup. My understanding is that the data is encrypted before it reaches AWS and the passphrase is never shared with Amazon, which means only you posess the key to decrypt your backup (so don't lose your key!)
+
+
+Well that's it. The first backup may take a long time, but further backups are done incrementally. If you explore the Deja Dup tool, you'll see settings for automating further backups, etc. Hope this tutorial helped!
+
