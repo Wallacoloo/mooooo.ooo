@@ -51,6 +51,13 @@
 {
 		border: 2px #909090 solid;
 }
+/* Fix the display of the social media icons for before the fonts have loaded */
+/*.footer-social > a:after
+{
+		content: "";
+		display: inline-block;
+		width: 100%;
+}*/
 
 /* The email icon needs a smaller font size to look natural when enclosed in a
  * circle */

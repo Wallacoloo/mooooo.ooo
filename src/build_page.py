@@ -66,6 +66,7 @@ def get_edit_dates_of_file(filename):
         if line.startswith("Date:"):
             line = line[len("Date:")]
             date = dateutil.parser.parse(line.strip())
+            print(filename, date)
             edit_dates.append(date)
     edit_dates.sort()
     return edit_dates
@@ -102,6 +103,15 @@ class BlogEntry(Page):
     def last_edit_date(self):
         return get_edit_dates_of_file(self._template_path_on_disk)[-1]
 
+    @property
+    def images(self):
+        basedir = os.path.split(self._template_path_on_disk)[0]
+        images = {}
+        for item in os.listdir(basedir):
+            if item.split(".")[-1] in ("png", "jpg", "jpeg", "svg"):
+                images[item] = Image(os.path.join(basedir, item))
+        return images
+
 class Author(object):
     def __init__(self, name):
         self.name = name
@@ -109,6 +119,10 @@ class Author(object):
         return self.name == other.name
     def __hash__(self):
         return hash(self.name)
+
+class Image(Page):
+    def __init__(self, path):
+        super().__init__(path)
 
 def get_blog_objects(env):
     blogs = [BlogEntry(out_path=os.path.join(BLOG_ENTRY_DIR, path, "index.html"), template_path_on_disk=\

@@ -10,6 +10,21 @@
 {% if linkable %}</a>{% endif %}
 {% endmacro %}
 
+{% macro show_image(image) %}
+{# Used to show an image in the center of the screen.
+   This also configures the link to a full-screen version #}
+
+<a href="{{ image.path|to_rel_path }}">
+<img src="{{ image.path|to_rel_path }}" class="theater-image"/>
+</a>
+{% endmacro %}
+
+{% macro offsite_link(path, label) %}
+{# Use whenever linking to an off-site resource.
+   This was we can indicate it's off-site (with an icon, etc), etc #}
+<a href="{{ path }}">{{ label }}</a>
+{% endmacro %}
+
 <!DOCTYPE html>
 <html>
 		<head>

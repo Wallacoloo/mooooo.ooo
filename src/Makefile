@@ -10,8 +10,9 @@ IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 
 # Which types of files to copy out of the resource directory
 # (don't want to accidentally copy editor backups, etc)
-RES_TYPES=*.eot *.otf *.svg *.ttf *.woff *.woff2
-RESOURCES=$(shell find res -name . $(addprefix -o -name ,$(RES_TYPES))) 
+RES_TYPES=*.eot *.otf *.png *.svg *.ttf *.woff *.woff2
+RESOURCES=$(shell find res -name . $(addprefix -o -name ,$(RES_TYPES)))
+RESOURCES:=$(RESOURCES) $(shell find blog_entries -name . $(addprefix -o -name ,$(RES_TYPES)))
 
 # All targets that should be publically visible when published
 PUB_TARGETS:=$(RESOURCES) $(RES_DIR)/css/global.css index.html
@@ -48,6 +49,11 @@ publish: publish-ipfs publish-cf publish-ipns
 
 # Copy static resources into the build directory
 $(BUILD_DIR)/$(RES_DIR)/%: $(RES_DIR)/%
+	mkdir -p $(dir $@)
+	cp $< $@
+
+# Copy static images
+$(BUILD_DIR)/%.png: %.png
 	mkdir -p $(dir $@)
 	cp $< $@
 

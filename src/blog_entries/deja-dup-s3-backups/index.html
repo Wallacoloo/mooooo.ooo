@@ -1,13 +1,17 @@
-{% from 'base.html' import heading %}
+{% from 'base.html' import heading, offsite_link, show_image %}
 {% extends 'blog_entry.html' %}
 {% set blog_title="Secure, Automated Backups with Amazon S3 and Deja-Dup" %}
 
 {% block entry_content %}
+
 {{ heading("Configuring an AWS User") }}
 
-First, go sign up for an amazon AWS account <0.png>.
+First, go {{ offsite_link("https://aws.amazon.com/", "sign up") }} for an amazon AWS account:
+{{ show_image(blog_entry.images["0-amazon-s3-landing.png"]) }}
 
-Follow the prompts, and you'll be deposited at the AWS landing page <1.png> (you can return here at any time by clicking the AWS box icon in the top left).
+Follow the prompts, and you'll be deposited at the AWS landing page
+(which you can always reach by clicking the AWS box icon in the top left).
+{{ show_image(blog_entry.images["1-amazon-aws-homepage.png"]) }}
 
 First thing to do is set up permissions / access keys. Click on the "Identity & Access Management" (A.K.A "IAM") link, under the "Security & Identity" header. This takes you here: <2.png>
 
