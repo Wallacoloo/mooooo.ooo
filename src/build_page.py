@@ -64,9 +64,8 @@ def get_edit_dates_of_file(filename):
     edit_dates = []
     for line in git_log.split("\n"):
         if line.startswith("Date:"):
-            line = line[len("Date:")]
+            line = line[len("Date:"):]
             date = dateutil.parser.parse(line.strip())
-            print(filename, date)
             edit_dates.append(date)
     edit_dates.sort()
     return edit_dates
