@@ -1,11 +1,12 @@
 {# Provide some common macros #}
 
-{% macro anchored_header(text, class="") %}
-<a class="anchored-header" href="#{{ text|into_tag }}">
-		<h1 id="{{ text|into_tag }}" class="{{ class }}">
+{% macro heading(text, class="", linkable=True, sublevel=0) %}
+{# sublevel=0 for an ordinary header, 1 for a sub-heading, 2 for a sub-sub-heading, etc #}
+<a class="anchored-header" {% if linkable %}href="#{{ text|into_tag }}"{% endif %}>
+		<h{{ sublevel+1 }} id="{{ text|into_tag }}" class="{{ class }}">
 				<span class="fa fa-paragraph" title="Permalink to this headline"></span>
 				{{ text }}
-		</h1>
+		</h{{ sublevel+1 }}>
 </a>
 {% endmacro %}
 

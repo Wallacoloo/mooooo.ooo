@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import json, os, sys
+import json, os, subprocess, sys
 
 from jinja2 import Environment, PackageLoader
 
@@ -29,22 +29,57 @@ def filter_into_tag(value):
 
     return value
 
+def get_authors_of_file(filename):
+    """Return a set of Author objects that have commits associated with the
+    file"""
+    proc = subprocess.Popen(["git", "log", "--", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    stdout, stderr = proc.communicate()
+    assert stderr == b''
+
+    authors = set()
+    for line in str(stdout).replace("\\n", "\n").split("\n"):
+        if line.startswith("Author:"):
+            line = line.replace("Author: ", "")
+            name, _email_with_right_angle_bracket = line.split("<")
+            name = name.strip()
+            authors.add(Author(name))
+    return list(authors)
+
 class Page(object):
     def __init__(self, path):
         self.path = path
 
 class BlogEntry(Page):
-    def __init__(self, out_path, template):
+    def __init__(self, out_path, template_path_on_disk, template):
         super().__init__(out_path)
         self._template = template
-
+        self._template_path_on_disk = template_path_on_disk
     @property
     def title(self):
         return self._template.render(title_only=True).strip()
 
+    @property
+    def authors(self):
+        authors = get_authors_of_file(self._template_path_on_disk)
+        # For now, we only have one author
+        assert len(authors) == 1 and all(a.name == "Colin Wallace" for a in authors)
+        return authors
+
+    @property
+    def template_path_on_disk(self):
+        return self._template_path_on_disk
+
+class Author(object):
+    def __init__(self, name):
+        self.name = name
+    def __eq__(self, other):
+        return self.name == other.name
+    def __hash__(self):
+        return hash(self.name)
 
 def get_blog_objects(env):
-    blogs = [BlogEntry(os.path.join(BLOG_ENTRY_DIR, path, "index.html"), env.from_string( \
+    blogs = [BlogEntry(out_path=os.path.join(BLOG_ENTRY_DIR, path, "index.html"), template_path_on_disk=\
+            os.path.join(BLOG_ENTRY_DIR, path, "index.html"), template=env.from_string( \
             open(os.path.join(BLOG_ENTRY_DIR, path, "index.html")).read() \
         )) for path in os.listdir("blog_entries")]
     return blogs
@@ -61,10 +96,15 @@ def render_page(config, in_path, out_path):
 
     # Populate template global variables & filters
     env.globals.update(config)
-    env.globals["blog_entries"] = get_blog_objects(env)
+    blog_entries = get_blog_objects(env)
+    env.globals["blog_entries"] = blog_entries
     env.globals["pages"] = { "index": Page("index.html"), "about": Page("pages/about/index.html")}
     env.filters["into_tag"] = filter_into_tag
     env.filters["to_rel_path"] = to_rel_path
+
+    for entry in blog_entries:
+        if entry.template_path_on_disk == in_path:
+            env.globals["blog_entry"] = entry
 
     template = env.from_string(open(in_path).read())
     return template.render()

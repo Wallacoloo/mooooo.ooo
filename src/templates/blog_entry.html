@@ -9,6 +9,7 @@
 	{% block title %}{{ blog_title }}{% endblock %}
 
 	{% block page_content %}
+	{{ blog_entry.authors[0].name }}
 	{# Provide a block for the blog entry to render its main content into #}
 		{% block entry_content %}{% endblock %}
 	{% endblock %}
