@@ -1,0 +1,26 @@
+/* Reset basic elements */
+body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, dl, dd, ol, ul, figure
+{
+	margin: 0;
+	padding: 0;
+}
+
+*
+{
+		box-sizing: border-box;
+		font-family: Raleway,"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+/* Always allocate 100% of the page to allow for pushing the footer to the bottom, etc */
+html, body
+{
+		height: 100%;
+}
+
+h1
+{
+	margin: 1em 0px 0px 0px;
+	font-family: "Quicksand","Helvetica Neue",Arial,sans-serif;
+	font-weight: bold;
+}
+

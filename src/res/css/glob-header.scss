@@ -1,0 +1,59 @@
+/* Global site-header links */
+.nav-header
+{
+	margin-left: 10%;
+	margin-right: 10%;
+	border-bottom: 1px solid #D8D8D8;
+}
+
+.nav-ul > li
+{
+		/* stack each navigation link horizontally, not vertically */
+		display: table-cell;
+		width: 1%;
+		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+		font-size: 26px;
+		padding-bottom: 1px;
+}
+.nav-ul > li > a
+{
+		padding-bottom: 2px;
+		text-decoration: none;
+		color: #337AB7;
+		font-family: Quicksand,"Helvetica Neue",Helvetica,Arial,sans-serif;
+		font-weight: bold;
+		border-bottom: rgba(216,216,216,0) 2px solid;
+		transition: all 0.15s ease 0s;
+}
+.nav-ul > li > a:hover
+{
+		color: #51687B;
+		border-bottom: #cccccc 2px solid;
+}
+
+.nav-li-blog
+{
+		text-align: left;
+}
+.nav-li-blog > a
+{
+		padding-left: 6.67%;
+		padding-right: 20%;
+}
+.nav-li-about > a
+{
+		padding-left: 20%;
+		padding-right: 6.67%;
+}
+
+.nav-li-about
+{
+		text-align: right;
+}
+
+.nav-ul > li.active > a
+{
+		/* The nav link of the page we're on gets a special underline highlight */
+		border-bottom: 2px solid #307AB0;
+}
+

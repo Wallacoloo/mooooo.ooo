@@ -1,0 +1,64 @@
+.page-content
+{
+		padding: 30px 10%;
+		/* push the footer to the bottom */
+		min-height: calc(100% - 240px);
+}
+.page-content > p
+{
+		text-align: justify;
+}
+
+.no-top-spacing
+{
+		margin-top: 0px;
+}
+
+/* A vertically-spaced list wherein each item is intended to fit on one line */
+.list-single-lines > li:before
+{
+		/* Bullet-point before each list item */
+		content: "◉";
+		text-align: right;
+		font-size: 0.8em;
+		/* Item indentation */
+		width: 10%;
+		min-width: 20px;
+		max-width: 60px;
+		display: inline-block;
+}
+
+.list-single-lines
+{
+		margin: 0.5em 0px;
+		list-style: inside none none;
+}
+
+/* Headers (i.e. h1, h2, ...) that also serve as anchors so user can navigate
+ * to `mypage.html#my-anchor`.
+ * This ability is indicated by changing the color of the link & showing a
+ * symbol upon hover */
+.anchored-header
+{
+		color: #101010;
+		/* Remove default `a` underline style */
+		text-decoration: none;
+}
+.anchored-header:hover
+{
+		color: #383838;
+}
+
+.anchored-header > h1 > .fa-paragraph
+{
+		color: #101010;
+		visibility: hidden;
+		/* Make it so the P icon will be displayed to the left of the boundary
+		 * that the header would normally occupy. This prevents the header from
+		 * being shifted right even when the P icon is invisible */
+		margin-left: -38px;
+}
+.anchored-header > h1:hover > .fa-paragraph
+{
+		visibility: visible;
+}

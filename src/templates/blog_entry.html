@@ -9,7 +9,13 @@
 	{% block title %}{{ blog_title }}{% endblock %}
 
 	{% block page_content %}
-	{{ blog_entry.authors[0].name }}
+	{{ heading(blog_title, linkable=False, class="no-top-spacing") }}
+
+	<a>By {{ blog_entry.authors[0].name }}</a>
+
+	<a>{{ blog_entry.pub_date|friendly_date }}
+	(last revised {{ blog_entry.last_edit_date|friendly_date }})
+	</a>
 	{# Provide a block for the blog entry to render its main content into #}
 		{% block entry_content %}{% endblock %}
 	{% endblock %}

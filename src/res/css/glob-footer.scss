@@ -1,0 +1,69 @@
+/* Site-wide footer styling */
+.glob-footer
+{
+		border-top: 1px solid #D8D8D8;
+		padding: 12px 10% 8px 11%;
+}
+.footer-social
+{
+		width: 25%;
+		min-width: 40px;
+		float: left;
+		list-style: outside none none;
+		padding-bottom: 8px;
+}
+
+.footer-social > a.fa
+{
+		color: #307AB0;
+		text-decoration: none;
+		text-align: center;
+		vertical-align: middle;
+		width: 32px;
+		height: 32px;
+		line-height: 28px;
+		margin: 2px;
+		/* Upon hover of the social media icons, we have color transitions.
+		 * These should be smoothed. */
+		transition: all 0.2s ease 0s;
+}
+
+.footer-social > .email:hover
+{
+		color: #DDA036;
+}
+.footer-social > .github:hover
+{
+		color: #101010;
+}
+.footer-social > .twitter:hover
+{
+		color: #4099ff;
+}
+
+.footer-social > a
+{
+		border-radius: 100%;
+		border: 2px #B0B0B0 solid;
+		font-size: 22px;
+}
+.footer-social > a:hover
+{
+		border: 2px #909090 solid;
+}
+
+/* The email icon needs a smaller font size to look natural when enclosed in a
+ * circle */
+.footer-social > a.email
+{
+		font-size: 18px;
+}
+
+.footer-legal
+{
+		width: 75%;
+		float: right;
+		padding-bottom: 8px;
+		font-size: 0.85em;
+}
+

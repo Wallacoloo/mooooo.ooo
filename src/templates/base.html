@@ -2,12 +2,12 @@
 
 {% macro heading(text, class="", linkable=True, sublevel=0) %}
 {# sublevel=0 for an ordinary header, 1 for a sub-heading, 2 for a sub-sub-heading, etc #}
-<a class="anchored-header" {% if linkable %}href="#{{ text|into_tag }}"{% endif %}>
-		<h{{ sublevel+1 }} id="{{ text|into_tag }}" class="{{ class }}">
-				<span class="fa fa-paragraph" title="Permalink to this headline"></span>
+{% if linkable %}<a class="anchored-header" href="#{{ text|into_tag }}">{% endif %}
+		<h{{ sublevel+1 }} id="{{ text|into_tag }}"{% if class %} class="{{ class }}"{% endif %}>
+		{% if linkable%}<span class="fa fa-paragraph" title="Permalink to this headline"></span>{% endif %}
 				{{ text }}
 		</h{{ sublevel+1 }}>
-</a>
+{% if linkable %}</a>{% endif %}
 {% endmacro %}
 
 <!DOCTYPE html>
@@ -16,7 +16,7 @@
 			<meta charset="utf-8">
 			<meta name="viewport" content="width=device-width initial-scale=1" />
 			<meta name="description" content="Weblog/homepage for an artist/developer/engineer. DIY build logs, opinions and artwork" />
-			<link rel="stylesheet" href="{{ "res/global.css"|to_rel_path }}">
+			<link rel="stylesheet" href="{{ pages["global_css"].path|to_rel_path }}">
 			<link rel="stylesheet" href="{{ "res/font-awesome/css/font-awesome.min.css"|to_rel_path }}">
 			<title>{% block title %}MOOOOO.ooo - DIY Builds, Opinions & Artwork{% endblock %}</title>
 			{{ page_path }}

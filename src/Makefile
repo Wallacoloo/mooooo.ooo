@@ -10,11 +10,11 @@ IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 
 # Which types of files to copy out of the resource directory
 # (don't want to accidentally copy editor backups, etc)
-RES_TYPES=*.css *.eot *.otf *.svg *.ttf *.woff *.woff2
+RES_TYPES=*.eot *.otf *.svg *.ttf *.woff *.woff2
 RESOURCES=$(shell find res -name . $(addprefix -o -name ,$(RES_TYPES))) 
 
 # All targets that should be publically visible when published
-PUB_TARGETS:=$(RESOURCES) index.html
+PUB_TARGETS:=$(RESOURCES) $(RES_DIR)/css/global.css index.html
 PUB_TARGETS:=$(PUB_TARGETS) $(shell find pages/*/index.html)
 PUB_TARGETS:=$(PUB_TARGETS) $(shell find blog_entries/*/index.html)
 PUB_TARGETS:=$(addprefix $(BUILD_DIR)/,$(PUB_TARGETS))
@@ -61,6 +61,9 @@ $(BUILD_DIR)/pages/%/index.html: pages/%/index.html templates/base.html $(BUILD_
 $(BUILD_DIR)/blog_entries/%/index.html: blog_entries/%/index.html templates/blog_entry.html $(BUILD_ROOT)/config.json ./build_page.py
 	mkdir -p $(dir $@)
 	./build_page.py $< $(BUILD_ROOT)/config.json $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
+$(BUILD_DIR)/$(RES_DIR)/%.css: $(RES_DIR)/%.scss
+	mkdir -p $(dir $@)
+	scss $< $@
 
 .PHONY: clean publish-ipfs publish-ipns publish-cf publish
 
