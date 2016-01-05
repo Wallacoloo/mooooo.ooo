@@ -8,13 +8,17 @@ body, h1, h2, h3, h4, h5, h6, p, blockquote, pre, dl, dd, ol, ul, figure
 *
 {
 		box-sizing: border-box;
-		font-family: Raleway,"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 /* Always allocate 100% of the page to allow for pushing the footer to the bottom, etc */
 html, body
 {
 		height: 100%;
+}
+
+body
+{
+		font-family: Raleway,"Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 h1
