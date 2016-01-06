@@ -6,6 +6,7 @@ import json, os, subprocess, sys
 
 import dateutil.parser
 from jinja2 import Environment, PackageLoader
+import PIL.Image;
 
 
 # Directory in which blog entries are stored
@@ -142,6 +143,11 @@ class Author(object):
 class Image(Page):
     def __init__(self, path):
         super().__init__(path)
+    @property
+    def size(self):
+        """Returns the size of the image in pixels (width, height)"""
+        im = PIL.Image.open(self._path_on_disk)
+        return im.size
 
 class BlogEntry(Page):
     pass 

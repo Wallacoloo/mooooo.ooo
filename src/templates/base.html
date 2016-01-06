@@ -15,7 +15,7 @@
    This also configures the link to a full-screen version #}
 
 <a href="{{ image.path|to_rel_path }}">
-<img src="{{ image.path|to_rel_path }}" class="theater-image"/>
+		<img src="{{ image.path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px" class="theater-image"/>
 </a>
 {% endmacro %}
 
