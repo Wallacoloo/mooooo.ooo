@@ -2,7 +2,6 @@
 
 {% if not query_type %}
 {% extends 'base.html' %}
-{% set is_page_blog = True %}
 
 {% block page_content %}
 {% for entry in pages.blog_entries.values() %}
