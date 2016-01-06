@@ -71,19 +71,26 @@ def get_edit_dates_of_file(filename):
     return edit_dates
 
 class Page(object):
-    def __init__(self, path=None, title=None):
-        self._path = path
+    def __init__(self, path_on_disk=None, title=None):
+        self._path_on_disk = path_on_disk
         self._title = title
+        if path_on_disk and path_on_disk.startswith("pages/"):
+            self._path = path_on_disk[len("pages/"):]
+        else:
+            self._path = path_on_disk
     @property
     def path(self):
+        """Path relative to the build directory (i.e. the URL of the resource, minus the domain name"""
         assert self._path is not None
         return self._path
-    def set_path(self, path):
-        # Only makes sense to set the path once
-        assert self._path == None
-        self._path = path
+    #def set_path(self, path):
+    #    # Only makes sense to set the path once
+    #    assert self._in_path == None
+    #    self._in_path = path
+    #    return ""
     def set_type(self, type):
         self.__metaclass__ = type
+        return ""
 
     @property
     def title(self):
@@ -93,13 +100,12 @@ class Page(object):
         # Only makes sense to set the title once
         assert self._title == None
         self._title = title
+        return ""
 
     @property
     def authors(self):
         #authors = get_authors_of_file(self._template_path_on_disk)
-        authors = get_authors_of_file(self.path)
-        print(self.path)
-        print(authors)
+        authors = get_authors_of_file(self._path_on_disk)
         # For now, we only have one author
         assert len(authors) == 1 and all(a.name == "Colin Wallace" for a in authors)
         return authors
@@ -107,13 +113,23 @@ class Page(object):
     @property
     def pub_date(self):
         #return get_edit_dates_of_file(self._template_path_on_disk)[0]
-        return get_edit_dates_of_file(self.path)[0]
+        return get_edit_dates_of_file(self._path_on_disk)[0]
 
     @property
     def last_edit_date(self):
         #return get_edit_dates_of_file(self._template_path_on_disk)[-1]
-        return get_edit_dates_of_file(self.path)[-1]
+        return get_edit_dates_of_file(self._path_on_disk)[-1]
 
+    @property
+    def images(self):
+        """Retrives the images in the same directory as this page"""
+        basedir = os.path.split(self._path_on_disk)[0]
+
+        images = {}
+        for page in os.listdir(basedir):
+            if os.path.splitext(page)[1] in (".jpg", ".png", ".svg"):
+                images[page] = Image(os.path.join(basedir, page))
+        return images
 
 class Author(object):
     def __init__(self, name):
@@ -128,7 +144,7 @@ class Image(Page):
         super().__init__(path)
 
 class BlogEntry(Page):
-    pass
+    pass 
 
 #def get_blog_objects(env):
 #    #blogs = [BlogEntry(out_path=os.path.join(BLOG_ENTRY_DIR, path, "index.html"), template_path_on_disk=\
@@ -163,15 +179,14 @@ def render_page(config, in_path, out_path):
     #blog_entries = get_blog_objects(env)
     #env.globals["blog_entries"] = blog_entries
     env.globals["pages"] = {
-        "index": Page(path="index.html"),
-        "about": Page(path="about/index.html"),
-        "global_css": Page(path="res/css/global.css"),
+        "index": Page(path_on_disk="pages/index.html"),
+        "about": Page(path_on_disk="pages/about/index.html"),
+        "global_css": Page(path_on_disk="res/css/global.css"),
     }
     env.filters["into_tag"] = filter_into_tag
     env.filters["friendly_date"] = filter_friendly_date
     env.filters["to_rel_path"] = to_rel_path
-    env.globals["page"] = Page(path=in_path)
-    env.globals["image"] = None
+    env.globals["page"] = Page(path_on_disk=in_path)
     # Expose these types for passing to the `set_page_type` macro
     env.globals["BlogEntry"] = BlogEntry
 

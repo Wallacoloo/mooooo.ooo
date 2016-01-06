@@ -12,7 +12,7 @@ IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 # (don't want to accidentally copy editor backups, etc)
 RES_TYPES=*.eot *.otf *.png *.svg *.ttf *.woff *.woff2
 RESOURCES=$(shell find res -name . $(addprefix -o -name ,$(RES_TYPES)))
-#RESOURCES:=$(RESOURCES) $(shell find blog_entries -name . $(addprefix -o -name ,$(RES_TYPES)))
+RESOURCES:=$(RESOURCES) $(subst pages/,,$(shell find pages -name . $(addprefix -o -name ,$(RES_TYPES))))
 
 # All targets that should be publically visible when published
 PUB_TARGETS:=$(RESOURCES) $(RES_DIR)/css/global.css index.html
@@ -52,7 +52,7 @@ $(BUILD_DIR)/$(RES_DIR)/%: $(RES_DIR)/%
 	cp $< $@
 
 # Copy static images
-$(BUILD_DIR)/%.png: %.png
+$(BUILD_DIR)/%.png: pages/%.png
 	mkdir -p $(dir $@)
 	cp $< $@
 
