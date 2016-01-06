@@ -84,11 +84,6 @@ class Page(object):
         """Path relative to the build directory (i.e. the URL of the resource, minus the domain name"""
         assert self._path is not None
         return self._path
-    #def set_path(self, path):
-    #    # Only makes sense to set the path once
-    #    assert self._in_path == None
-    #    self._in_path = path
-    #    return ""
     def set_type(self, type):
         self.__metaclass__ = type
         return ""
@@ -105,7 +100,6 @@ class Page(object):
 
     @property
     def authors(self):
-        #authors = get_authors_of_file(self._template_path_on_disk)
         authors = get_authors_of_file(self._path_on_disk)
         # For now, we only have one author
         assert len(authors) == 1 and all(a.name == "Colin Wallace" for a in authors)
@@ -113,12 +107,10 @@ class Page(object):
 
     @property
     def pub_date(self):
-        #return get_edit_dates_of_file(self._template_path_on_disk)[0]
         return get_edit_dates_of_file(self._path_on_disk)[0]
 
     @property
     def last_edit_date(self):
-        #return get_edit_dates_of_file(self._template_path_on_disk)[-1]
         return get_edit_dates_of_file(self._path_on_disk)[-1]
 
     @property
@@ -152,13 +144,6 @@ class Image(Page):
 class BlogEntry(Page):
     pass 
 
-#def get_blog_objects(env):
-#    #blogs = [BlogEntry(out_path=os.path.join(BLOG_ENTRY_DIR, path, "index.html"), template_path_on_disk=\
-#    #        os.path.join(BLOG_ENTRY_DIR, path, "index.html"), template=env.from_string( \
-#    #        open(os.path.join(BLOG_ENTRY_DIR, path, "index.html")).read() \
-#    #    )) for path in os.listdir("blog_entries")]
-#    #return blogs
-#    return []
 
 def render_page(config, in_path, out_path):
     page_type = Page
@@ -182,8 +167,6 @@ def render_page(config, in_path, out_path):
 
     # Populate template global variables & filters
     env.globals.update(config)
-    #blog_entries = get_blog_objects(env)
-    #env.globals["blog_entries"] = blog_entries
     env.globals["pages"] = {
         "index": Page(path_on_disk="pages/index.html"),
         "about": Page(path_on_disk="pages/about/index.html"),
@@ -195,10 +178,6 @@ def render_page(config, in_path, out_path):
     env.globals["page"] = Page(path_on_disk=in_path)
     # Expose these types for passing to the `set_page_type` macro
     env.globals["BlogEntry"] = BlogEntry
-
-    #for entry in blog_entries:
-    #    if entry.template_path_on_disk == in_path:
-    #        env.globals["blog_entry"] = entry
 
     template = env.from_string(open(in_path).read())
     r = template.render()
