@@ -12,12 +12,11 @@ IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 # (don't want to accidentally copy editor backups, etc)
 RES_TYPES=*.eot *.otf *.png *.svg *.ttf *.woff *.woff2
 RESOURCES=$(shell find res -name . $(addprefix -o -name ,$(RES_TYPES)))
-RESOURCES:=$(RESOURCES) $(shell find blog_entries -name . $(addprefix -o -name ,$(RES_TYPES)))
+#RESOURCES:=$(RESOURCES) $(shell find blog_entries -name . $(addprefix -o -name ,$(RES_TYPES)))
 
 # All targets that should be publically visible when published
 PUB_TARGETS:=$(RESOURCES) $(RES_DIR)/css/global.css index.html
-PUB_TARGETS:=$(PUB_TARGETS) $(shell find pages/*/index.html)
-PUB_TARGETS:=$(PUB_TARGETS) $(shell find blog_entries/*/index.html)
+PUB_TARGETS:=$(PUB_TARGETS) $(subst pages/,,$(shell find pages/*/index.html))
 PUB_TARGETS:=$(addprefix $(BUILD_DIR)/,$(PUB_TARGETS))
 all: $(PUB_TARGETS)
 
@@ -61,10 +60,7 @@ $(BUILD_DIR)/%.png: %.png
 $(BUILD_DIR)/index.html: pages/index.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
 	mkdir -p $(dir $@)
 	./build_page.py $< $(BUILD_ROOT)/config.json $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
-$(BUILD_DIR)/pages/%/index.html: pages/%/index.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
-	mkdir -p $(dir $@)
-	./build_page.py $< $(BUILD_ROOT)/config.json $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
-$(BUILD_DIR)/blog_entries/%/index.html: blog_entries/%/index.html templates/blog_entry.html $(BUILD_ROOT)/config.json ./build_page.py
+$(BUILD_DIR)/%/index.html: pages/%/index.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
 	mkdir -p $(dir $@)
 	./build_page.py $< $(BUILD_ROOT)/config.json $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
 $(BUILD_DIR)/$(RES_DIR)/%.css: $(RES_DIR)/%.scss

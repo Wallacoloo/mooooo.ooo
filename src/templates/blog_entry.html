@@ -1,26 +1,23 @@
-{% if title_only %}
+{{ page.set_type(BlogEntry) }}
+{{ page.set_title(blog_title) }}
 
-{{ blog_title }}
+{% extends 'base.html' %}
 
-{% else %}
+{% block title %}{{ blog_title }}{% endblock %}
 
-	{% extends 'base.html' %}
+{% block page_content %}
+{{ heading(blog_title, linkable=False, class="no-top-spacing") }}
 
-	{% block title %}{{ blog_title }}{% endblock %}
+<p class="blog-author">
+By {{ page.authors[0].name }}
+</p>
 
-	{% block page_content %}
-	{{ heading(blog_title, linkable=False, class="no-top-spacing") }}
+<p class="blog-pubdate">
+{{ page.pub_date|friendly_date }}
+(last revised {{ page.last_edit_date|friendly_date }})
+</p>
 
-	<p class="blog-author">
-	By {{ blog_entry.authors[0].name }}
-	</p>
-
-	<p class="blog-pubdate">
-	{{ blog_entry.pub_date|friendly_date }}
-	(last revised {{ blog_entry.last_edit_date|friendly_date }})
-	</p>
-	{# Provide a block for the blog entry to render its main content into #}
-		{% block entry_content %}{% endblock %}
-	{% endblock %}
-{% endif %}
+{# Provide a block for the blog entry to render its main content into #}
+	{% block entry_content %}{% endblock %}
+{% endblock %}
 

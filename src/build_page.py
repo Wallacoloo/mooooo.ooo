@@ -71,45 +71,49 @@ def get_edit_dates_of_file(filename):
     return edit_dates
 
 class Page(object):
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, path=None, title=None):
+        self._path = path
+        self._title = title
+    @property
+    def path(self):
+        assert self._path is not None
+        return self._path
+    def set_path(self, path):
+        # Only makes sense to set the path once
+        assert self._path == None
+        self._path = path
+    def set_type(self, type):
+        self.__metaclass__ = type
 
-class BlogEntry(Page):
-    def __init__(self, out_path, template_path_on_disk, template):
-        super().__init__(out_path)
-        self._template = template
-        self._template_path_on_disk = template_path_on_disk
     @property
     def title(self):
-        return self._template.render(title_only=True).strip()
+        assert self._title is not None
+        return self._title
+    def set_title(self, title):
+        # Only makes sense to set the title once
+        assert self._title == None
+        self._title = title
 
     @property
     def authors(self):
-        authors = get_authors_of_file(self._template_path_on_disk)
+        #authors = get_authors_of_file(self._template_path_on_disk)
+        authors = get_authors_of_file(self.path)
+        print(self.path)
+        print(authors)
         # For now, we only have one author
         assert len(authors) == 1 and all(a.name == "Colin Wallace" for a in authors)
         return authors
 
     @property
-    def template_path_on_disk(self):
-        return self._template_path_on_disk
-
-    @property
     def pub_date(self):
-        return get_edit_dates_of_file(self._template_path_on_disk)[0]
+        #return get_edit_dates_of_file(self._template_path_on_disk)[0]
+        return get_edit_dates_of_file(self.path)[0]
 
     @property
     def last_edit_date(self):
-        return get_edit_dates_of_file(self._template_path_on_disk)[-1]
+        #return get_edit_dates_of_file(self._template_path_on_disk)[-1]
+        return get_edit_dates_of_file(self.path)[-1]
 
-    @property
-    def images(self):
-        basedir = os.path.split(self._template_path_on_disk)[0]
-        images = {}
-        for item in os.listdir(basedir):
-            if item.split(".")[-1] in ("png", "jpg", "jpeg", "svg"):
-                images[item] = Image(os.path.join(basedir, item))
-        return images
 
 class Author(object):
     def __init__(self, name):
@@ -123,42 +127,61 @@ class Image(Page):
     def __init__(self, path):
         super().__init__(path)
 
-def get_blog_objects(env):
-    blogs = [BlogEntry(out_path=os.path.join(BLOG_ENTRY_DIR, path, "index.html"), template_path_on_disk=\
-            os.path.join(BLOG_ENTRY_DIR, path, "index.html"), template=env.from_string( \
-            open(os.path.join(BLOG_ENTRY_DIR, path, "index.html")).read() \
-        )) for path in os.listdir("blog_entries")]
-    return blogs
+class BlogEntry(Page):
+    pass
+
+#def get_blog_objects(env):
+#    #blogs = [BlogEntry(out_path=os.path.join(BLOG_ENTRY_DIR, path, "index.html"), template_path_on_disk=\
+#    #        os.path.join(BLOG_ENTRY_DIR, path, "index.html"), template=env.from_string( \
+#    #        open(os.path.join(BLOG_ENTRY_DIR, path, "index.html")).read() \
+#    #    )) for path in os.listdir("blog_entries")]
+#    #return blogs
+#    return []
 
 def render_page(config, in_path, out_path):
+    page_type = Page
+    page_args = {}
     def to_rel_path(abs_path):
         prefix = "../"*out_path.count("/")
         rel = os.path.join(prefix, abs_path)
         if rel.endswith("index.html") and config["omit_index_from_url"]:
             rel = rel[:-len("index.html")]
         return rel
+    def set_page_type(type):
+        nonlocal page_type
+        page_type = type
+        return ""
+    def set_page_title(title):
+        nonlocal page_args
+        #page_args["title"] = title
+        return ""
 
     env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True)
 
     # Populate template global variables & filters
     env.globals.update(config)
-    blog_entries = get_blog_objects(env)
-    env.globals["blog_entries"] = blog_entries
+    #blog_entries = get_blog_objects(env)
+    #env.globals["blog_entries"] = blog_entries
     env.globals["pages"] = {
-        "index": Page("index.html"),
-        "about": Page("pages/about/index.html"),
-        "global_css": Page("res/css/global.css"),
+        "index": Page(path="index.html"),
+        "about": Page(path="about/index.html"),
+        "global_css": Page(path="res/css/global.css"),
     }
     env.filters["into_tag"] = filter_into_tag
     env.filters["friendly_date"] = filter_friendly_date
     env.filters["to_rel_path"] = to_rel_path
+    env.globals["page"] = Page(path=in_path)
+    env.globals["image"] = None
+    # Expose these types for passing to the `set_page_type` macro
+    env.globals["BlogEntry"] = BlogEntry
 
-    for entry in blog_entries:
-        if entry.template_path_on_disk == in_path:
-            env.globals["blog_entry"] = entry
+    #for entry in blog_entries:
+    #    if entry.template_path_on_disk == in_path:
+    #        env.globals["blog_entry"] = entry
 
     template = env.from_string(open(in_path).read())
-    return template.render()
+    r = template.render()
+    return r
 
 
 if __name__ == "__main__":
@@ -170,6 +193,6 @@ if __name__ == "__main__":
 
     config = json.loads(open(config_path, "r").read())
 
-    data = render_page(config, in_path, out_path)
+    page = render_page(config, in_path, out_path)
     f = open(os.path.join(build_dir, out_path), "w")
-    f.write(data)
+    f.write(page)
