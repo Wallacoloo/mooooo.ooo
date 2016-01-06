@@ -1,3 +1,6 @@
+{{ page.set_type(AboutPage) }}
+
+{% if not query_type %}
 {% from 'base.html' import heading %}
 
 {% extends 'base.html' %}
@@ -75,3 +78,5 @@ The exceptions to this include:
 </ul>
 
 {% endblock %}
+{% endif %}
+
