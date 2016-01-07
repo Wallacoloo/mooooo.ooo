@@ -14,19 +14,26 @@ Follow the prompts, and you'll be deposited at the AWS landing page
 (which you can always reach by clicking the AWS box icon in the top left).
 {{ show_image(page.images["1-amazon-aws-homepage.png"]) }}
 
-First thing to do is set up permissions / access keys. Click on the "Identity & Access Management" (A.K.A "IAM") link, under the "Security & Identity" header. This takes you here: <2.png>
+First thing to do is set up permissions / access keys. Click on the "Identity & Access Management" (A.K.A "IAM") link, under the "Security & Identity" header. This takes you here:
+{{ show_image(page.images["2-amazon-IAM-homepage.png"]) }}
 
-From here, click 'Users' <3.png>.
+From here, click 'Users':
+{{ show_image(page.images["3-amazon-IAM-users-page.png"]) }}.
 
-Then click "Create New Users", enter the name for your user: <4.png> and click "create".
+Then click "Create New Users", enter the name for your user and click "create".
+{{ show_image(page.images["4-amazon-IAM-new-users.png"]) }}
 
-Expand the "Show User Security Credentials" dropdown and note the Access Key ID - this will be needed later. <5.png>
+Expand the "Show User Security Credentials" dropdown and note the Access Key ID - this will be needed later.
+{{ show_image(page.images["5-amazon-IAM-user-created.png"]) }}
 
-Now return to the IAM homepage and again click on 'Users'. You should see your new user: <6.png>
+Now return to the IAM homepage and again click on 'Users'. You should see your new user:
+{{ show_image(page.images["6-amazon-IAM-users-page-2.png"]) }}
 
-Click on the row that contains your user, and then click the "Permissions" tab: <7.png>
+Click on the row that contains your user, and then click the "Permissions" tab:
+{{ show_image(page.images["7-amazon-IAM-users-colin.png"]) }}
 
-Next, click "Attach Policy" and in the filter, type "S3" and select the "AmazonS3FullAccess" policy: <8.png>
+Next, click "Attach Policy" and in the filter, type "S3" and select the "AmazonS3FullAccess" policy:
+{{ show_image(page.images["8-amazon-IAM-attach-policy.png"]) }}
 
 Finally, click "Attach Policy". Now you have a user with read/write access to S3 services.
 
