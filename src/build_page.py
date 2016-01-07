@@ -113,7 +113,8 @@ class Page(object):
             self.set_type(Css)
         else:
             assert get_ext(self._path) == ".html"
-            self.set_type(UnknownHtml)
+            # By rendering the page, we can determine our type
+            self.render(query_type=True)
 
     @property
     def path(self):
@@ -124,14 +125,6 @@ class Page(object):
         self.__class__ = type
         return ""
 
-    def resolve_type(self):
-        """Used by derivative classes (e.g. UnknownHtml) to determine in more
-        detail what type of resource this is.
-        This can be an expensive operation, and could potentially cause infinite
-        recursion if it was done upon instantiation, hence why it's done on-demand
-        """
-        assert self.__class__ != Page
-        return self.__class__
 
     @property
     def title(self):
@@ -139,7 +132,7 @@ class Page(object):
         return self._title
     def set_title(self, title):
         # Only makes sense to set the title once
-        assert self._title == None
+        assert self._title == None or title == self._title
         self._title = title
         return ""
 
@@ -223,16 +216,6 @@ class Css(Page):
 class BlogEntry(Page):
     pass 
 
-class UnknownHtml(Page):
-    """
-    Type for a Page where we know it's some html resource,
-    but haven't identified yet if it's a BlogEntry or something else.
-    """
-    def resolve_type(self):
-        """Try rendering the template to determine its type"""
-        self.render(query_type=True)
-        return self.__class__
-
 
 class HomePage(Page):
     pass
@@ -242,10 +225,19 @@ class AboutPage(Page):
 
 class Pages(object):
     def __init__(self, basedir, extensions):
-        self.all = {}
-        for fname in recursive_listdir(basedir):
-            if get_ext(fname) in extensions:
-                self.all[fname] = Page(path_on_disk=os.path.join(basedir, fname))
+        self._basedir = basedir
+        self._extensions = extensions
+        self._all = None
+
+    @property
+    def all(self):
+        if self._all is None:
+            self._all = {}
+            for fname in recursive_listdir(self._basedir):
+                if get_ext(fname) in self._extensions:
+                    self._all[fname] = Page(path_on_disk=os.path.join(self._basedir, fname))
+        return self._all
+
     def __getitem__(self, key):
         """Returns a page by its path.
         Note: index.html is implicit (if the path doesn't exist)
@@ -268,8 +260,7 @@ class Pages(object):
         """Return all pages which are blog entries"""
         entries = {}
         for key, item in self.all.items():
-            t = item.resolve_type()
-            if t == BlogEntry:
+            if isinstance(item, BlogEntry):
                 entries[key] = item
         return entries
 

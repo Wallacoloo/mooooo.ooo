@@ -25,6 +25,7 @@
 <a href="{{ path }}">{{ label }}</a>
 {% endmacro %}
 
+{% if not query_type %}
 <!DOCTYPE html>
 <html>
 		<head>
@@ -65,3 +66,5 @@
 			</footer>
 		</body>
 </html>
+{% endif %}
+
