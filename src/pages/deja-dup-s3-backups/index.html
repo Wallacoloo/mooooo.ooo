@@ -39,40 +39,54 @@ Finally, click "Attach Policy". Now you have a user with read/write access to S3
 
 
 {{ heading("Configuring an S3 Bucket") }}
-Now return to the Console Home (or click on the "Services" dropdown at the top of the page) and click on "S3": <9.png>
+Now return to the Console Home (or click on the "Services" dropdown at the top of the page) and click on "S3":
+{{ show_image(page.images["9-amazon-AWS-S3-link.png"]) }}
 
-Next, click on "Create Bucket", fill in the form with your bucket name <10.png> and click "Create".
+Next, click on "Create Bucket", fill in the form with your bucket name and click "Create".
+{{ show_image(page.images["10-amazon-S3-create-a-bucket.png"]) }}
 
 {{ heading("Optional: Switching to Lower-Cost Infrequent Access Storage", sublevel=1) }}
 Since you won't be needing a speedy CDN for your backup, you can change some settings to decrease your AWS bill.
 
-Click on "Properties" to see something like the following: <11.png>
+Click on "Properties" to see something like the following:
+{{ show_image(page.images["11-amazon-S3-bucket-properties-2.png"]) }}
 
-Expand the "Lifecycle" section, and then click "Add rule": <12.png>
+Expand the "Lifecycle" section, and then click "Add rule":
+{{ show_image(page.images["12-amazon-S3-lifecycle-rule1-2.png"]) }}
 
 Stick with the defaults for step 1 (i.e. apply to the whole bucket) and click "Configure Rule".
 
-Check the "Transition to the Standard - Infrequent Access Storage Class" box and stick with the 30 days default (which is the minimum). You could instead check the "Archive to the Glacier Storage Class" option, which offers even cheaper storage but at the additional cost of 3-5 hours of latency and a significantly higher read cost. <13.png>
+Check the "Transition to the Standard - Infrequent Access Storage Class" box and stick with the 30 days default (which is the minimum). You could instead check the "Archive to the Glacier Storage Class" option, which offers even cheaper storage but at the additional cost of 3-5 hours of latency and a significantly higher read cost.
+{{ show_image(page.images["13-amazon-S3-lifecycle-rule2.png"]) }}
 
-After completing the above, click "Review", give the rule some name <14.png> and then click "Create and Activate Rule". Don't forget to click "Save"! <15.png>
+After completing the above, click "Review", give the rule some name and then click "Create and Activate Rule".
+{{ show_image(page.images["14-amazon-S3-lifecycle-rule3.png"]) }}
+
+Don't forget to click "Save"!
+{{ show_image(page.images["15-amazon-S3-lifecycle-save.png"]) }}
 
 {{ heading("Configuring Deja-Dup") }}
 You'll first have to install Deja Dup. This is included in most linux distributions. However, you'll also need to install the `python2-boto` package for Amazon S3 support. Example (Arch Linux): `# pacman -S deja-dup python2-boto`.
 
 Note that if you're using a Gnome environment, the application will probably be labeled "Backups" instead of "Deja-Dup".
 
-Launch the application: <16.png>
+Launch the application:
+{{ show_image(page.images["16-deja-dup-overview.png"]) }}
 
 Go ahead and configure the folders you want to save and ignore (note: dot-prefixed folders are *not* ignored by default. You might want to think about ignoring redundant folders like `~/.cache` to save space and bandwidth).
 
-Next, click the "Storage Location" section and configure it for Amazon S3. Use the S3 Access Key you noted previously. <17.png>
+Next, click the "Storage Location" section and configure it for Amazon S3. Use the S3 Access Key you noted previously.
+{{ show_image(page.images["17-deja-dup-storage-location.png"]) }}
 
-Return to the overview and click "Back Up Now..." to initiate the backup process. Here you'll have to enter the Secret Access Key as well <18.png>.
+Return to the overview and click "Back Up Now..." to initiate the backup process. Here you'll have to enter the Secret Access Key as well.
+{{ show_image(page.images["18-deja-dup-first-run-1.png"]) }}
 
 
-If the permissions were correctly configured, you should be prompted to choose an optional passphrase with which to encrypt your backup. My understanding is that the data is encrypted before it reaches AWS and the passphrase is never shared with Amazon, which means only you posess the key to decrypt your backup (so don't lose your key!) <19.png>
+ the permissions were correctly configured, you should be prompted to choose an optional passphrase with which to encrypt your backup. My understanding is that the data is encrypted before it reaches AWS and the passphrase is never shared with Amazon, which means only you posess the key to decrypt your backup (so don't lose your key!)
+{{ show_image(page.images["19-deja-dup-first-run-2.png"]) }}
 
-Once the backup is complete, Deja Dup doesn't explicitly say so - the progress bar will be full, but it will still say "uploading". However, you can tell that it truly is finished by looking at the bucket in Amazon S3 and seeing that the very last difftar isn't 25 mb like all the rest: <20.png>
+Once the backup is complete, Deja Dup doesn't explicitly say so - the progress bar will be full, but it will still say "uploading". However, you can tell that it truly is finished by looking at the bucket in Amazon S3 and seeing that the very last difftar isn't 25 mb like all the rest:
+{{ show_image(page.images["20-backup-complete.png"]) }}
 
 
 Well that's it. The first backup may take a long time, but further backups are done incrementally. If you explore the Deja Dup tool, you'll see settings for automating further backups, etc. Hope this tutorial helped!
