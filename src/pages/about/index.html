@@ -1,11 +1,9 @@
 {{ page.set_type(AboutPage) }}
+{{ page.set_title("About MOOOOOooo") }}
 
-{% if not query_type %}
 {% from 'base.html' import heading %}
 
 {% extends 'base.html' %}
-
-{% block title %}About MOOOOOooo{% endblock %}
 
 {% block page_content %}
 {{ heading("About this Website", class="no-top-spacing") }}
@@ -77,5 +75,4 @@ The exceptions to this include:
 </ul>
 
 {% endblock %}
-{% endif %}
 

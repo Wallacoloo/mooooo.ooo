@@ -1,12 +1,13 @@
 {{ page.set_type(HomePage) }}
+{{ page.set_title("MOOOOO.ooo - DIY Builds, Opinions & Artwork") }}
 
-{% if not query_type %}
 {% extends 'base.html' %}
 
 {% block page_content %}
+
 {% for entry in pages.blog_entries.values() %}
 <a href="{{ entry.path|to_rel_path }}">{{ entry.title }}</a>
 {% endfor %}
+
 {% endblock %}
-{% endif %}
 

@@ -1,13 +1,9 @@
 {{ page.set_type(BlogEntry) }}
-{{ page.set_title(blog_title) }}
 
-{% if not query_type %}
 {% extends 'base.html' %}
 
-{% block title %}{{ blog_title }}{% endblock %}
-
 {% block page_content %}
-{{ heading(blog_title, linkable=False, class="no-top-spacing") }}
+{{ heading(page.title, linkable=False, class="no-top-spacing") }}
 
 <p class="blog-author">
 By {{ page.authors[0].name }}
@@ -21,5 +17,4 @@ By {{ page.authors[0].name }}
 {# Provide a block for the blog entry to render its main content into #}
 	{% block entry_content %}{% endblock %}
 {% endblock %}
-{% endif %}
 

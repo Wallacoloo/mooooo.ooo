@@ -34,8 +34,7 @@
 			<meta name="description" content="Weblog/homepage for an artist/developer/engineer. DIY build logs, opinions and artwork" />
 			<link rel="stylesheet" href="{{ resources["css/global.css"].path|to_rel_path }}">
 			<link rel="stylesheet" href="{{ "res/font-awesome/css/font-awesome.min.css"|to_rel_path }}">
-			<title>{% block title %}MOOOOO.ooo - DIY Builds, Opinions & Artwork{% endblock %}</title>
-			{{ page_path }}
+			<title>{% block title %}{{ page.title }}{% endblock %}</title>
 		</head>
 		<body>
 			<header class="nav-header">
