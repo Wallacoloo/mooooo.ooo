@@ -40,18 +40,21 @@
  * symbol upon hover */
 .anchored-header
 {
-		color: #101010;
+		/* Remove the (blue) link coloring */
+		color: inherit;
 		/* Remove default `a` underline style */
-		text-decoration: none;
+		text-decoration: inherit;
 }
 .anchored-header:hover
 {
-		color: #383838;
+		/* Reduce the contrast to indicate it's a link */
+		opacity: 0.8;
 }
 
 .anchored-header > h1 > .fa-paragraph
 {
-		color: #101010;
+		/*color: #101010;*/
+		opacity: 0.85;
 		visibility: hidden;
 		/* Make it so the P icon will be displayed to the left of the boundary
 		 * that the header would normally occupy. This prevents the header from
