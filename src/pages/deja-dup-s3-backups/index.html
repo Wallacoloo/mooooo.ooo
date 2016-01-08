@@ -18,7 +18,7 @@ First thing to do is set up permissions / access keys. Click on the "Identity & 
 {{ show_image(page.images["2-amazon-IAM-homepage.png"]) }}
 
 From here, click 'Users':
-{{ show_image(page.images["3-amazon-IAM-users-page.png"]) }}.
+{{ show_image(page.images["3-amazon-IAM-users-page.png"]) }}
 
 Then click "Create New Users", enter the name for your user and click "create".
 {{ show_image(page.images["4-amazon-IAM-new-users.png"]) }}
@@ -82,7 +82,7 @@ Return to the overview and click "Back Up Now..." to initiate the backup process
 {{ show_image(page.images["18-deja-dup-first-run-1.png"]) }}
 
 
- the permissions were correctly configured, you should be prompted to choose an optional passphrase with which to encrypt your backup. My understanding is that the data is encrypted before it reaches AWS and the passphrase is never shared with Amazon, which means only you posess the key to decrypt your backup (so don't lose your key!)
+If the permissions were correctly configured, you should be prompted to choose an optional passphrase with which to encrypt your backup. My understanding is that the data is encrypted before it reaches AWS and the passphrase is never shared with Amazon, which means only you posess the key to decrypt your backup (so don't lose your key!)
 {{ show_image(page.images["19-deja-dup-first-run-2.png"]) }}
 
 Once the backup is complete, Deja Dup doesn't explicitly say so - the progress bar will be full, but it will still say "uploading". However, you can tell that it truly is finished by looking at the bucket in Amazon S3 and seeing that the very last difftar isn't 25 mb like all the rest:
