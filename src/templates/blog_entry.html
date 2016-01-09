@@ -10,8 +10,8 @@ By {{ page.authors[0].name }}
 </p>
 
 <p class="blog-pubdate">
-{{ page.pub_date|friendly_date }}
-(last revised {{ page.last_edit_date|friendly_date }})
+{{ show_date(page.pub_date) }}
+(last revised {{ show_date(page.last_edit_date) }})
 </p>
 
 {# Provide a block for the blog entry to render its main content into #}

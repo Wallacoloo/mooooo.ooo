@@ -58,6 +58,11 @@ def filter_friendly_date(date):
     """Takes a datetime.datetime object, returns a friendly version of the date, e.g. 'Jan 22, 2015'"""
     return date.strftime("%b %d, %Y")
 
+def filter_detailed_date(date):
+    """Takes a datetime.datetime object, returns a detaile version of the date, e.g. 'Jan 22, 2015 at 8:09 PM PST'"""
+    return date.strftime("%b %d, %Y at %I:%M %p PST")
+
+
 def get_git_log(filename):
     proc = subprocess.Popen(["git", "log", "--", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
@@ -182,6 +187,7 @@ class Page(object):
         env.globals["resources"] = Pages("res/", [".css", ".scss"])
         env.filters["into_tag"] = filter_into_tag
         env.filters["friendly_date"] = filter_friendly_date
+        env.filters["detailed_date"] = filter_detailed_date
         env.filters["to_rel_path"] = to_rel_path
         env.globals["page"] = self
         # Expose these types for passing to the `set_page_type` macro

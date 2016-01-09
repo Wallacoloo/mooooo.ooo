@@ -25,6 +25,12 @@
 <a href="{{ path }}">{{ label }}</a>
 {% endmacro %}
 
+{% macro show_date(date) %}
+<span title="{{ date|detailed_date }}">
+{{ date|friendly_date }}
+</span>
+{% endmacro %}
+
 {% if not query_type %}
 <!DOCTYPE html>
 <html>
