@@ -51,7 +51,7 @@
 		opacity: 0.8;
 }
 
-.anchored-header > h1 > .fa-paragraph
+.anchored-header > .fa-paragraph
 {
 		/*color: #101010;*/
 		opacity: 0.85;
@@ -61,7 +61,7 @@
 		 * being shifted right even when the P icon is invisible */
 		margin-left: -38px;
 }
-.anchored-header > h1:hover > .fa-paragraph
+.anchored-header:hover > .fa-paragraph
 {
 		visibility: visible;
 }
