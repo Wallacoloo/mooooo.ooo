@@ -3,7 +3,7 @@
 {% extends 'base.html' %}
 
 {% block page_content %}
-{{ heading(page.title, linkable=False, class="no-top-spacing") }}
+{{ heading(page.title, link=False, class="no-top-spacing") }}
 
 <p class="blog-author">
 By {{ page.authors[0].name }}

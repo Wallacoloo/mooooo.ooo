@@ -6,7 +6,10 @@
 {% block page_content %}
 
 {% for entry in pages.blog_entries.values() %}
-<a href="{{ entry.path|to_rel_path }}">{{ entry.title }}</a>
+{{ heading(entry.title, link_to=entry.path|to_rel_path, show_icon=False, sublevel=1) }}
+<p class="blog-pubdate">
+{{ entry.pub_date|friendly_date }}
+</p>
 {% endfor %}
 
 {% endblock %}
