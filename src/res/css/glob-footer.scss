@@ -23,7 +23,7 @@
 		width: 32px;
 		height: 32px;
 		/* Inline-flex makes this properly render as a circle while we wait for the font to load */
-		display: inline-flex;
+		display: inline-table;
 		line-height: 28px;
 		font-size: 22px;
 		margin: 2px;
