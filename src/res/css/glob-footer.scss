@@ -15,17 +15,30 @@
 
 .footer-social > a.fa
 {
+		background-color: #ffffff;
 		color: #307AB0;
 		text-decoration: none;
 		text-align: center;
 		vertical-align: middle;
 		width: 32px;
 		height: 32px;
+		/* Inline-flex makes this properly render as a circle while we wait for the font to load */
+		display: inline-flex;
 		line-height: 28px;
+		font-size: 22px;
 		margin: 2px;
 		/* Upon hover of the social media icons, we have color transitions.
 		 * These should be smoothed. */
 		transition: all 0.2s ease 0s;
+		/* Rounded border */
+		border-radius: 100%;
+		border: 2px #CCCCCC solid;
+		opacity: 0.8;
+}
+.footer-social > a.fa:hover
+{
+		border: 2px #8A8A8A solid;
+		opacity: 1.0;
 }
 
 .footer-social > .email:hover
@@ -41,16 +54,6 @@
 		color: #4099ff;
 }
 
-.footer-social > a
-{
-		border-radius: 100%;
-		border: 2px #B0B0B0 solid;
-		font-size: 22px;
-}
-.footer-social > a:hover
-{
-		border: 2px #909090 solid;
-}
 /* Fix the display of the social media icons for before the fonts have loaded */
 /*.footer-social > a:after
 {
