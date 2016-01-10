@@ -22,8 +22,7 @@
 {% macro offsite_link(path, label) %}
 {# Use whenever linking to an off-site resource.
    This was we can indicate it's off-site (with an icon, etc), etc #}
-<a href="{{ path }}">{{ label }}</a>
-{% endmacro %}
+<a href="{{ path }}">{{ label }}</a>{% endmacro %}
 
 {# Note: the below needs to be all on one line so its use within a P tag won't cause formatting issues #}
 {# see the (last revised XXX) line in blog_entry.html as example #}
