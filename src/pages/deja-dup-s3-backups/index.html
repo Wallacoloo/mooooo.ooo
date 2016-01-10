@@ -8,11 +8,11 @@
 {{ heading("Background") }}
 
 <p>
-After setting myself up with a new computer a few months ago, I decided to finally configure automated backups of the data important to me. Cloud storage services can be incredibly cost-effective for this, require less hassle than Network Attached Storage, often make use of data redundancy and backups to cloud storage are inherently off-site.
+After setting myself up with a new computer a few months ago, I decided to finally configure automated backups of the data important to me. Cloud storage services can be incredibly cost-effective for this, require less hassle than Network Attached Storage, are inherently off-site and often make use of extra data redundancy. So it seems that these services may be well-suited for backups.
 </p>
 
 <p>
-Amazon Web Services (AWS) offers one such storage solution under the name S3. Rates are typically around $0.01 / GB / Month for infrequently-accessed data. Google offers a competing platform with similar pricing, but I chose to use S3 as it's been around longer, so more programs integrate well with it.
+Amazon Web Services (AWS) offers one such storage solution under the name of S3. Rates are typically around $0.01 / GB / Month for infrequently-accessed data. Google offers a competing platform with similar pricing, but I chose to use S3 as it's been around longer so more programs integrate well with it.
 </p>
 
 <p>
@@ -26,7 +26,7 @@ In configuring Deja Dup to backup my home directory to AWS, I was dissappointed 
 {{ heading("Configuring an AWS User") }}
 
 <p>
-First, go {{ offsite_link("https://aws.amazon.com/", "sign up") }} for an amazon AWS account:
+First, {{ offsite_link("https://aws.amazon.com/", "sign up") }} for an amazon AWS account if you don't have one:
 </p>
 {{ show_image(page.images["0-amazon-s3-landing.png"]) }}
 
@@ -37,7 +37,7 @@ Follow the prompts, and you'll be deposited at the AWS landing page
 {{ show_image(page.images["1-amazon-aws-homepage.png"]) }}
 
 <p>
-The first thing to do is to set up permissions / access keys. Click on the "Identity & Access Management" (A.K.A "IAM") link under the "Security & Identity" header. This takes you here:
+The first thing to do is to set up permissions / access keys. Click on the "Identity &amp; Access Management" (A.K.A "IAM") link under the "Security &amp; Identity" header. This takes you here:
 </p>
 {{ show_image(page.images["2-amazon-IAM-homepage.png"]) }}
 
@@ -52,7 +52,7 @@ Then click "Create New Users", enter the name for your user and click "create".
 {{ show_image(page.images["4-amazon-IAM-new-users.png"]) }}
 
 <p>
-Expand the "Show User Security Credentials" dropdown and note both the Access Key ID & the Secret Access Key - these will be needed later.
+Expand the "Show User Security Credentials" dropdown and note both the Access Key ID &amp; the Secret Access Key - these will be needed later.
 </p>
 {{ show_image(page.images["5-amazon-IAM-user-created.png"]) }}
 
