@@ -29,6 +29,14 @@
 {# see the (last revised XXX) line in blog_entry.html as example #}
 {% macro show_date(date) %}<span title="{{ date|detailed_date }}">{{ date|friendly_date }}</span>{% endmacro %}
 
+{% macro inline_code(code) %}
+<code class="inline-code">{{ code }}</code>
+{% endmacro %}
+
+{% macro multiline_code(code) %}
+<code class="multiline-code">{{ code }}</code>
+{% endmacro %}
+
 {% if not query_type %}
 <!DOCTYPE html>
 <html>
