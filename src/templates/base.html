@@ -25,11 +25,9 @@
 <a href="{{ path }}">{{ label }}</a>
 {% endmacro %}
 
-{% macro show_date(date) %}
-<span title="{{ date|detailed_date }}">
-{{ date|friendly_date }}
-</span>
-{% endmacro %}
+{# Note: the below needs to be all on one line so its use within a P tag won't cause formatting issues #}
+{# see the (last revised XXX) line in blog_entry.html as example #}
+{% macro show_date(date) %}<span title="{{ date|detailed_date }}">{{ date|friendly_date }}</span>{% endmacro %}
 
 {% if not query_type %}
 <!DOCTYPE html>
