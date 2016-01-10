@@ -15,6 +15,16 @@ By {{ page.authors[0].name }}
 </div>
 
 {# Provide a block for the blog entry to render its main content into #}
-	{% block entry_content %}{% endblock %}
+{% block entry_content %}{% endblock %}
+
+<div class="blog-footer">
+		{{ show_date(page.pub_date) }}
+<p class="fix-info">
+<i>
+		See something in this article that needs fixing? Please contact the author using one of the methods at the bottom of the page or submit a pull request against this article on {{ offsite_link(page.repo_page, "github") }}.
+</i>
+</p>
+</div>
+
 {% endblock %}
 

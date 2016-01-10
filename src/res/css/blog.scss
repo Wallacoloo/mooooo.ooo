@@ -8,3 +8,14 @@
 {
 		opacity: 0.55;
 }
+
+/* Templated info displayed at the bottom of the blog, e.g. link to source */
+.blog-footer
+{
+		margin-top: 3em;
+}
+.blog-footer > .fix-info
+{
+		margin-top: 1em;
+}
+

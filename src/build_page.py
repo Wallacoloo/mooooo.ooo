@@ -126,6 +126,11 @@ class Page(object):
         """Path relative to the build directory (i.e. the URL of the resource, minus the domain name"""
         assert self._path is not None
         return self._path
+    @property
+    def repo_page(self):
+        """Path where the user can view the source/revision history of a file & submit pull requests."""
+        return "https://github.com/Wallacoloo/mooooo.ooo/tree/master/src/pages/%s" %self.path
+
     def set_type(self, type):
         self.__class__ = type
         return ""
