@@ -10,15 +10,33 @@ By {{ page.authors[0].name }}
 </div>
 
 <div class="blog-pubdate">
-{{ show_date(page.pub_date) }}
-(last revised {{ show_date(page.last_edit_date) }})
+{% if page.is_published %}
+	{# If the revision day would display as the same as the publish day, we simply show the day with the revision time as hovertext. #}
+	{# Otherwise, show both dates #}
+	{% if page.pub_date|friendly_date == page.last_edit_date|friendly_date %}
+		{{ show_date(page.last_edit_date) }}
+	{% else %}
+		{{ show_date(page.pub_date) }}
+		(last revised {{ show_date(page.last_edit_date) }})
+	{% endif %}
+{% else %}
+	<span><i>Draft</i></span>
+{% endif %}
 </div>
 
 {# Provide a block for the blog entry to render its main content into #}
 {% block entry_content %}{% endblock %}
 
 <div class="blog-footer">
-		{{ show_date(page.pub_date) }}
+	{% if page.is_published %}
+		{% if page.pub_date|friendly_date == page.last_edit_date|friendly_date %}
+			{{ show_date(page.last_edit_date) }}
+		{% else %}
+			{{ show_date(page.pub_date) }}
+		{% endif %}
+	{% else %}
+		<i>Draft</i>
+	{% endif %}
 <p class="fix-info">
 <i>
 		See something in this article that needs fixing? Please contact the author using one of the methods at the bottom of the page or submit a pull request against this article on {{ offsite_link(page.repo_page, "github") }}.

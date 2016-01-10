@@ -63,39 +63,49 @@ def filter_detailed_date(date):
     return date.strftime("%b %d, %Y at %I:%M %p PST")
 
 
-def get_git_log(filename):
-    proc = subprocess.Popen(["git", "log", "--", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+def get_unparsed_commits(filename):
+    """Returns an array of commit dicts, where each entry looks like:
+    { 'author': '<name>', 'date': '<date>', 'message': '<message>' }
+    """
+    proc = subprocess.Popen(["git", "log", '--pretty=format:{%n  "author": "%aN",%n  "date": "%cD",%n  "message": "%s"%n},', "--", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
-    assert stderr == b''
-    return str(stdout).replace("\\n", "\n")
+    if stderr:
+        raise RuntimeError("git log error:", stderr)
+
+    # For some stupid reason, the above Popen results in all the content being escaped and contained inside of b'<...>'
+    raw = str(stdout).encode('utf-8').decode('unicode_escape')
+    unquoted = raw[2:-1]
+    return json.loads("[%s []]" %unquoted)[:-1]
+
+def get_commits(filename):
+    """Returns an array of commit dicts, where each entry looks like:
+    { 'author': <Author object>, 'date': <Datetime object>, 'message': '<message>' }
+    """
+    commits = get_unparsed_commits(filename)
+    for c in commits:
+        c["author"] = Author(c["author"])
+        c["date"] = dateutil.parser.parse(c["date"])
+
+    return commits
 
 def get_authors_of_file(filename):
     """Return a set of Author objects that have commits associated with the
     file"""
-    git_log = get_git_log(filename)
+    commits = get_commits(filename)
 
     authors = set()
-    for line in git_log.split("\n"):
-        if line.startswith("Author:"):
-            line = line[len("Author:"):]
-            name, _email_with_right_angle_bracket = line.split("<")
-            name = name.strip()
-            authors.add(Author(name))
+    for commit in commits:
+        authors.add(commit['author'])
     return list(authors)
 
-def get_edit_dates_of_file(filename):
-    """Returns an ordered list of the dates at which a file was modified,
-    according to the git metadata"""
-    git_log = get_git_log(filename)
+def get_pub_date_of_file(filename):
+    """Returns the date at which this file was committed with the message "PUBLISH", indicating it is ready to be made public"""
+    commits = get_commits(filename)
 
-    edit_dates = []
-    for line in git_log.split("\n"):
-        if line.startswith("Date:"):
-            line = line[len("Date:"):]
-            date = dateutil.parser.parse(line.strip())
-            edit_dates.append(date)
-    edit_dates.sort()
-    return edit_dates
+    for c in commits:
+        if c["message"] == "PUBLISH":
+            return c["date"]
+
 
 class Page(object):
     def __init__(self, path_on_disk=None, title=None):
@@ -154,12 +164,23 @@ class Page(object):
         return authors
 
     @property
+    def _pub_date(self):
+        """Returns the date the article was made public, or None if it's still in draft form"""
+        return get_pub_date_of_file(self._path_on_disk)
+
+    @property
     def pub_date(self):
-        return get_edit_dates_of_file(self._path_on_disk)[0]
+        pub_date = self._pub_date
+        assert pub_date is not None
+        return pub_date
+
+    @property
+    def is_published(self):
+        return self._pub_date is not None
 
     @property
     def last_edit_date(self):
-        return get_edit_dates_of_file(self._path_on_disk)[-1]
+        return sorted(get_commits(self._path_on_disk), key=lambda c: c["date"])[-1]["date"]
 
     @property
     def images(self):
