@@ -5,14 +5,14 @@
 {% block page_content %}
 {{ heading(page.title, link=False) }}
 
-<p class="blog-author">
+<div class="blog-author">
 By {{ page.authors[0].name }}
-</p>
+</div>
 
-<p class="blog-pubdate">
+<div class="blog-pubdate">
 {{ show_date(page.pub_date) }}
 (last revised {{ show_date(page.last_edit_date) }})
-</p>
+</div>
 
 {# Provide a block for the blog entry to render its main content into #}
 	{% block entry_content %}{% endblock %}

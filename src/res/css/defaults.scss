@@ -37,3 +37,8 @@ h2
 	margin: 0.75em 0px 0px 0px;
 }
 
+/* Successive paragraphs should have empty lines between them */
+p + p
+{
+		margin-top: 1em;
+}
