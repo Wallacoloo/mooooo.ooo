@@ -10,11 +10,11 @@
 {
     font-family: 'quicksand';
 	src: local("Quicksand Regular"), local("Quicksand-Regular");
-    src: url('fonts/quicksand-regular-webfont.eot');
-    src: url('fonts/quicksand-regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('fonts/quicksand-regular-webfont.woff2') format('woff2'),
-         url('fonts/quicksand-regular-webfont.woff') format('woff'),
-         url('fonts/quicksand-regular-webfont.ttf') format('truetype');
+    src: url('../fonts/quicksand-regular-webfont.eot');
+    src: url('../fonts/quicksand-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/quicksand-regular-webfont.woff2') format('woff2'),
+         url('../fonts/quicksand-regular-webfont.woff') format('woff'),
+         url('../fonts/quicksand-regular-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -23,11 +23,11 @@
 {
     font-family: 'quicksand';
 	src: local("Quicksand Bold"), local("Quicksand-Bold");
-    src: url('fonts/quicksand-bold-webfont.eot');
-    src: url('fonts/quicksand-bold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('fonts/quicksand-bold-webfont.woff2') format('woff2'),
-         url('fonts/quicksand-bold-webfont.woff') format('woff'),
-         url('fonts/quicksand-bold-webfont.ttf') format('truetype');
+    src: url('../fonts/quicksand-bold-webfont.eot');
+    src: url('../fonts/quicksand-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/quicksand-bold-webfont.woff2') format('woff2'),
+         url('../fonts/quicksand-bold-webfont.woff') format('woff'),
+         url('../fonts/quicksand-bold-webfont.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
 }
@@ -42,11 +42,11 @@
 {
     font-family: 'raleway';
 	src: local("Raleway Regular"), local("Raleway-Regular");
-    src: url('fonts/raleway-regular-webfont.eot');
-    src: url('fonts/raleway-regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('fonts/raleway-regular-webfont.woff2') format('woff2'),
-         url('fonts/raleway-regular-webfont.woff') format('woff'),
-         url('fonts/raleway-regular-webfont.ttf') format('truetype');
+    src: url('../fonts/raleway-regular-webfont.eot');
+    src: url('../fonts/raleway-regular-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/raleway-regular-webfont.woff2') format('woff2'),
+         url('../fonts/raleway-regular-webfont.woff') format('woff'),
+         url('../fonts/raleway-regular-webfont.ttf') format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -55,11 +55,11 @@
 {
     font-family: 'raleway';
 	src: local("Raleway Bold"), local("Raleway-Bold");
-    src: url('fonts/raleway-bold-webfont.eot');
-    src: url('fonts/raleway-bold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('fonts/raleway-bold-webfont.woff2') format('woff2'),
-         url('fonts/raleway-bold-webfont.woff') format('woff'),
-         url('fonts/raleway-bold-webfont.ttf') format('truetype');
+    src: url('../fonts/raleway-bold-webfont.eot');
+    src: url('../fonts/raleway-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/raleway-bold-webfont.woff2') format('woff2'),
+         url('../fonts/raleway-bold-webfont.woff') format('woff'),
+         url('../fonts/raleway-bold-webfont.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
 }
