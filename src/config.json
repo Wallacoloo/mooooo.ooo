@@ -7,9 +7,20 @@
 				"github_url": "https://github.com/wallacoloo",
 				"twitter_url": "https://twitter.com/wallacoloo"
 		},
+		"comments":
+		{
+				"check_interval": 120
+		},
 		"ipfs":
 		{
 				"ipns_id": "<IPNS_ID>"
+		},
+		"mx":
+		{
+				"mooooo.ooo":
+				{
+						"pop_domain": "pop.zoho.com"
+				}
 		}
 }
 
