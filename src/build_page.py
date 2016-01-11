@@ -90,10 +90,8 @@ def get_unparsed_commits(filename):
     if stderr:
         raise RuntimeError("git log error:", stderr)
 
-    # For some stupid reason, the above Popen results in all the content being escaped and contained inside of b'<...>'
-    raw = str(stdout).encode('utf-8').decode('unicode_escape')
-    unquoted = raw[2:-1]
-    return json.loads("[%s []]" %unquoted)[:-1]
+    raw = stdout.decode('utf-8')
+    return json.loads("[%s []]" %raw)[:-1]
 
 def get_commits(filename):
     """Returns an array of commit dicts, where each entry looks like:
