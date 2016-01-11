@@ -44,5 +44,9 @@ By {{ page.authors[0].name }}
 </p>
 </div>
 
+<div>
+		{{ mailto_link(page.comment_email, "Submit a new comment", subject=page.comment_email_subject) }} via email.
+</div>
+
 {% endblock %}
 

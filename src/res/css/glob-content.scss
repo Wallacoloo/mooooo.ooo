@@ -33,20 +33,20 @@
  * to `mypage.html#my-anchor`.
  * This ability is indicated by changing the color of the link & showing a
  * symbol upon hover */
-.anchored-header
+.anchored-header *
 {
 		/* Remove the (blue) link coloring */
 		color: inherit;
 		/* Remove default `a` underline style */
 		text-decoration: inherit;
 }
-.anchored-header:hover
+.anchored-header > a:hover
 {
 		/* Reduce the contrast to indicate it's a link */
 		opacity: 0.75;
 }
 
-.anchored-header > .fa-paragraph
+.anchored-header .fa-paragraph
 {
 		/*color: #101010;*/
 		opacity: 0.85;
@@ -56,9 +56,20 @@
 		 * being shifted right even when the P icon is invisible */
 		margin-left: -38px;
 }
-.anchored-header:hover > .fa-paragraph
+.anchored-header > a:hover .fa-paragraph
 {
 		visibility: visible;
+}
+
+/* Stylize the header if we were linked directly to it,
+  ala page.html#someId */
+.anchored-header:target *
+{
+		color: #BA0000;
+}
+.anchored-header:target .header-text
+{
+		text-decoration: underline;
 }
 
 .theater-image

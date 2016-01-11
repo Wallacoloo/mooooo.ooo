@@ -13,11 +13,10 @@
 		width: 1%;
 		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 		font-size: 26px;
-		padding-bottom: 1px;
 }
 .nav-ul > li > a
 {
-		padding-bottom: -1px;
+		display: block;
 		text-decoration: none;
 		color: #337AB7;
 		font-family: Quicksand,"Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -38,11 +37,11 @@
 .nav-li-blog > a
 {
 		padding-left: 6.67%;
-		padding-right: 20%;
+		margin-right: 70%;
 }
 .nav-li-about > a
 {
-		padding-left: 20%;
+		margin-left: 70%;
 		padding-right: 6.67%;
 }
 

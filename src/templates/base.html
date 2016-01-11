@@ -2,10 +2,10 @@
 
 {% macro heading(text, link=True, link_to=None, show_icon=True, sublevel=0) %}
 {# sublevel=0 for an ordinary header, 1 for a sub-heading, 2 for a sub-sub-heading, etc #}
-<h{{ sublevel+1 }} id="{{ text|into_tag }}">
-{% if link %}<a class="anchored-header" href="{{ "#" + text|into_tag if link_to == None else link_to }}">{% endif %}
+<h{{ sublevel+1 }} class="anchored-header" id="{{ text|into_tag }}">
+{% if link %}<a href="{{ "#" + text|into_tag if link_to == None else link_to }}">{% endif %}
 		{% if link and show_icon %}<span class="fa fa-paragraph" title="Permalink to this headline"></span>{% endif %}
-		{{ text }}
+		<span class="header-text">{{ text }}</span>
 		{% if link %}</a>{% endif %}
 </h{{ sublevel+1 }}>
 {% endmacro %}
@@ -19,10 +19,13 @@
 </a>
 {% endmacro %}
 
-{% macro offsite_link(path, label) %}
+{% macro offsite_link(path, label="", class="") %}
 {# Use whenever linking to an off-site resource.
    This was we can indicate it's off-site (with an icon, etc), etc #}
-<a href="{{ path }}">{{ label }}</a>{% endmacro %}
+<a class="{{ class }}" href="{{ path }}">{{ label }}</a>{% endmacro %}
+
+{% macro mailto_link(address, label="", class="", subject="", body="") %}
+{{ offsite_link(path=("mailto::" + address)|url_with_args(**dict(subject=subject, body=body)|drop_null_values), label=label, class=class) }}{% endmacro %}
 
 {# Note: the below needs to be all on one line so its use within a P tag won't cause formatting issues #}
 {# see the (last revised XXX) line in blog_entry.html as example #}
@@ -65,9 +68,9 @@
 			</div>
 			<footer class="glob-footer">
 					<div class="footer-social">
-							<a class="email fa fa-envelope" href="mailto:{{ social.contact_email }}"></a>
-							<a class="github fa fa-github" href="{{ social.github_url }}"></a>
-							<a class="twitter fa fa-twitter" href="{{ social.twitter_url }}"></a>
+							{{ mailto_link(social.contact_email, class="email fa fa-envelope") }}
+							{{ offsite_link(social.github_url, class="github fa fa-github") }}
+							{{ offsite_link(social.twitter_url, class="twitter fa fa-twitter") }}
 					</div>
 					<p class="footer-legal">
 							Unless otherwise stated, all code snippets, artwork or writings hosted on this website are released into the public domain.
