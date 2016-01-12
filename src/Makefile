@@ -59,10 +59,10 @@ $(BUILD_DIR)/%.png: pages/%.png
 # Turn any templates into actual pages
 $(BUILD_DIR)/index.html: pages/index.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
 	mkdir -p $(dir $@)
-	./build_page.py $< $(BUILD_ROOT)/config.json $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
+	./build_page.py $< $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
 $(BUILD_DIR)/%/index.html: pages/%/index.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
 	mkdir -p $(dir $@)
-	./build_page.py $< $(BUILD_ROOT)/config.json $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
+	./build_page.py $< $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
 $(BUILD_DIR)/$(RES_DIR)/%.css: $(RES_DIR)/%.scss
 	mkdir -p $(dir $@)
 	scss $< $@
