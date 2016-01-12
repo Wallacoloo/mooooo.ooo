@@ -5,7 +5,9 @@ Then we recompile / publish the affected article.
 
 import email.parser, json, poplib, time
 
-config = json.loads(open("config.json").read())
+import make
+from page_info import config, Comment, get_pages
+
 secrets = json.loads(open("secret.json").read())
 
 comments_addr = config["social"]["comment_email"]
@@ -32,6 +34,10 @@ def get_new_messages():
         yield msg
     num_messages_seen = msg_count
 
+    # Some resources may now need to be re-made
+    make.make()
+    make.publish()
+
 def process_email(message):
     """Check if the message is a comment,
     and if so, save it to disk & regenerate the effected pages"""
@@ -48,6 +54,7 @@ def process_email(message):
         elif in_tag:
             tags[-1] += char
 
+    # Extract the comment body
     for part in message.walk():
         if part.get_content_type():
             charset = part.get_content_charset()
@@ -60,6 +67,19 @@ def process_email(message):
 
     print("received message with tags:", tags, "and body:", body)
 
+    # Find which article this message pertains to
+    articles = [b for b in get_pages().blog_entries.values() if b.friendly_path in tags]
+    if len(articles) != 1:
+        print("[WARN] user attempted to post a comment to %i blog entries" %len(articles))
+        return
+
+    article = articles
+
+    # Save the comment to disk
+    comment = Comment(page=article, body=body)
+    comment.save()
+
+    make.new_dependency(article)
 
 if __name__ == "__main__":
     while True:

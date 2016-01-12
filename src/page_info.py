@@ -164,7 +164,7 @@ class Page(object):
             p = p[:-1]
         if p == "":
             p = "/"
-        return p
+        return p.lower()
     @property
     def repo_page(self):
         """Path where the user can view the source/revision history of a file & submit pull requests."""
@@ -293,6 +293,17 @@ class HomePage(Page):
 
 class AboutPage(Page):
     pass
+
+class Comment(Page):
+    def __init__(self, page, body):
+        """page = the Page object to which this comment belongs to."""
+        self._page = page
+        self._body = body
+    def save(self):
+        """Save the comment to disk.
+        Note: this will not implicitly regenerate any affected content
+        """
+        print("[FIXME] Comment.save() not implemented")
 
 class Pages(object):
     def __init__(self, basedir, extensions):
