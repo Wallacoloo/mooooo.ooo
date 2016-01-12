@@ -1,5 +1,17 @@
+#!/usr/bin/env python
 """Dependency management from python.
 Exposes methods to build specific resources & publish to IPFS, etc"""
+
+import os
+
+import page_info
+
+def create_dirs_and_open(fname, mode):
+    """Creates any directories not existing in the file path
+    and then opens the file name with the given mode and returns a handle"""
+    os.makedirs(os.path.split(fname)[0], exist_ok=True)
+    return open(fname, mode)
+
 
 def new_dependency(page):
     """page should be an instance of page_info.Page.
@@ -12,20 +24,35 @@ def make(page=None):
     but it will not be implicitly published.
     If page is an instance of page_info.Page, build just that page"""
     if page is None:
-        import page_info
         for page in page_info.get_pages():
             make(page)
     else:
         print("[make %r]" %page)
         print("[FIXME] make.make() not implemented")
 
-def make_deps(page=None):
+def make_deps(page=None, outfile=None):
     """Determine the dependencies for building the given page,
     and create the proper Makefile rules for that,
     inserting them into <page>.deps.
     If page is None, this will create ALL dependencies,
     otherwise, page should be a page_info.Page object."""
-    print("[FIXME] make.make_deps() not implemented")
+    if page is None:
+        f = create_dirs_and_open(outfile, "w+")
+        for page in page_info.get_pages().all.values():
+            make_deps(page)
+            f.write("all: %s\n" %page.path_in_build_tree)
+    else:
+        print("[make_deps %r]" %page)
+        print("[FIXME] make.make_deps() not implemented")
+        rule_name = page.path_in_build_tree
+
+        if outfile is None:
+            outfile = rule_name + ".deps"
+
+        f = create_dirs_and_open(outfile, "w+")
+
+        for dep in [page]:
+            f.write("%s: %s\n" %(rule_name, page.path_in_build_tree))
 
 def publish():
     """Publish the website to IPFS and update any necessary host records"""
@@ -45,8 +72,8 @@ if __name__ == "__main__":
     targets = sys.argv[1:]
 
     for target in targets:
-        if target == "dependencies.includes":
-            make_deps()
+        if target.endswith("all.depincludes"):
+            make_deps(outfile=target)
         elif target.endswith(".deps"):
             page = page_info.get_pages()[target[:-len(".deps")]]
             make_deps(page)

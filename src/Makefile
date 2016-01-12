@@ -10,24 +10,33 @@ IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 
 # Which types of files to copy out of the resource directory
 # (don't want to accidentally copy editor backups, etc)
-RES_TYPES=*.css *.eot *.otf *.png *.svg *.ttf *.woff *.woff2
-RESOURCES=$(shell find res -name . $(addprefix -o -name ,$(RES_TYPES)))
-RESOURCES:=$(RESOURCES) $(subst pages/,,$(shell find pages -name . $(addprefix -o -name ,$(RES_TYPES))))
+#RES_TYPES=*.css *.eot *.otf *.png *.svg *.ttf *.woff *.woff2
+#RESOURCES=$(shell find res -name . $(addprefix -o -name ,$(RES_TYPES)))
+#RESOURCES:=$(RESOURCES) $(subst pages/,,$(shell find pages -name . $(addprefix -o -name ,$(RES_TYPES))))
 
 # All targets that should be publically visible when published
-PUB_TARGETS:=$(RESOURCES) $(RES_DIR)/css/global.css index.html
-PUB_TARGETS:=$(PUB_TARGETS) $(subst pages/,,$(shell find pages/*/index.html))
-PUB_TARGETS:=$(addprefix $(BUILD_DIR)/,$(PUB_TARGETS))
-all: $(PUB_TARGETS)
+#PUB_TARGETS:=$(RESOURCES) $(RES_DIR)/css/global.css index.html
+#PUB_TARGETS:=$(PUB_TARGETS) $(subst pages/,,$(shell find pages/*/index.html))
+#PUB_TARGETS:=$(addprefix $(BUILD_DIR)/,$(PUB_TARGETS))
+#all: $(PUB_TARGETS)
+
+-include $(BUILD_ROOT)/all.depincludes
+
+$(BUILD_ROOT)/all.depincludes: $(BUILD_ROOT)/config.json
+	./make.py $@
+
+all: $(BUILD_ROOT)/all.depincludes
 
 clean:
-	rm -rf $(BUILD_DIR)
+	rm -rf $(BUILD_ROOT)
 
 # Create a file that contains the constant IPNS key that we associate with the website
 $(IPNSID_FILE):
+	mkdir -p $(dir $@)
 	ipfs id --format="<id>" > $@
 
 $(BUILD_ROOT)/config.json: config.json $(IPNSID_FILE)
+	mkdir -p $(dir $@)
 	sed  "s:<IPNS_ID>:$(shell cat $(IPNSID_FILE)):" $< > $@
 
 # Publish the site to IPFS
@@ -57,13 +66,13 @@ $(BUILD_DIR)/%.png: pages/%.png
 	cp $< $@
 
 # Turn any templates into actual pages
-$(BUILD_DIR)/index.html: pages/index.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
+$(BUILD_DIR)/index.html:
 	mkdir -p $(dir $@)
-	./build_page.py $< $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
-$(BUILD_DIR)/%/index.html: pages/%/index.html templates/base.html $(BUILD_ROOT)/config.json ./build_page.py
+	./build_page.py pages/$(subst $(BUILD_DIR)/,,$@) $@
+$(BUILD_DIR)/%/index.html:
 	mkdir -p $(dir $@)
-	./build_page.py $< $(BUILD_DIR) $(subst $(BUILD_DIR)/,,$@)
-$(BUILD_DIR)/$(RES_DIR)/%.css: $(RES_DIR)/%.scss
+	./build_page.py pages/$(subst $(BUILD_DIR)/,,$@) $@
+$(BUILD_DIR)/$(RES_DIR)/%.css:
 	mkdir -p $(dir $@)
 	scss $< $@
 

@@ -170,6 +170,18 @@ class Page(object):
         """Path where the user can view the source/revision history of a file & submit pull requests."""
         return "https://github.com/Wallacoloo/mooooo.ooo/tree/master/src/pages/%s" %self.path
 
+    @property
+    def path_in_build_tree(self):
+        """Path that this page will occupy on the disk after being built.
+        This is always just the URL relative to base of the website, prefixed
+        with the build directory path on disk"""
+        return os.path.join(config["build"]["dir"], self.path)
+
+    @property
+    def path_on_disk():
+        assert self._path_on_disk is not None
+        return self._path_on_disk
+
     def set_type(self, type):
         self.__class__ = type
         return ""

@@ -21,6 +21,10 @@
 				{
 						"pop_domain": "pop.zoho.com"
 				}
+		},
+		"build":
+		{
+				"dir": "../build/mooooo"
 		}
 }
 
