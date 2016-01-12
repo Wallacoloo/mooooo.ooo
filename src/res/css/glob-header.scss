@@ -14,6 +14,11 @@
 		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 		font-size: 26px;
 }
+.nav-ul > li.filler
+{
+		width: 7%;
+}
+
 .nav-ul > li > a
 {
 		display: block;
@@ -36,13 +41,11 @@
 }
 .nav-li-blog > a
 {
-		padding-left: 6.67%;
-		margin-right: 70%;
+		padding-left: 20%;
 }
 .nav-li-about > a
 {
-		margin-left: 70%;
-		padding-right: 6.67%;
+		padding-right: 20%;
 }
 
 .nav-li-about
