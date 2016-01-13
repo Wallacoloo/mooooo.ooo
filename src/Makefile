@@ -20,12 +20,13 @@ IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 #PUB_TARGETS:=$(addprefix $(BUILD_DIR)/,$(PUB_TARGETS))
 #all: $(PUB_TARGETS)
 
+all: $(BUILD_ROOT)/all.depincludes
+
 -include $(BUILD_ROOT)/all.depincludes
 
 $(BUILD_ROOT)/all.depincludes: $(BUILD_ROOT)/config.json
 	./make.py $@
 
-all: $(BUILD_ROOT)/all.depincludes
 
 clean:
 	rm -rf $(BUILD_ROOT)

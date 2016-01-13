@@ -13,7 +13,7 @@
 {% macro show_image(image) %}
 {# Used to show an image in the center of the screen.
    This also configures the link to a full-screen version #}
-
+{{ add_dep(image) }}
 <a href="{{ image.path|to_rel_path }}">
 		<img src="{{ image.path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px" class="theater-image"/>
 </a>
@@ -39,7 +39,7 @@
 <code class="multiline-code">{{ code }}</code>
 {% endmacro %}
 
-{% if not query_type %}
+{% if do_render %}
 <!DOCTYPE html>
 <html>
 		<head>

@@ -40,6 +40,7 @@ def make_deps(page=None, outfile=None):
         f = create_dirs_and_open(outfile, "w+")
         for page in page_info.get_pages().all.values():
             make_deps(page)
+            f.write("-include %s\n" %(page.path_in_build_tree + ".deps"))
             f.write("all: %s\n" %page.path_in_build_tree)
     else:
         print("[make_deps %r]" %page)
@@ -51,8 +52,9 @@ def make_deps(page=None, outfile=None):
 
         f = create_dirs_and_open(outfile, "w+")
 
-        for dep in [page]:
-            f.write("%s: %s\n" %(rule_name, page.path_in_build_tree))
+        f.write("%s: %s\n" %(rule_name, page.path_on_disk))
+        for dep in page.deps:
+            f.write("%s: %s\n" %(rule_name, dep.path_in_build_tree))
 
 def publish():
     """Publish the website to IPFS and update any necessary host records"""

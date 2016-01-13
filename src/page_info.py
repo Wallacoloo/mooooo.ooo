@@ -131,6 +131,7 @@ class Page(object):
 
         self._path_on_disk = path_on_disk
         self._title = title
+        self._deps = None # Haven't calculated the dependencies
         if path_on_disk and path_on_disk.startswith("pages/"):
             self._path = path_on_disk[len("pages/"):]
         elif path_on_disk and get_ext(path_on_disk) == ".scss":
@@ -178,7 +179,7 @@ class Page(object):
         return os.path.join(config["build"]["dir"], self.path)
 
     @property
-    def path_on_disk():
+    def path_on_disk(self):
         assert self._path_on_disk is not None
         return self._path_on_disk
 
@@ -234,22 +235,43 @@ class Page(object):
                 images[page] = Image(path_on_disk=os.path.join(basedir, page))
         return images
 
-    def render(self, query_type=False):
+    @property
+    def deps(self):
+        """Query all the resources this file *immediately* depends on,
+        and return them as a list of Page objects"""
+        if self._deps is None:
+            r = self.render(query_deps=True)
+        print("deps:", self._deps)
+        return self._deps
+
+    def render(self, query_type=False, query_deps=False):
         global config
         in_path = self._path_on_disk
         out_path = self.path
+        deps = set()
         def to_rel_path(abs_path):
             prefix = "../"*out_path.count("/")
             rel = os.path.join(prefix, abs_path)
             if rel.endswith("index.html") and config["omit_index_from_url"]:
                 rel = rel[:-len("index.html")]
             return rel
+        def add_dep(dep):
+            deps.add(dep)
+            return ""
+
+        # We are either (a) rendering the page,
+        # (b) querying its type
+        # (c) querying its dependencies
+        # Both (a) and (c) require rendering the page
+        do_render = not query_type
 
         env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True)
 
         # Populate template global variables & filters
         env.globals.update(config)
+        env.globals["add_dep"] = add_dep
         env.globals["query_type"] = query_type
+        env.globals["do_render"] = do_render
         env.globals["pages"] = get_pages()
         env.globals["resources"] = Pages("res/", [".css", ".scss"])
         env.filters["into_tag"] = filter_into_tag
@@ -266,6 +288,12 @@ class Page(object):
 
         template = env.from_string(open(in_path).read())
         r = template.render()
+
+        if do_render:
+            if self._deps:
+                deps.update(self._deps)
+            self._deps = deps
+
         return r
 
 class Author(object):
