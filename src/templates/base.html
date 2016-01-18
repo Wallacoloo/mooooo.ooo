@@ -25,7 +25,7 @@
 <a class="{{ class }}" href="{{ path }}">{{ label }}</a>{% endmacro %}
 
 {% macro mailto_link(address, label="", class="", subject="", body="") %}
-{{ offsite_link(path=("mailto::" + address)|url_with_args(**dict(subject=subject, body=body)|drop_null_values), label=label, class=class) }}{% endmacro %}
+{{ offsite_link(path=("mailto:" + address)|url_with_args(**dict(subject=subject, body=body)|drop_null_values), label=label, class=class) }}{% endmacro %}
 
 {# Note: the below needs to be all on one line so its use within a P tag won't cause formatting issues #}
 {# see the (last revised XXX) line in blog_entry.html as example #}
@@ -49,6 +49,15 @@
 			<link rel="stylesheet" href="{{ resources["css/global.css"].path|to_rel_path }}">
 			<link rel="stylesheet" href="{{ "res/font-awesome/css/font-awesome.min.css"|to_rel_path }}">
 			<title>{% block title %}{{ page.title }}{% endblock %}</title>
+			<style>
+{# Include absolutely essentially style in the header; things that prevent the page from looking outright horrible while loading #}
+
+{# Unless otherwise specified, don't allow elements to overflow their container (or the page as a whole) #}
+*
+{
+		max-width: 100%;
+}
+			</style>
 		</head>
 		<body>
 			<header class="nav-header">
