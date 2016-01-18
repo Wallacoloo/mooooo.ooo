@@ -73,7 +73,7 @@ $(BUILD_DIR)/index.html:
 $(BUILD_DIR)/%/index.html:
 	mkdir -p $(dir $@)
 	./build_page.py pages/$(subst $(BUILD_DIR)/,,$@) $@
-$(BUILD_DIR)/$(RES_DIR)/%.css:
+$(BUILD_DIR)/$(RES_DIR)/%.css: $(RES_DIR)/%.scss
 	mkdir -p $(dir $@)
 	scss $< $@
 

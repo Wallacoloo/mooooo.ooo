@@ -19,6 +19,11 @@
 </a>
 {% endmacro %}
 
+{% macro include_css(css_page) %}
+{{ add_dep(css_page) }}
+<link rel="stylesheet" href="{{ css_page.path|to_rel_path }}">
+{% endmacro %}
+
 {% macro offsite_link(path, label="", class="") %}
 {# Use whenever linking to an off-site resource.
    This was we can indicate it's off-site (with an icon, etc), etc #}
@@ -46,7 +51,7 @@
 			<meta charset="utf-8">
 			<meta name="viewport" content="width=device-width initial-scale=1" />
 			<meta name="description" content="Weblog/homepage for an artist/developer/engineer. DIY build logs, opinions and artwork" />
-			<link rel="stylesheet" href="{{ resources["css/global.css"].path|to_rel_path }}">
+			{{ include_css(resources["css/global.css"]) }}
 			<link rel="stylesheet" href="{{ "res/font-awesome/css/font-awesome.min.css"|to_rel_path }}">
 			<title>{% block title %}{{ page.title }}{% endblock %}</title>
 			<style>
