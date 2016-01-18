@@ -150,6 +150,9 @@ class Page(object):
             # By rendering the page, we can determine our type
             self.render(query_type=True)
 
+    def __repr__(self):
+        return "<Page.%s %r>" %(self.__class__.__name__, self.path_on_disk)
+
     @property
     def path(self):
         """Path relative to the build directory (i.e. the URL of the resource, minus the domain name"""
@@ -244,6 +247,10 @@ class Page(object):
         print("deps:", self._deps)
         return self._deps
 
+    @property
+    def contents(self):
+        return self.render()
+
     def render(self, query_type=False, query_deps=False):
         global config
         in_path = self._path_on_disk
@@ -273,7 +280,7 @@ class Page(object):
         env.globals["query_type"] = query_type
         env.globals["do_render"] = do_render
         env.globals["pages"] = get_pages()
-        env.globals["resources"] = Pages("res/", [".css", ".scss"])
+        #env.globals["resources"] = Pages("res/", [".css", ".scss"])
         env.filters["into_tag"] = filter_into_tag
         env.filters["friendly_date"] = filter_friendly_date
         env.filters["detailed_date"] = filter_detailed_date
@@ -372,9 +379,9 @@ class Pages(object):
         elif os.path.join(key, "index.html") in self.all:
             return self.all[os.path.join(key, "index.html")]
         else:
-            if os.path.splitext(key)[1] == ".css":
-                # SASS files are compiled into normal CSS
-                return self[key[:-len(".css")] + ".scss"]
+            #if os.path.splitext(key)[1] == ".css":
+            #    # SASS files are compiled into normal CSS
+            #    return self[key[:-len(".css")] + ".scss"]
             return KeyError(key)
 
     @property
@@ -387,5 +394,5 @@ class Pages(object):
         return entries
 
 def get_pages():
-    return Pages("pages/", [".html"])
+    return Pages("pages/", [".html", ".css"])
 

@@ -1,0 +1,7 @@
+{# Provide some common macros that can be used on *any* jinja template,
+regardless of type (css, html, etc) #}
+
+{% macro include_inline(page) %}
+{{ add_dep(page) }}
+{{ page.contents }}
+{% endmacro %}
