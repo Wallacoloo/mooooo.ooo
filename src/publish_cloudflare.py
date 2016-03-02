@@ -5,19 +5,25 @@
 # an IPNS id because the cost of doing a IPNS lookup for EVERY request is too high.
 
 # How does the TXT record work?
-# see https://github.com/diasdavid/ipscend#use-ipfs-to-host-your-webpage-using-a-standard-domain-includes-cool-dns-trick
-# If we alias ipfs.yourdomain.com to ipfs.io and then create a DNS TXT entry with
-# name: "ipfs",
-# content: "dnslink=/ipfs/QmRpCcmoMWVEa8mYn1bczeUDxS2QUcsysodPUBuMkxfzPN"
-# Then ipfs.yourdomain.com will serve the IPFS object indicated above
-# ipfs.yourdomain.com/XYZ will serve the IPFS object: QmRpCcmoMWVEa8mYn1bczeUDxS2QUcsysodPUBuMkxfzPN/XYZ
+# see https://github.com/ipfs/notes/issues/39
+# point yourdomain.com to gateway.ipfs.io (either via A record or a flattened CNAME record).
+# Add a TXT entry to _dnslink.yourdomain.com with contens: "dnslink=/ipfs/Qmfoo"
+#
+# OLD METHOD:
+##### see https://github.com/diasdavid/ipscend#use-ipfs-to-host-your-webpage-using-a-standard-domain-includes-cool-dns-trick
+##### If we alias ipfs.yourdomain.com to ipfs.io and then create a DNS TXT entry with
+##### name: "ipfs",
+##### content: "dnslink=/ipfs/QmRpCcmoMWVEa8mYn1bczeUDxS2QUcsysodPUBuMkxfzPN"
+##### Then ipfs.yourdomain.com will serve the IPFS object indicated above
+##### ipfs.yourdomain.com/XYZ will serve the IPFS object: QmRpCcmoMWVEa8mYn1bczeUDxS2QUcsysodPUBuMkxfzPN/XYZ
 
 import json, requests, sys
 
 # Cloudflare Name for the website (this might not be the DOMAIN name)
 zone_name = "mooooo.ooo"
 # Cloudflare Name for the DNS TXT entry that we wish to link to IPFS
-ipfs_subdomain = "ipfs.mooooo.ooo"
+#ipfs_subdomain = "ipfs.mooooo.ooo"
+dnslink_subdomains = ("_dnslink.mooooo.ooo", "ipfs.mooooo.ooo", "mooooo.ooo")
 
 user_email = "wallacoloo@gmail.com"
 
@@ -57,9 +63,8 @@ if __name__ == "__main__":
     ipfs_id = sys.argv[2]
     
     zone_id = get_zone_id(api_key, zone_name)
-    dns_entry = get_dns_txt_info(api_key, zone_id, ipfs_subdomain)
-
-    dns_entry["content"] = "dnslink=/ipfs/%s" %ipfs_id
-
-    update_txt_record(api_key, zone_id, dns_entry)
+    for sub in dnslink_subdomains:
+        dns_entry = get_dns_txt_info(api_key, zone_id, sub)
+        dns_entry["content"] = "dnslink=/ipfs/%s" %ipfs_id
+        update_txt_record(api_key, zone_id, dns_entry)
 
