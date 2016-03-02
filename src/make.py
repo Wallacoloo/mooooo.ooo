@@ -42,7 +42,6 @@ def make_deps(page=None, outfile=None):
             f.write("-include %s.deps\n" %page.path_in_build_tree)
             #f.write("all: %s\n" %page.path_in_build_tree)
     else:
-        print("[make_deps %r]" %page)
         rule_name = page.path_in_build_tree
 
         if outfile is None:

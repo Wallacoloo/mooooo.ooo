@@ -21,12 +21,12 @@ clean:
 
 ## Create a file that contains the constant IPNS key that we associate with the website
 $(IPNSID_FILE):
-	mkdir -p $(dir $@)
+	@mkdir -p $(dir $@)
 	ipfs id --format="<id>" > $@
 
 ## Build the site's config file, which holds secret keys, etc.
 $(BUILD_ROOT)/config.json: config.json $(IPNSID_FILE)
-	mkdir -p $(dir $@)
+	@mkdir -p $(dir $@)
 	sed  "s:<IPNS_ID>:$(shell cat $(IPNSID_FILE)):" $< |\
 	sed  "s:<BUILD_DIR>:$(BUILD_DIR):" $< \
 	> $@
@@ -46,13 +46,14 @@ publish: publish-ipfs publish-cf publish-ipns ## Publish the site everywhere
 
 ## Build compresses png images
 $(BUILD_DIR)/%.png: pages/%.png
-	mkdir -p $(dir $@)
+	@mkdir -p $(dir $@)
 	@# Copy the image, then run optipng (but don't abort if optipng isn't found.
-	cp $^ $@ && optipng -q $@ || true
+	cp $^ $@
+	optipng --quiet $@ || true
 
 ## Build any resources (webpages, css, images, fonts, etc)
 $(BUILD_DIR)/%: pages/%
-	mkdir -p $(dir $@)
+	@mkdir -p $(dir $@)
 	./build_page.py pages/$(subst $(BUILD_DIR)/,,$@) $@
 
 # Self-documenting help function provided by http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html

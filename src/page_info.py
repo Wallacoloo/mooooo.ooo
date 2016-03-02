@@ -271,7 +271,6 @@ class Page(object):
         and return them as a list of Page objects"""
         if self._deps is None:
             r = self.render(query_deps=True)
-        print("deps:", self._deps)
         return self._deps
     @property
     def rtdeps(self):
@@ -438,7 +437,6 @@ class Pages(object):
         return self._all
 
     def __hasitem__(self, key):
-        print("hasitem:", key)
         try:
             self[key]
         except KeyError:
