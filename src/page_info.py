@@ -15,6 +15,7 @@ BLOG_ENTRY_DIR="blog_entries"
 TEMPLATE_DIR="templates"
 
 IMG_EXTENSIONS = ".jpg", ".jpeg", ".png", ".svg"
+FONT_EXTENSIONS = ".eot", ".ttf", ".woff", ".woff2"
 
 # Config file read from .json on disk
 config = json.loads(open(CONFIG_PATH, "r").read())
@@ -143,10 +144,13 @@ class Page(object):
         if get_ext(self._path) in IMG_EXTENSIONS:
             # If this resource is an image, cast it as such for the extra data
             self.set_type(Image)
+        elif get_ext(self._path) in FONT_EXTENSIONS:
+            self.set_type(Font)
         elif get_ext(self._path) == ".css":
             self.set_type(Css)
         else:
             assert get_ext(self._path) == ".html"
+            self.do_render_with_jinja = True
             # By rendering the page, we can determine our type
             self.render(query_type=True)
 
@@ -293,10 +297,14 @@ class Page(object):
         env.globals["HomePage"] = HomePage
         env.globals["AboutPage"] = AboutPage
 
-        template = env.from_string(open(in_path).read())
-        r = template.render()
+        if self.do_render_with_jinja:
+            template = env.from_string(open(in_path).read())
+            r = template.render()
+        else:
+            # This is a binary file
+            r = open(in_path, "rb").read()
 
-        if do_render:
+        if query_deps:
             if self._deps:
                 deps.update(self._deps)
             self._deps = deps
@@ -312,6 +320,7 @@ class Author(object):
         return hash(self.name)
 
 class Image(Page):
+    do_render_with_jinja = False
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
     @property
@@ -320,10 +329,14 @@ class Image(Page):
         im = PIL.Image.open(self._path_on_disk)
         return im.size
 
+class Font(Page):
+    do_render_with_jinja = False
+
 class Css(Page):
-    pass
+    do_render_with_jinja = True
 
 class BlogEntry(Page):
+    do_render_with_jinja = True
     @property
     def comment_email(self):
         """The email address that should be used to send comments to this blog entry"""
@@ -336,10 +349,10 @@ class BlogEntry(Page):
 
 
 class HomePage(Page):
-    pass
+    do_render_with_jinja = True
 
 class AboutPage(Page):
-    pass
+    do_render_with_jinja = True
 
 class Comment(Page):
     def __init__(self, page, body):
@@ -367,10 +380,22 @@ class Pages(object):
                     self._all[fname] = Page(path_on_disk=os.path.join(self._basedir, fname))
         return self._all
 
+    def __hasitem__(self, key):
+        print("hasitem:", key)
+        try:
+            self[key]
+        except KeyError:
+            return False
+        else:
+            return True
+
     def __getitem__(self, key):
         """Returns a page by its path.
         Note: index.html is implicit (if the path doesn't exist)
         """
+        if not isinstance(key, str):
+            raise KeyError(key)
+
         if key.startswith("/"):
             # Leading slash is optional, but useful for requesting the index page
             key = key[1:]
@@ -382,7 +407,7 @@ class Pages(object):
             #if os.path.splitext(key)[1] == ".css":
             #    # SASS files are compiled into normal CSS
             #    return self[key[:-len(".css")] + ".scss"]
-            return KeyError(key)
+            raise KeyError(key)
 
     @property
     def blog_entries(self):
@@ -394,5 +419,8 @@ class Pages(object):
         return entries
 
 def get_pages():
-    return Pages("pages/", [".html", ".css"])
+    ext = [".html", ".css"]
+    ext.extend(IMG_EXTENSIONS)
+    ext.extend(FONT_EXTENSIONS)
+    return Pages("pages/", ext)
 

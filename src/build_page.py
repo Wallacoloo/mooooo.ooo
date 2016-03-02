@@ -14,5 +14,10 @@ if __name__ == "__main__":
     in_path, out_path = sys.argv[1:]
 
     page = Page(in_path).render()
-    f = open(out_path, "w+")
+    if isinstance(page, str):
+        # Open the file in text mode
+        f = open(out_path, "w+")
+    else:
+        # Writing binary data (e.g. images)
+        f = open(out_path, "wb+")
     f.write(page)

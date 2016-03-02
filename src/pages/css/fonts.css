@@ -1,3 +1,4 @@
+{% from 'macros.css' import incl_font_sources %}
 /* Fonts */
 /* QuickSand font:
  * source: http://www.fontsquirrel.com/fonts/Quicksand
@@ -10,11 +11,7 @@
 {
     font-family: 'quicksand';
 	src: local("Quicksand Regular"), local("Quicksand-Regular");
-    src: url('../fonts/quicksand-regular-webfont.eot');
-    src: url('../fonts/quicksand-regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/quicksand-regular-webfont.woff2') format('woff2'),
-         url('../fonts/quicksand-regular-webfont.woff') format('woff'),
-         url('../fonts/quicksand-regular-webfont.ttf') format('truetype');
+	{{ incl_font_sources("quicksand-regular-webfont") }}
     font-weight: normal;
     font-style: normal;
 }
@@ -23,11 +20,7 @@
 {
     font-family: 'quicksand';
 	src: local("Quicksand Bold"), local("Quicksand-Bold");
-    src: url('../fonts/quicksand-bold-webfont.eot');
-    src: url('../fonts/quicksand-bold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/quicksand-bold-webfont.woff2') format('woff2'),
-         url('../fonts/quicksand-bold-webfont.woff') format('woff'),
-         url('../fonts/quicksand-bold-webfont.ttf') format('truetype');
+	{{ incl_font_sources("quicksand-bold-webfont") }}
     font-weight: bold;
     font-style: normal;
 }
@@ -42,11 +35,7 @@
 {
     font-family: 'raleway';
 	src: local("Raleway Regular"), local("Raleway-Regular");
-    src: url('../fonts/raleway-regular-webfont.eot');
-    src: url('../fonts/raleway-regular-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/raleway-regular-webfont.woff2') format('woff2'),
-         url('../fonts/raleway-regular-webfont.woff') format('woff'),
-         url('../fonts/raleway-regular-webfont.ttf') format('truetype');
+	{{ incl_font_sources("raleway-regular-webfont") }}
     font-weight: normal;
     font-style: normal;
 }
@@ -55,11 +44,7 @@
 {
     font-family: 'raleway';
 	src: local("Raleway Bold"), local("Raleway-Bold");
-    src: url('../fonts/raleway-bold-webfont.eot');
-    src: url('../fonts/raleway-bold-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../fonts/raleway-bold-webfont.woff2') format('woff2'),
-         url('../fonts/raleway-bold-webfont.woff') format('woff'),
-         url('../fonts/raleway-bold-webfont.ttf') format('truetype');
+	{{ incl_font_sources("raleway-bold-webfont") }}
     font-weight: bold;
     font-style: normal;
 }
