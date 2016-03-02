@@ -28,7 +28,8 @@ $(IPNSID_FILE):
 $(BUILD_ROOT)/config.json: config.json $(IPNSID_FILE)
 	@mkdir -p $(dir $@)
 	sed  "s:<IPNS_ID>:$(shell cat $(IPNSID_FILE)):" $< |\
-	sed  "s:<BUILD_DIR>:$(BUILD_DIR):" $< \
+	sed  "s:<BUILD_DIR>:$(BUILD_DIR):" |\
+	sed  "s:<BUILD_ROOT>:$(BUILD_ROOT):" \
 	> $@
 
 publish-ipfs: $(PUB_TARGETS) ## Publish the site to IPFS

@@ -202,6 +202,11 @@ class Page(object):
         return os.path.join(config["build"]["dir"], self.path)
 
     @property
+    def build_dep_path(self):
+        """Path in which dependency information for this file should be stored"""
+        return os.path.join(config["build"]["root"], "deps", self.path + ".deps")
+
+    @property
     def path_on_disk(self):
         assert self._path_on_disk is not None
         return self._path_on_disk

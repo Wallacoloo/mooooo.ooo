@@ -39,13 +39,12 @@ def make_deps(page=None, outfile=None):
         f = create_dirs_and_open(outfile, "w+")
         for page in page_info.get_pages().all.values():
             make_deps(page)
-            f.write("-include %s.deps\n" %page.path_in_build_tree)
-            #f.write("all: %s\n" %page.path_in_build_tree)
+            f.write("-include %s\n" %page.build_dep_path)
     else:
         rule_name = page.path_in_build_tree
 
         if outfile is None:
-            outfile = rule_name + ".deps"
+            outfile = page.build_dep_path
 
         f = create_dirs_and_open(outfile, "w+")
 
