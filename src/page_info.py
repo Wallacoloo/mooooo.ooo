@@ -133,6 +133,7 @@ class Page(object):
         self._path_on_disk = path_on_disk
         self._title = title
         self._deps = None # Haven't calculated the dependencies
+        self._rtdeps = None # Haven't calculated the dependencies
         if path_on_disk and path_on_disk.startswith("pages/"):
             self._path = path_on_disk[len("pages/"):]
         elif path_on_disk and get_ext(path_on_disk) == ".scss":
@@ -250,6 +251,12 @@ class Page(object):
             r = self.render(query_deps=True)
         print("deps:", self._deps)
         return self._deps
+    @property
+    def rtdeps(self):
+        """All resources that this file depends on at runtime (e.g. links, etc)"""
+        # trigger building of deps    
+        self.deps
+        return self._rtdeps
 
     @property
     def contents(self):
@@ -260,6 +267,7 @@ class Page(object):
         in_path = self._path_on_disk
         out_path = self.path
         deps = set()
+        rtdeps = set()
         def to_rel_path(abs_path):
             prefix = "../"*out_path.count("/")
             rel = os.path.join(prefix, abs_path)
@@ -268,6 +276,9 @@ class Page(object):
             return rel
         def add_dep(dep):
             deps.add(dep)
+            return ""
+        def add_rtdep(dep):
+            rtdeps.add(dep)
             return ""
 
         # We are either (a) rendering the page,
@@ -281,6 +292,7 @@ class Page(object):
         # Populate template global variables & filters
         env.globals.update(config)
         env.globals["add_dep"] = add_dep
+        env.globals["add_rtdep"] = add_rtdep
         env.globals["query_type"] = query_type
         env.globals["do_render"] = do_render
         env.globals["pages"] = get_pages()
@@ -308,6 +320,9 @@ class Page(object):
             if self._deps:
                 deps.update(self._deps)
             self._deps = deps
+            if self._rtdeps:
+                rtdeps.update(self._rtdeps)
+            self._rtdeps = rtdeps
 
         return r
 
