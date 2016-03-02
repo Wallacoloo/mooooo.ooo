@@ -134,6 +134,7 @@ class Page(object):
         self._title = title
         self._deps = None # Haven't calculated the dependencies
         self._rtdeps = None # Haven't calculated the dependencies
+        self._anchors = None # Haven't enumerated the page's anchors
         if path_on_disk and path_on_disk.startswith("pages/"):
             self._path = path_on_disk[len("pages/"):]
         elif path_on_disk and get_ext(path_on_disk) == ".scss":
@@ -178,6 +179,20 @@ class Page(object):
     def repo_page(self):
         """Path where the user can view the source/revision history of a file & submit pull requests."""
         return "https://github.com/Wallacoloo/mooooo.ooo/tree/master/src/pages/%s" %self.path
+
+    def anchor_path(self, anchor, validate=True):
+        """Assert that the anchor is found on this page, and return the full page + anchor path.
+        e.g. mypage.html#myheading
+        """
+        if not anchor:
+            return self.path
+        else:
+            if anchor.startswith("#"):
+                anchor = anchor[1:0]
+            if not validate or anchor == "" or anchor in self.anchors:
+                return self.path + "#" + anchor
+            else:
+                raise KeyError("anchor not found on page: #%s" %anchor)
 
     @property
     def path_in_build_tree(self):
@@ -233,6 +248,13 @@ class Page(object):
         return sorted(get_commits(self._path_on_disk), key=lambda c: c["date"])[-1]["date"]
 
     @property
+    def anchors(self):
+        """Return a set of all html anchors on the page that can be linked to"""
+        if self._anchors is None:
+            self.render(query_anchors=True)
+        return self._anchors
+
+    @property
     def images(self):
         """Retrives the images in the same directory as this page"""
         basedir = os.path.split(self._path_on_disk)[0]
@@ -262,30 +284,43 @@ class Page(object):
     def contents(self):
         return self.render()
 
-    def render(self, query_type=False, query_deps=False):
+    def render(self, query_type=False, query_anchors=False, query_deps=False):
         global config
         in_path = self._path_on_disk
         out_path = self.path
         deps = set()
         rtdeps = set()
+        anchors = set() # html anchors, e.g. mypage.html#heading1 - "heading1" is an anchor
         def to_rel_path(abs_path):
             prefix = "../"*out_path.count("/")
             rel = os.path.join(prefix, abs_path)
-            if rel.endswith("index.html") and config["omit_index_from_url"]:
-                rel = rel[:-len("index.html")]
-            return rel
+            if "#" in rel:
+                base, anchor = rel.split("#")
+            else:
+                base, anchor = rel, None
+            # Remove index.html from the path if configured to.
+            # Note: Need to remove any html anchor before doing this (done above)
+            if base.endswith("index.html") and config["omit_index_from_url"]:
+                base = base[:-len("index.html")]
+            # Re-add the anchor, if there was one
+            return base if anchor is None else "#".join((base, anchor))
         def add_dep(dep):
             deps.add(dep)
+            # Return empty string so this expression won't write to the output stream
             return ""
         def add_rtdep(dep):
             rtdeps.add(dep)
             return ""
+        def add_anchor(anch):
+            anchors.add(anch)
+            return ""
 
         # We are either (a) rendering the page,
         # (b) querying its type
-        # (c) querying its dependencies
-        # Both (a) and (c) require rendering the page
-        do_render = not query_type
+        # (c) querying its anchors
+        # (d) querying its dependencies
+        # Both (a), (c), (d) require rendering the page
+        do_render = not query_type or query_anchors or query_deps
 
         env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True)
 
@@ -293,8 +328,10 @@ class Page(object):
         env.globals.update(config)
         env.globals["add_dep"] = add_dep
         env.globals["add_rtdep"] = add_rtdep
+        env.globals["add_anchor"] = add_anchor
         env.globals["query_type"] = query_type
         env.globals["do_render"] = do_render
+        env.globals["validate_anchors"] = not query_anchors # Avoid circular dependencies.
         env.globals["pages"] = get_pages()
         #env.globals["resources"] = Pages("res/", [".css", ".scss"])
         env.filters["into_tag"] = filter_into_tag
@@ -323,6 +360,11 @@ class Page(object):
             if self._rtdeps:
                 rtdeps.update(self._rtdeps)
             self._rtdeps = rtdeps
+
+        if query_anchors:
+            if self._anchors:
+                anchors.update(self._anchors)
+            self._anchors = anchors
 
         return r
 
