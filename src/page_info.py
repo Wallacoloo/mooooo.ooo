@@ -132,7 +132,7 @@ class Page(object):
 
         self._path_on_disk = path_on_disk
         self._title = title
-        self._deps = None # Haven't calculated the dependencies
+        self._srcdeps = None # Haven't calculated the dependencies
         self._rtdeps = None # Haven't calculated the dependencies
         self._anchors = None # Haven't enumerated the page's anchors
         if path_on_disk and path_on_disk.startswith("pages/"):
@@ -266,17 +266,17 @@ class Page(object):
         return images
 
     @property
-    def deps(self):
+    def srcdeps(self):
         """Query all the resources this file *immediately* depends on,
         and return them as a list of Page objects"""
-        if self._deps is None:
+        if self._srcdeps is None:
             r = self.render(query_deps=True)
-        return self._deps
+        return self._srcdeps
     @property
     def rtdeps(self):
         """All resources that this file depends on at runtime (e.g. links, etc)"""
         # trigger building of deps    
-        self.deps
+        self.srcdeps
         return self._rtdeps
 
     @property
@@ -287,7 +287,7 @@ class Page(object):
         global config
         in_path = self._path_on_disk
         out_path = self.path
-        deps = set()
+        srcdeps = set()
         rtdeps = set()
         anchors = set() # html anchors, e.g. mypage.html#heading1 - "heading1" is an anchor
         def to_rel_path(abs_path):
@@ -303,8 +303,8 @@ class Page(object):
                 base = base[:-len("index.html")]
             # Re-add the anchor, if there was one
             return base if anchor is None else "#".join((base, anchor))
-        def add_dep(dep):
-            deps.add(dep)
+        def add_srcdep(dep):
+            srcdeps.add(dep)
             # Return empty string so this expression won't write to the output stream
             return ""
         def add_rtdep(dep):
@@ -325,7 +325,7 @@ class Page(object):
 
         # Populate template global variables & filters
         env.globals.update(config)
-        env.globals["add_dep"] = add_dep
+        env.globals["add_srcdep"] = add_srcdep
         env.globals["add_rtdep"] = add_rtdep
         env.globals["add_anchor"] = add_anchor
         env.globals["query_type"] = query_type
@@ -353,9 +353,9 @@ class Page(object):
             r = open(in_path, "rb").read()
 
         if query_deps:
-            if self._deps:
-                deps.update(self._deps)
-            self._deps = deps
+            if self._srcdeps:
+                srcdeps.update(self._srcdeps)
+            self._srcdeps = srcdeps
             if self._rtdeps:
                 rtdeps.update(self._rtdeps)
             self._rtdeps = rtdeps

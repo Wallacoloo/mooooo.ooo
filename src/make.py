@@ -50,8 +50,8 @@ def make_deps(page=None, outfile=None):
         f = create_dirs_and_open(outfile, "w+")
 
         f.write("%s: %s\n" %(rule_name, page.path_on_disk))
-        for dep in page.deps:
-            f.write("%s: %s\n" %(rule_name, dep.path_in_build_tree))
+        for dep in page.srcdeps:
+            f.write("%s: %s\n" %(rule_name, dep.path_on_disk))
         for dep in page.rtdeps:
             f.write("all: %s\n" %dep.path_in_build_tree)
 
