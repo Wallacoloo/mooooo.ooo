@@ -352,7 +352,7 @@ class Page(object):
 
         if self.do_render_with_jinja:
             template = env.from_string(open(in_path).read())
-            r = template.render()
+            r = template.render().strip()
         else:
             # This is a binary file
             r = open(in_path, "rb").read()
