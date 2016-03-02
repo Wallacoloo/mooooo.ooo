@@ -1,9 +1,9 @@
 {% from 'macros.jinja' import include_inline %}
 {{ include_inline(pages["css/blog.css"]) }}
-{{ include_inline(pages["css/code.css"]) }}
 {{ include_inline(pages["css/defaults.css"]) }}
-{{ include_inline(pages["css/fonts.css"]) }}
-{{ include_inline(pages["css/glob-content.css"]) }}
 {{ include_inline(pages["css/glob-header.css"]) }}
+{{ include_inline(pages["css/glob-content.css"]) }}
 {{ include_inline(pages["css/glob-footer.css"]) }}
+{{ include_inline(pages["css/code.css"]) }}
+{{ include_inline(pages["css/fonts.css"]) }}
 
