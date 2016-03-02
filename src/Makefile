@@ -31,48 +31,53 @@ $(BUILD_ROOT)/all.depincludes: $(BUILD_ROOT)/config.json
 clean:
 	rm -rf $(BUILD_ROOT)
 
-# Create a file that contains the constant IPNS key that we associate with the website
+## Create a file that contains the constant IPNS key that we associate with the website
 $(IPNSID_FILE):
 	mkdir -p $(dir $@)
 	ipfs id --format="<id>" > $@
 
+## Build the site's config file, which holds secret keys, etc.
 $(BUILD_ROOT)/config.json: config.json $(IPNSID_FILE)
 	mkdir -p $(dir $@)
 	sed  "s:<IPNS_ID>:$(shell cat $(IPNSID_FILE)):" $< > $@
 
-# Publish the site to IPFS
-publish-ipfs: $(PUB_TARGETS)
+publish-ipfs: $(PUB_TARGETS) ## Publish the site to IPFS
 	ipfs add -r -q $(BUILD_DIR) | tail -1 > $(BUILD_DIR)/../mooooo.ipfsid
 
-# Update the IPNS link to point to the newest version of the website
-publish-ipns: publish-ipfs
+publish-ipns: publish-ipfs ## Update the IPNS link to point to the newest version of the website
 	ipfs name publish /ipfs/$(shell cat $(IPFSID_FILE))
 
-# Update the DNS records for a cloudflare server
-publish-cf: publish-ipfs
+
+publish-cf: publish-ipfs ## Update the DNS records for a cloudflare server
 	./publish_cloudflare.py $(shell cat ../cloudflare_apikey) $(shell cat $(IPFSID_FILE))
 
-# Publish the site everywhere
-publish: publish-ipfs publish-cf publish-ipns 
+publish: publish-ipfs publish-cf publish-ipns ## Publish the site everywhere
 	true
 
-# Copy static resources into the build directory
+## Copy static resources into the build directory
 $(BUILD_DIR)/$(RES_DIR)/%: $(RES_DIR)/%
 	mkdir -p $(dir $@)
 	cp $< $@
 
-# Copy static images
+## Copy static images to the build directory
 $(BUILD_DIR)/%.png: pages/%.png
 	mkdir -p $(dir $@)
 	cp $< $@
 
-# Turn any templates into actual pages
+## Build the top-level index.html page
 $(BUILD_DIR)/index.html:
 	mkdir -p $(dir $@)
 	./build_page.py pages/$(subst $(BUILD_DIR)/,,$@) $@
+
+## Build any non-root webpage or css document
 $(BUILD_DIR)/%/index.html $(BUILD_DIR)/%.css:
 	mkdir -p $(dir $@)
 	./build_page.py pages/$(subst $(BUILD_DIR)/,,$@) $@
 
-.PHONY: clean publish-ipfs publish-ipns publish-cf publish
+# Self-documenting help function provided by http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
+help:
+	@grep -h -P '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
+
+.PHONY: clean help publish-ipfs publish-ipns publish-cf publish
 
