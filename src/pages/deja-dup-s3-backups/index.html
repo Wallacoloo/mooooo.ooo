@@ -138,7 +138,9 @@ Expand the "Lifecycle" section, and then click "Add rule":
 <p>
 Stick with the defaults for step 1 (i.e. apply to the whole bucket) and click "Configure Rule".
 
-Check the "Transition to the Standard - Infrequent Access Storage Class" box and stick with the 30 days default (which is the minimum). You could instead check the "Archive to the Glacier Storage Class" option, which offers even cheaper storage but at the additional cost of 3-5 hours of latency and a significantly higher read cost.
+Check the "Transition to the Standard - Infrequent Access Storage Class" box and stick with the 30 days default (which is the minimum).
+You could instead check the "Archive to the Glacier Storage Class" option, which offers even cheaper storage but at the additional cost of 3-5 hours of latency and a <i>significantly</i> higher read cost (DON'T do this unless you're sure you understand the pricing.
+{{ offsite_link("https://medium.com/@karppinen/how-i-ended-up-paying-150-for-a-single-60gb-download-from-amazon-glacier-6cb77b288c3e#.pqzerjta6", "Here's") }} a cautionary tale from somebody who paid $150 to restore 60 GB of data from Amazon Glacier Storage).
 </p>
 {{ show_image(page.images["13-amazon-S3-lifecycle-rule2.png"]) }}
 

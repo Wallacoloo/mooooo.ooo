@@ -15,6 +15,7 @@ BLOG_ENTRY_DIR="blog_entries"
 TEMPLATE_DIR="templates"
 
 IMG_EXTENSIONS = ".jpg", ".jpeg", ".png", ".svg"
+FONT_EXTENSIONS = ".eot", ".ttf", ".woff", ".woff2"
 
 # Config file read from .json on disk
 config = json.loads(open(CONFIG_PATH, "r").read())
@@ -131,6 +132,9 @@ class Page(object):
 
         self._path_on_disk = path_on_disk
         self._title = title
+        self._deps = None # Haven't calculated the dependencies
+        self._rtdeps = None # Haven't calculated the dependencies
+        self._anchors = None # Haven't enumerated the page's anchors
         if path_on_disk and path_on_disk.startswith("pages/"):
             self._path = path_on_disk[len("pages/"):]
         elif path_on_disk and get_ext(path_on_disk) == ".scss":
@@ -142,12 +146,18 @@ class Page(object):
         if get_ext(self._path) in IMG_EXTENSIONS:
             # If this resource is an image, cast it as such for the extra data
             self.set_type(Image)
+        elif get_ext(self._path) in FONT_EXTENSIONS:
+            self.set_type(Font)
         elif get_ext(self._path) == ".css":
             self.set_type(Css)
         else:
             assert get_ext(self._path) == ".html"
+            self.do_render_with_jinja = True
             # By rendering the page, we can determine our type
             self.render(query_type=True)
+
+    def __repr__(self):
+        return "<Page.%s %r>" %(self.__class__.__name__, self.path_on_disk)
 
     @property
     def path(self):
@@ -169,6 +179,32 @@ class Page(object):
     def repo_page(self):
         """Path where the user can view the source/revision history of a file & submit pull requests."""
         return "https://github.com/Wallacoloo/mooooo.ooo/tree/master/src/pages/%s" %self.path
+
+    def anchor_path(self, anchor, validate=True):
+        """Assert that the anchor is found on this page, and return the full page + anchor path.
+        e.g. mypage.html#myheading
+        """
+        if not anchor:
+            return self.path
+        else:
+            if anchor.startswith("#"):
+                anchor = anchor[1:0]
+            if not validate or anchor == "" or anchor in self.anchors:
+                return self.path + "#" + anchor
+            else:
+                raise KeyError("anchor not found on page: #%s" %anchor)
+
+    @property
+    def path_in_build_tree(self):
+        """Path that this page will occupy on the disk after being built.
+        This is always just the URL relative to base of the website, prefixed
+        with the build directory path on disk"""
+        return os.path.join(config["build"]["dir"], self.path)
+
+    @property
+    def path_on_disk(self):
+        assert self._path_on_disk is not None
+        return self._path_on_disk
 
     def set_type(self, type):
         self.__class__ = type
@@ -212,6 +248,13 @@ class Page(object):
         return sorted(get_commits(self._path_on_disk), key=lambda c: c["date"])[-1]["date"]
 
     @property
+    def anchors(self):
+        """Return a set of all html anchors on the page that can be linked to"""
+        if self._anchors is None:
+            self.render(query_anchors=True)
+        return self._anchors
+
+    @property
     def images(self):
         """Retrives the images in the same directory as this page"""
         basedir = os.path.split(self._path_on_disk)[0]
@@ -222,24 +265,75 @@ class Page(object):
                 images[page] = Image(path_on_disk=os.path.join(basedir, page))
         return images
 
-    def render(self, query_type=False):
+    @property
+    def deps(self):
+        """Query all the resources this file *immediately* depends on,
+        and return them as a list of Page objects"""
+        if self._deps is None:
+            r = self.render(query_deps=True)
+        print("deps:", self._deps)
+        return self._deps
+    @property
+    def rtdeps(self):
+        """All resources that this file depends on at runtime (e.g. links, etc)"""
+        # trigger building of deps    
+        self.deps
+        return self._rtdeps
+
+    @property
+    def contents(self):
+        return self.render()
+
+    def render(self, query_type=False, query_anchors=False, query_deps=False):
         global config
         in_path = self._path_on_disk
         out_path = self.path
+        deps = set()
+        rtdeps = set()
+        anchors = set() # html anchors, e.g. mypage.html#heading1 - "heading1" is an anchor
         def to_rel_path(abs_path):
             prefix = "../"*out_path.count("/")
             rel = os.path.join(prefix, abs_path)
-            if rel.endswith("index.html") and config["omit_index_from_url"]:
-                rel = rel[:-len("index.html")]
-            return rel
+            if "#" in rel:
+                base, anchor = rel.split("#")
+            else:
+                base, anchor = rel, None
+            # Remove index.html from the path if configured to.
+            # Note: Need to remove any html anchor before doing this (done above)
+            if base.endswith("index.html") and config["omit_index_from_url"]:
+                base = base[:-len("index.html")]
+            # Re-add the anchor, if there was one
+            return base if anchor is None else "#".join((base, anchor))
+        def add_dep(dep):
+            deps.add(dep)
+            # Return empty string so this expression won't write to the output stream
+            return ""
+        def add_rtdep(dep):
+            rtdeps.add(dep)
+            return ""
+        def add_anchor(anch):
+            anchors.add(anch)
+            return ""
+
+        # We are either (a) rendering the page,
+        # (b) querying its type
+        # (c) querying its anchors
+        # (d) querying its dependencies
+        # Both (a), (c), (d) require rendering the page
+        do_render = not query_type or query_anchors or query_deps
 
         env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True)
 
         # Populate template global variables & filters
         env.globals.update(config)
+        env.globals["add_dep"] = add_dep
+        env.globals["add_rtdep"] = add_rtdep
+        env.globals["add_anchor"] = add_anchor
         env.globals["query_type"] = query_type
+        env.globals["do_render"] = do_render
+        env.globals["validate_anchors"] = not query_anchors # Avoid circular dependencies.
         env.globals["pages"] = get_pages()
-        env.globals["resources"] = Pages("res/", [".css", ".scss"])
+        #env.globals["resources"] = Pages("res/", [".css", ".scss"])
         env.filters["into_tag"] = filter_into_tag
         env.filters["friendly_date"] = filter_friendly_date
         env.filters["detailed_date"] = filter_detailed_date
@@ -252,8 +346,26 @@ class Page(object):
         env.globals["HomePage"] = HomePage
         env.globals["AboutPage"] = AboutPage
 
-        template = env.from_string(open(in_path).read())
-        r = template.render()
+        if self.do_render_with_jinja:
+            template = env.from_string(open(in_path).read())
+            r = template.render()
+        else:
+            # This is a binary file
+            r = open(in_path, "rb").read()
+
+        if query_deps:
+            if self._deps:
+                deps.update(self._deps)
+            self._deps = deps
+            if self._rtdeps:
+                rtdeps.update(self._rtdeps)
+            self._rtdeps = rtdeps
+
+        if query_anchors:
+            if self._anchors:
+                anchors.update(self._anchors)
+            self._anchors = anchors
+
         return r
 
 class Author(object):
@@ -265,6 +377,7 @@ class Author(object):
         return hash(self.name)
 
 class Image(Page):
+    do_render_with_jinja = False
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
     @property
@@ -273,10 +386,14 @@ class Image(Page):
         im = PIL.Image.open(self._path_on_disk)
         return im.size
 
+class Font(Page):
+    do_render_with_jinja = False
+
 class Css(Page):
-    pass
+    do_render_with_jinja = True
 
 class BlogEntry(Page):
+    do_render_with_jinja = True
     @property
     def comment_email(self):
         """The email address that should be used to send comments to this blog entry"""
@@ -289,10 +406,10 @@ class BlogEntry(Page):
 
 
 class HomePage(Page):
-    pass
+    do_render_with_jinja = True
 
 class AboutPage(Page):
-    pass
+    do_render_with_jinja = True
 
 class Comment(Page):
     def __init__(self, page, body):
@@ -320,10 +437,22 @@ class Pages(object):
                     self._all[fname] = Page(path_on_disk=os.path.join(self._basedir, fname))
         return self._all
 
+    def __hasitem__(self, key):
+        print("hasitem:", key)
+        try:
+            self[key]
+        except KeyError:
+            return False
+        else:
+            return True
+
     def __getitem__(self, key):
         """Returns a page by its path.
         Note: index.html is implicit (if the path doesn't exist)
         """
+        if not isinstance(key, str):
+            raise KeyError(key)
+
         if key.startswith("/"):
             # Leading slash is optional, but useful for requesting the index page
             key = key[1:]
@@ -332,10 +461,10 @@ class Pages(object):
         elif os.path.join(key, "index.html") in self.all:
             return self.all[os.path.join(key, "index.html")]
         else:
-            if os.path.splitext(key)[1] == ".css":
-                # SASS files are compiled into normal CSS
-                return self[key[:-len(".css")] + ".scss"]
-            return KeyError(key)
+            #if os.path.splitext(key)[1] == ".css":
+            #    # SASS files are compiled into normal CSS
+            #    return self[key[:-len(".css")] + ".scss"]
+            raise KeyError(key)
 
     @property
     def blog_entries(self):
@@ -347,5 +476,8 @@ class Pages(object):
         return entries
 
 def get_pages():
-    return Pages("pages/", [".html"])
+    ext = [".html", ".css"]
+    ext.extend(IMG_EXTENSIONS)
+    ext.extend(FONT_EXTENSIONS)
+    return Pages("pages/", ext)
 

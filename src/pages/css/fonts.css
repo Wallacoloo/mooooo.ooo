@@ -1,0 +1,55 @@
+{% from 'macros.jinja' import include_inline %}
+{% from 'macros.css' import incl_font_sources %}
+
+/* Fonts */
+/* QuickSand font:
+ * source: http://www.fontsquirrel.com/fonts/Quicksand
+ *       : https://www.google.com/fonts/specimen/Quicksand
+ * License: SIL Open Font License 1.1
+ * Author: Andrew Paglinawan
+ * Thanks for such a beautiful font, Andrew!
+ */
+@font-face
+{
+    font-family: 'quicksand';
+	src: local("Quicksand Regular"), local("Quicksand-Regular");
+	{{ incl_font_sources("quicksand-regular-webfont") }}
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face
+{
+    font-family: 'quicksand';
+	src: local("Quicksand Bold"), local("Quicksand-Bold");
+	{{ incl_font_sources("quicksand-bold-webfont") }}
+    font-weight: bold;
+    font-style: normal;
+}
+
+/* Raleway font:
+ * source: http://www.fontsquirrel.com/fonts/Raleway
+ *       : https://www.google.com/fonts/specimen/Raleway
+ * License: SIL Open Font License 1.1
+ * Author: Multiple (The League of Moveable Type)
+ */
+@font-face
+{
+    font-family: 'raleway';
+	src: local("Raleway Regular"), local("Raleway-Regular");
+	{{ incl_font_sources("raleway-regular-webfont") }}
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face
+{
+    font-family: 'raleway';
+	src: local("Raleway Bold"), local("Raleway-Bold");
+	{{ incl_font_sources("raleway-bold-webfont") }}
+    font-weight: bold;
+    font-style: normal;
+}
+
+{{ include_inline(pages["css/font-awesome.css"]) }}
+

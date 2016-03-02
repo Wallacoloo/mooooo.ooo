@@ -6,7 +6,7 @@
 {% block page_content %}
 
 {% for entry in pages.blog_entries.values()|selectattr("is_published")|sort(attribute="pub_date", reverse=True) %}
-{{ heading(entry.title, link_to=entry.path|to_rel_path, show_icon=False, sublevel=1) }}
+{{ heading(entry.title, link_to=entry, show_icon=False, sublevel=1) }}
 <div class="blog-pubdate">
 {{ show_date(entry.pub_date) }}
 </div>

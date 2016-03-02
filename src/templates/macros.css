@@ -1,0 +1,20 @@
+{% macro incl_font_sources(fname) %}
+{% if ("fonts/%s.eot"|format(fname)) in pages.all %}
+	/* Embedded Open Type, for IE */
+	{{ add_rtdep(pages["fonts/%s.eot"|format(fname)]) }}
+	src: url('{{ pages["fonts/%s.eot"|format(fname)].path|to_rel_path }}');
+	src: url('{{ pages["fonts/%s.eot"|format(fname)].path|to_rel_path }}?#iefix') format('embedded-opentype');
+{% endif %}
+{% if ("fonts/%s.ttf"|format(fname)) in pages.all %}
+	{{ add_rtdep(pages["fonts/%s.ttf"|format(fname)]) }}
+	src: url('{{ pages["fonts/%s.ttf"|format(fname)].path|to_rel_path }}');
+{% endif %}
+{% if ("fonts/%s.woff"|format(fname)) in pages.all %}
+	{{ add_rtdep(pages["fonts/%s.woff"|format(fname)]) }}
+	src: url('{{ pages["fonts/%s.woff"|format(fname)].path|to_rel_path }}');
+{% endif %}
+{% if ("fonts/%s.woff2"|format(fname)) in pages.all %}
+	{{ add_rtdep(pages["fonts/%s.woff2"|format(fname)]) }}
+	src: url('{{ pages["fonts/%s.woff2"|format(fname)].path|to_rel_path }}');
+{% endif %}
+{% endmacro %}
