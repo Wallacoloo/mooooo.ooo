@@ -28,7 +28,6 @@ def make(page=None):
             make(page)
     else:
         print("[make %r]" %page)
-        print("[FIXME] make.make() not implemented")
 
 def make_deps(page=None, outfile=None):
     """Determine the dependencies for building the given page,
@@ -44,7 +43,6 @@ def make_deps(page=None, outfile=None):
             #f.write("all: %s\n" %page.path_in_build_tree)
     else:
         print("[make_deps %r]" %page)
-        print("[FIXME] make.make_deps() not implemented")
         rule_name = page.path_in_build_tree
 
         if outfile is None:
