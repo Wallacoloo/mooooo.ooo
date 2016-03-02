@@ -44,6 +44,12 @@ publish-cf: publish-ipfs ## Update the DNS records for a cloudflare server
 publish: publish-ipfs publish-cf publish-ipns ## Publish the site everywhere
 	true
 
+## Build compresses png images
+$(BUILD_DIR)/%.png: pages/%.png
+	mkdir -p $(dir $@)
+	@# Copy the image, then run optipng (but don't abort if optipng isn't found.
+	cp $^ $@ && optipng -q $@ || true
+
 ## Build any resources (webpages, css, images, fonts, etc)
 $(BUILD_DIR)/%: pages/%
 	mkdir -p $(dir $@)
