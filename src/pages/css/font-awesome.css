@@ -7,7 +7,7 @@
  * -------------------------- */
 @font-face {
   font-family: 'FontAwesome';
-  {{ incl_font_sources("fontawesome-webfont") }}
+  {{ incl_font_sources("FontAwesome") }}
   font-weight: normal;
   font-style: normal;
 }

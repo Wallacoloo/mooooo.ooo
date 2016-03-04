@@ -13,7 +13,7 @@
 {
     font-family: 'quicksand';
 	src: local("Quicksand Regular"), local("Quicksand-Regular");
-	{{ incl_font_sources("quicksand-regular-webfont") }}
+	{{ incl_font_sources("Quicksand-Regular") }}
     font-weight: normal;
     font-style: normal;
 }
@@ -22,7 +22,7 @@
 {
     font-family: 'quicksand';
 	src: local("Quicksand Bold"), local("Quicksand-Bold");
-	{{ incl_font_sources("quicksand-bold-webfont") }}
+	{{ incl_font_sources("Quicksand-Bold") }}
     font-weight: bold;
     font-style: normal;
 }
@@ -37,7 +37,7 @@
 {
     font-family: 'raleway';
 	src: local("Raleway Regular"), local("Raleway-Regular");
-	{{ incl_font_sources("raleway-regular-webfont") }}
+	{{ incl_font_sources("Raleway-Regular") }}
     font-weight: normal;
     font-style: normal;
 }
@@ -46,7 +46,7 @@
 {
     font-family: 'raleway';
 	src: local("Raleway Bold"), local("Raleway-Bold");
-	{{ incl_font_sources("raleway-bold-webfont") }}
+	{{ incl_font_sources("Raleway-Bold") }}
     font-weight: bold;
     font-style: normal;
 }

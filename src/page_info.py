@@ -127,8 +127,8 @@ def get_pub_date_of_file(filename):
 
 
 class Page(object):
-    def __init__(self, path_on_disk=None, title=None):
-        assert os.path.exists(path_on_disk)
+    def __init__(self, path_on_disk=None, title=None, need_exist=True):
+        if need_exist: assert os.path.exists(path_on_disk)
 
         self._path_on_disk = path_on_disk
         self._title = title
@@ -349,6 +349,7 @@ class Page(object):
         env.globals["BlogEntry"] = BlogEntry
         env.globals["HomePage"] = HomePage
         env.globals["AboutPage"] = AboutPage
+        env.globals["Page"] = Page
 
         if self.do_render_with_jinja:
             template = env.from_string(open(in_path).read())

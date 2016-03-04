@@ -1,7 +1,7 @@
+MAKE_DIR=$(shell pwd)
 BUILD_ROOT=$(shell cd ../ && pwd)/build
 # Directory in which to create the static website
 BUILD_DIR=$(BUILD_ROOT)/mooooo
-# Directory where static resources are kept
 
 IPFSID_FILE=$(BUILD_ROOT)/mooooo.ipfsid
 IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
@@ -45,12 +45,36 @@ publish-cf: publish-ipfs ## Update the DNS records for a cloudflare server
 publish: publish-ipfs publish-cf publish-ipns ## Publish the site everywhere
 	true
 
-## Build compresses png images
+## Build compressed png images
 $(BUILD_DIR)/%.png: pages/%.png
 	@mkdir -p $(dir $@)
 	@# Copy the image, then run optipng (but don't abort if optipng isn't found.
 	cp $^ $@
 	optipng --quiet $@ || true
+
+# If the font already exists, just directly copy it
+$(BUILD_ROOT)/fonts/%: fonts/%
+	mkdir -p $(dir $@)
+	cp $< $@
+
+## Build TTF fonts from OTF
+$(BUILD_ROOT)/fonts/%.ttf: fonts/%.otf
+	mkdir -p $(dir $@)
+	fontforge -c 'import fontforge; font = fontforge.open("$(MAKE_DIR)/$<"); font.generate("$@")'
+
+## Build WOFF, SVG, EOT fonts from TTF
+$(BUILD_ROOT)/fonts/%.woff $(BUILD_ROOT)/fonts/%.eot $(BUILD_ROOT)/fonts/%.svg: $(BUILD_ROOT)/fonts/%.ttf
+	mkdir -p $(dir $@)
+	webify $<
+
+## Build WOFF2 fonts from WOFF
+%.woff2: %.ttf
+	woff2_compress $<
+
+## Copy generated fonts to the published directory (as the font generators may create extra files)
+$(BUILD_DIR)/fonts/%: $(BUILD_ROOT)/fonts/%
+	mkdir -p $(dir $@)
+	cp $< $@
 
 ## Build any resources (webpages, css, images, fonts, etc)
 $(BUILD_DIR)/%: pages/%

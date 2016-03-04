@@ -1,20 +1,12 @@
 {% macro incl_font_sources(fname) %}
-{% if ("fonts/%s.eot"|format(fname)) in pages.all %}
 	/* Embedded Open Type, for IE */
-	{{ add_rtdep(pages["fonts/%s.eot"|format(fname)]) }}
-	src: url('{{ pages["fonts/%s.eot"|format(fname)].path|to_rel_path }}');
-	src: url('{{ pages["fonts/%s.eot"|format(fname)].path|to_rel_path }}?#iefix') format('embedded-opentype');
-{% endif %}
-{% if ("fonts/%s.ttf"|format(fname)) in pages.all %}
-	{{ add_rtdep(pages["fonts/%s.ttf"|format(fname)]) }}
-	src: url('{{ pages["fonts/%s.ttf"|format(fname)].path|to_rel_path }}');
-{% endif %}
-{% if ("fonts/%s.woff"|format(fname)) in pages.all %}
-	{{ add_rtdep(pages["fonts/%s.woff"|format(fname)]) }}
-	src: url('{{ pages["fonts/%s.woff"|format(fname)].path|to_rel_path }}');
-{% endif %}
-{% if ("fonts/%s.woff2"|format(fname)) in pages.all %}
-	{{ add_rtdep(pages["fonts/%s.woff2"|format(fname)]) }}
-	src: url('{{ pages["fonts/%s.woff2"|format(fname)].path|to_rel_path }}');
-{% endif %}
+	{% set f=Page("fonts/%s.eot"|format(fname), need_exist=False) %}
+	{{ add_rtdep(f) }}
+	src: url('{{ f.path|to_rel_path }}');
+	src: url('{{ f.path|to_rel_path }}?#iefix') format('embedded-opentype');
+	{% for ext in ("ttf", "woff", "woff2") %}
+		{% set f=Page("fonts/%s.%s"|format(fname, ext), need_exist=False) %}
+		{{ add_rtdep(f) }}
+		src: url('{{ f.path|to_rel_path }}');
+	{% endfor %}
 {% endmacro %}
