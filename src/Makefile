@@ -6,6 +6,9 @@ BUILD_DIR=$(BUILD_ROOT)/mooooo
 IPFSID_FILE=$(BUILD_ROOT)/mooooo.ipfsid
 IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 
+EC2_ID_FILE=../MOOOOOoooWebServer.pem
+EC2_USER_DOMAIN=root@ec2.mooooo.ooo
+
 
 all: $(BUILD_ROOT)/all.depincludes
 all: $(BUILD_DIR)/index.html
@@ -42,7 +45,10 @@ publish-ipns: publish-ipfs ## Update the IPNS link to point to the newest versio
 publish-cf: publish-ipfs ## Update the DNS records for a cloudflare server
 	./publish_cloudflare.py $(shell cat ../cloudflare_apikey) $(shell cat $(IPFSID_FILE))
 
-publish: publish-ipfs publish-cf publish-ipns ## Publish the site everywhere
+publish-ec2: publish-ipfs ## Pin the new build to the Amazon EC2 instance
+	ssh -i $(EC2_ID_FILE) $(EC2_USER_DOMAIN) "ipfs pin add /ipfs/$(shell cat $(IPFSID_FILE))"
+
+publish: publish-ipfs publish-cf publish-ipns publish-ec2 ## Publish the site everywhere
 	true
 
 ## Build compressed png images
