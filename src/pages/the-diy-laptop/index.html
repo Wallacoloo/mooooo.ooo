@@ -1,7 +1,47 @@
+{% from 'base.html' import heading %}
 {{ page.set_title("The DIY Laptop") }}
 
 {% extends 'blog_entry.html' %}
 {% block entry_content %}
-Test
+
+{{ show_image(page.images["end-result-1.jpg"]) }}
+
+{{ heading("Background") }}
+
+<p>
+Back in August, I decided to ditch my horribly dated Toshiba Satellite and set myself up with a new computer.
+Based on my experience buying a low-end laptop the previous time and then my inability to meaningfully upgrade its RAM or hard disk,
+I wanted something that was atleast mid-range for today, and upgradeable in the future.
+Turns out, it's very difficult to find a mid-range laptop that doesn't have a ridiculous price markup.
+And barebones, easily upgradeable laptops are prohibitively expensive.
+</p>
+
+<p>
+So I looked into other options - especially in the DIY area. There's a fair amount of talk about "DIY laptops", but everyone interprets the phrase differently and there are very actual results beyond somebody's ridiculously over-the-top plans.
+</p>
+
+<p>
+But my research led me to discover the realm of "Mini PCs" - full desktop PCs with very small form factors that are mostly designed to fit in some discreet location or attach to the back of a monitor. Many of these were actually as thin as my previous laptop.
+</p>
+
+<p>
+So I thought to myself: <i>if these PCs are already designed to mount to the back of a display, maybe I can find a portable display/battery/keyboard and just connect everything together</i>. For the most part, the components necessary for such a system that balanced size and cost didn't exist at the time. However, I happened to have a Motorola Lapdock lying around from a previous project.
+</p>
+
+<p>
+So I began planning. The first thing to figure out was what options I had available for powering a PC off of a battery.
+<!--By looking at all the specs for mini PCs whose performance I deemed acceptable, I knew that most of these systems had a TDP of 15 W. So I figured my system should be capable of supplying at least about 30 W, to accomodate for the RAM and SSD, plus at least some error margin. -->
+The Lapdock <i>is</i> designed to charge a phone when it's connected. And it also has 2 USB ports -- so <i>maybe</i> it can source enough power to boot the system, and I can see how things work from there?
+I mean, people use these to power Raspberry Pi's, so it must be able to source <i>some</i> amount of current
+</p>
+
+<p>
+So I attached a 5-ohm load across the USB power pins and measured things with a multimeter. I can't remember exactly my approach, but it was immediately clear that powering even one of the intel compute stick's would be pushing it past its limits.
+</p>
+
+<p>
+</p>
+
+
 {% endblock %}
 
