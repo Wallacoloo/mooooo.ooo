@@ -72,16 +72,25 @@
 		text-decoration: underline;
 }
 
-.theater-image
+/* Contains an image and an optional caption (which will be aligned accordingle) */
+.image-container
 {
 		display: block;
 		margin-left: auto;
 		margin-right: auto;
 		max-width: 80%;
+}
+
+.theater-image
+{
 		height: auto;
 		margin-top: 0.5em;
-		margin-bottom: 1em;
 		border: 4px #686868 solid;
 		border-radius: 16px;
 }
 
+.image-container > .caption
+{
+		margin-left: 28px;
+		/*margin-right: 28px;*/
+}

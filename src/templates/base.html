@@ -18,13 +18,18 @@
 </h{{ sublevel+1 }}>
 {% endmacro %}
 
-{% macro show_image(image) %}
+{% macro show_image(image, caption="") %}
 {# Used to show an image in the center of the screen.
    This also configures the link to a full-screen version #}
 {{ add_rtdep(image) }}
+<span class="image-container">
 <a href="{{ image.path|to_rel_path }}">
 		<img src="{{ image.path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px" class="theater-image"/>
 </a>
+{% if caption %}
+<i class="caption">{{ caption }}</i>
+{% endif %}
+</span>
 {% endmacro %}
 
 {% macro include_css(css_page) %}
