@@ -1,6 +1,6 @@
 #!/bin/sh
 # Installs the pre-requisites for Arch Linux
-pacman -Su --needed --noconfirm fontforge go-ipfs optipng python python-dateutil python-jinja python-pillow python-requests
+pacman -Su --needed --noconfirm fontforge go-ipfs jpegoptim optipng python python-dateutil python-jinja python-pillow python-requests
 
 alias makepkg="sudo -u nobody makepkg"
 
