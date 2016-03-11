@@ -58,6 +58,13 @@ $(BUILD_DIR)/%.png: pages/%.png
 	cp $^ $@
 	optipng --quiet $@ || true
 
+## Compress jpegs (losslessly), plus remove a lot of metadata
+$(BUILD_DIR)/%.jpg: pages/%.jpg
+	@mkdir -p $(dir $@)
+	@# Copy the image, then run jpegoptim (but don't abort if binary doesn't exist)
+	cp $^ $@
+	jpegoptim -s $@ || true
+
 # If the font already exists, just directly copy it
 $(BUILD_ROOT)/fonts/%: fonts/%
 	mkdir -p $(dir $@)
