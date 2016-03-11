@@ -6,6 +6,12 @@
 
 {{ show_image(page.images["end-result-1.jpg"], caption="The end result of this experiment.") }}
 
+{# Plan:
+Background: Why a DIY laptop.
+Existing options: (xbox laptop).
+
+#}
+
 {{ heading("Background") }}
 
 <p>
@@ -31,17 +37,28 @@ So I thought to myself: <i>if these PCs are already designed to mount to the bac
 <p>
 So I began planning. The first thing to figure out was what options I had available for powering a PC off of a battery.
 <!--By looking at all the specs for mini PCs whose performance I deemed acceptable, I knew that most of these systems had a TDP of 15 W. So I figured my system should be capable of supplying at least about 30 W, to accomodate for the RAM and SSD, plus at least some error margin. -->
-The Lapdock <i>is</i> designed to charge a phone when it's connected. And it also has 2 USB ports -- so <i>maybe</i> it can source enough power to boot the system, and I can see how things work from there?
-I mean, people use these to power Raspberry Pi's, so it must be able to source <i>some</i> amount of current
+The Lapdock <i>is</i> designed to charge a phone when it's connected. And it also has 2 USB ports -- so <i>maybe</i> it can source enough power to boot some low-power system, and I can see how things work from there?
+I mean, people use these to power Raspberry Pi's, so it must be able to source <i>some</i> amount of current.
 </p>
 
 <p>
-So I attached a 5-ohm load across the USB power pins and measured things with a multimeter. I can't remember exactly my approach, but it was immediately clear that powering even one of the intel compute stick's would be pushing it past its limits.
+So I attached a load across the USB power pins and measured things with a multimeter. I can't remember exactly my approach, but it was immediately clear that powering even one of the intel compute stick's would be pushing it past its limits (which happen to be roughly 3.2 W).
+Maybe this was a good thing though, because it made me much less interested in the USB-stick computers which I know I wouldn't have been happy with anyway.
+Instead, I decided upon the intel NUC as my mini-computer, and I would find a small battery capable of outputting the 12-19 V input the NUC expects. 
+The NUC model I had in mind shipped with a 2-core i5 processor with a TDP of 15 W.
+So I figured my system should be capable of supplying at about 30 W, to accomodate for the RAM and SSD, plus at least some error margin.
 </p>
 
 <p>
+I was having a bit of trouble finding a good solution, so I went out on (what I thought was) a whim and decided to see how much power the Lapdock's battery could source, thinking that <i>maybe</i> I could piggyback off that and boost it up to 12-19 V.
+So I opened up the lapdock and hunted for the power rails using a multimeter. Much to my surprise, the power circuitry actually made use of 3 cells stacked in series... summing to a nominal voltage <i>just over</i> 12 V.
 </p>
 
+<p>
+Well that was rather convenient. Next step: figure out how much current this can source. This part was new to me - batteries are an intimidating thing when it comes to safety. I figured Motorola, being a fairly reputable company, had the proper protections very close to the cells, if not actually integrated into the batteries, so I just attached clips right near the base of the bus that transmits power from the battery circuitboard to the main circuit board, made a mental note of where my (electrical-)fire extinguisher was, attached an "adjustable load", and measured the voltage across the load as I adjusted it.
+</p>
+
+{{ show_image(page.images["lapdock-power-load.jpg"], caption="A low-precision \"adjustable load\" for the hapless engineer.") }}
 
 {% endblock %}
 
