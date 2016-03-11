@@ -1,3 +1,12 @@
+# Binaries:
+OPTIPNG=optipng
+JPGCRUSH=jpgcrush
+
+# jpegoptim provides 3~4% improvement (w/ -s)
+# jpegrescan provides 6~7% (w/ -s)
+# jpegcrush provides 6-8% (this is a wrapper around jpegrescan)
+
+
 MAKE_DIR=$(shell pwd)
 BUILD_ROOT=$(shell cd ../ && pwd)/build
 # Directory in which to create the static website
@@ -56,14 +65,14 @@ $(BUILD_DIR)/%.png: pages/%.png
 	@mkdir -p $(dir $@)
 	@# Copy the image, then run optipng (but don't abort if optipng isn't found.
 	cp $^ $@
-	optipng --quiet $@ || true
+	$(OPTIPNG) --quiet $@ || true
 
 ## Compress jpegs (losslessly), plus remove a lot of metadata
 $(BUILD_DIR)/%.jpg: pages/%.jpg
 	@mkdir -p $(dir $@)
 	@# Copy the image, then run jpegoptim (but don't abort if binary doesn't exist)
 	cp $^ $@
-	jpegoptim -s $@ || true
+	$(JPGCRUSH) $@ || true
 
 # If the font already exists, just directly copy it
 $(BUILD_ROOT)/fonts/%: fonts/%
