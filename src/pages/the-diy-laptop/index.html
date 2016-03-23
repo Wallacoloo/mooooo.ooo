@@ -23,39 +23,42 @@ And barebones, easily upgradeable laptops are prohibitively expensive.
 </p>
 
 <p>
-So I looked into other options - especially in the DIY area. There's a fair amount of talk about "DIY laptops", but everyone interprets the phrase differently and there are very actual results beyond somebody's ridiculously over-the-top plans.
+So I looked into other options - especially in the DIY area. There's a fair amount of talk about "DIY laptops", but everyone interprets the phrase differently and there are very few actual results beyond somebody's ridiculously over-the-top plans.
 </p>
 
 <p>
-But my research led me to discover the realm of "Mini PCs" - full desktop PCs with very small form factors that are mostly designed to fit in some discreet location or attach to the back of a monitor. Many of these were actually as thin as my previous laptop.
+Enter Intel's NUC (I spent a good 2 months with research before deciding upon the NUC, but I'm skipping all the ideas I ditched for the sake of brevity).
+</p>
+
+{{ show_image(get_image("digital-trends-nuc-5i5ryk.jpg"), caption="The Intel NUC 5i5RYK. Source (along with an in-depth review): " + offsite_link("http://www.digitaltrends.com/desktop-computer-reviews/intel-nuc-core-i5-nuc5i5ryk-review/attachment/intel-nuc-core-i5-nuc5i5ryk-mini-pc-review-front-ports/", "Digital Trends")) }}
+
+<p>
+The intel NUC is an unusually-powerful mini-PC. There's a whole class of PCs in this form factor, but the majority of them pack whimpy Atom processors and have soldered RAM or few connectivity options.
 </p>
 
 <p>
-So I thought to myself: <i>if these PCs are already designed to mount to the back of a display, maybe I can find a portable display/battery/keyboard and just connect everything together</i>. For the most part, the components necessary for such a system that balanced size and cost didn't exist at the time. However, I happened to have a Motorola Lapdock lying around from a previous project.
+This particular model packs a 5th-generation i5-5250U dual-core (plus hyperthreading) processor with intel HD 6000 graphics packing 768 GFLOPS {{ cite(url="https://en.wikipedia.org/wiki/Intel_HD_and_Iris_Graphics#Broadwell") }} all at a 15 W TDP. It also accepts 2x8GB LPDDR3 DIMMs and has one M.2 slot for your choice of SSD. The price tag is around $350. Couple this with a display, battery, keyboard and touchpad, and you've got a decent laptop.
 </p>
 
 <p>
-So I began planning. The first thing to figure out was what options I had available for powering a PC off of a battery.
-<!--By looking at all the specs for mini PCs whose performance I deemed acceptable, I knew that most of these systems had a TDP of 15 W. So I figured my system should be capable of supplying at least about 30 W, to accomodate for the RAM and SSD, plus at least some error margin. -->
-The Lapdock <i>is</i> designed to charge a phone when it's connected. And it also has 2 USB ports -- so <i>maybe</i> it can source enough power to boot some low-power system, and I can see how things work from there?
-I mean, people use these to power Raspberry Pi's, so it must be able to source <i>some</i> amount of current.
+And... enter Motorola's failed Lapdock project:
+</p>
+
+{{ show_image(get_image("amazon-lapdock.jpg"), caption="Source: " + offsite_link("https://www.amazon.com/AT-Laptop-Dock-Motorola-ATRIX/dp/B004M17D62", "Amazon product page")) }}
+
+<p>
+The Lapdock provides all the components I listed previously, plus a pair of (weak) speakers and exposes all those peripherals over a single USB connection + one HDMI connection. It was originally designed to be paired with a specific Motorola phone model, but that's irrelevant - it can be connected to <em>anything</em>.
 </p>
 
 <p>
-So I attached a load across the USB power pins and measured things with a multimeter. I can't remember exactly my approach, but it was immediately clear that powering even one of the intel compute stick's would be pushing it past its limits (which happen to be roughly 3.2 W).
-Maybe this was a good thing though, because it made me much less interested in the USB-stick computers which I know I wouldn't have been happy with anyway.
-Instead, I decided upon the intel NUC as my mini-computer, and I would find a small battery capable of outputting the 12-19 V input the NUC expects. 
-The NUC model I had in mind shipped with a 2-core i5 processor with a TDP of 15 W.
-So I figured my system should be capable of supplying at about 30 W, to accomodate for the RAM and SSD, plus at least some error margin.
+Naturally, these two products should pair with each other.
+The next thing to determine is whether the Lapdock could source enough power for the NUC or if I'd need an additional battery (the Lapdock is just designed to charge a phone and host a pair of USB devices - it might not be spec'd high enough for the NUC system).
+So I cracked open the Lapdock and found my way to the battery circuitry.
 </p>
 
 <p>
-I was having a bit of trouble finding a good solution, so I went out on (what I thought was) a whim and decided to see how much power the Lapdock's battery could source, thinking that <i>maybe</i> I could piggyback off that and boost it up to 12-19 V.
-So I opened up the lapdock and hunted for the power rails using a multimeter. Much to my surprise, the power circuitry actually made use of 3 cells stacked in series... summing to a nominal voltage of <i>almost</i> 12 V.
-</p>
-
-<p>
-Next step: figure out how much power this can source. This part was new to me - batteries are an intimidating thing when it comes to safety. I figured Motorola, being a fairly reputable company, had the proper protections very close to the cells, if not actually integrated into the batteries, so I just attached clips right near the base of the bus that transmits power from the battery circuitboard to the main circuit board, made a mental note of where my (electrical-)fire extinguisher was, attached an "adjustable load", and measured the voltage across the load as I adjusted it.
+This part was new to me - batteries are an intimidating thing when it comes to safety.
+I figured Motorola, being a fairly reputable company, had the proper protections very close to the cells, if not actually integrated into the batteries, so I just attached clips right near the base of the bus that transmits power from the battery circuitboard to the main circuit board, made a mental note of where my (electrical-)fire extinguisher was, attached an "adjustable load", and measured the voltage across the load as I adjusted it.
 </p>
 
 {{ show_image(page.images["lapdock-power-load.jpg"], caption="A low-precision \"adjustable load\" for the hapless engineer.") }}
@@ -68,7 +71,7 @@ I stopped at 35 W as a precaution (it's enough for my application), but presumab
 {{ show_image(get_image("voltage-vs-power.png"), caption="Voltage vs. Power measured at full-charge with ambient temperature around 25 C.") }}
 
 <p>
-I don't know much about battery chemistry, but if we model the battery and its control circuitry as a {{ offsite_link("https://en.wikipedia.org/wiki/Th%C3%A9venin's_theorem", "Thevenin circuit") }}, {{ inline_code("P=IV") }} we can infer that over 4 W are dissipated in the surrounding circuitry when the load reaches 35 W (i.e. 89% efficiency).
+I don't know much about battery chemistry, but if we model the battery and its control circuitry as a {{ offsite_link("https://en.wikipedia.org/wiki/Th%C3%A9venin's_theorem", "Thevenin circuit") }},  we can infer that over 4 W are dissipated in the surrounding circuitry when the load reaches 35 W (i.e. 89% efficiency).
 I don't know the implications of this -- the lapdock's shell should serve as a giant heat-sink if necessary, and this heat is already spread over much more area than a single IC -- but I still wouldn't push it.
 Fortunately, power loss appears to have a <em>quadratic</em> relationship with the load (which is intuitive); a 20 W load causes only about 1.1 W in power loss, and that's our target operating range.
 </p>
@@ -79,7 +82,7 @@ Hence, it wouldn't be unexpected if it's really designed for ~11.5 V, as the bat
 </p>
 
 <p>
-So in the spirit of error margins, or rather, <em>against</em> that spirit, I figured I'd at least <em>try</em> connecting the lapdock's power supply directly to the NUC. Lo and behold, it works!*
+So in the spirit of error margins, or rather, <em>against</em> that spirit, I figured I'd at least <em>try</em> connecting the lapdock's power supply directly to the NUC. Lo and behold, it worked!*
 </p>
 
 *<i> Well, on a full charge, anyway. The NUC has a tendency to shut off around the 40% battery level in warmer weather.</i>
