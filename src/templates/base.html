@@ -62,6 +62,11 @@
 {% macro mailto_link(address, label="", class="", subject="", body="") %}
 {{ offsite_link(path=("mailto:" + address)|url_with_args(**dict(subject=subject, body=body)|drop_null_values), label=label, class=class) }}{% endmacro %}
 
+{% macro cite(url) %}
+{# TODO: implement a reference count #}
+<sup>{{ offsite_link(url, "[1]") }}</sup>
+{% endmacro %}
+
 {# Note: the below needs to be all on one line so its use within a P tag won't cause formatting issues #}
 {# see the (last revised XXX) line in blog_entry.html as example #}
 {% macro show_date(date) %}<span title="{{ date|detailed_date }}">{{ date|friendly_date }}</span>{% endmacro %}
