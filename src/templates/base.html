@@ -7,7 +7,9 @@
 		{% if link %}
 			{% if link_to != None %}{# Link to other page #}
 				{{ add_rtdep(link_to) }}
-				<a href="{{ link_to.path|to_rel_path }}">
+				{% if do_render %}
+					<a href="{{ link_to.path|to_rel_path }}">
+				{% endif %}
 			{% else %}{# Link to self #}
 				<a href="{{ "#" + text|into_tag }}">
 			{% endif %}
@@ -20,21 +22,27 @@
 
 {% macro show_image(image, caption="") %}
 {# Used to show an image in the center of the screen.
-   This also configures the link to a full-screen version #}
+   This also configures the link to a full-screen version.
+   Note: srcdep is needed to know the image size at build time. #}
+{{ add_srcdep(image) }}
 {{ add_rtdep(image) }}
-<span class="image-container">
-<a href="{{ image.path|to_rel_path }}">
+{% if do_render %}
+	<span class="image-container">
+	<a href="{{ image.path|to_rel_path }}">
 		<img src="{{ image.path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px" class="theater-image"/>
-</a>
-{% if caption %}
-<i class="caption">{{ caption }}</i>
+	</a>
+	{% if caption %}
+		<i class="caption">{{ caption }}</i>
+	{% endif %}
+	</span>
 {% endif %}
-</span>
 {% endmacro %}
 
 {% macro include_css(css_page) %}
 {{ add_rtdep(css_page) }}
-<link rel="stylesheet" href="{{ css_page.path|to_rel_path }}">
+{% if do_render %}
+	<link rel="stylesheet" href="{{ css_page.path|to_rel_path }}">
+{% endif %}
 {% endmacro %}
 
 {% macro offsite_link(path, label="", class="") %}
@@ -62,7 +70,7 @@
 <code class="multiline-code">{{ code }}</code>
 {% endmacro %}
 
-{% if do_render %}
+{% if do_render or query_anchors or query_deps %}
 <!DOCTYPE html>
 <html>
 		<head>

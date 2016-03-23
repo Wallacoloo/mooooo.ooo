@@ -211,6 +211,11 @@ class Page(object):
         assert self._path_on_disk is not None
         return self._path_on_disk
 
+    @property
+    def dir_on_disk(self):
+        """Returns the directory containing the source file for this resource"""
+        return os.path.split(self._path_on_disk)[0]
+
     def set_type(self, type):
         self.__class__ = type
         return ""
@@ -259,16 +264,24 @@ class Page(object):
             self.render(query_anchors=True)
         return self._anchors
 
+    def _get_images(self, names=None, **kwargs):
+        """Returns all the images in the same source directory as the object,
+        or the images in the directory indicated by names, regardless of if they exist"""
+        if not names:
+            names = os.listdir(self.dir_on_disk)
+
+        images = {}
+        for page in names:
+            if get_ext(page) in IMG_EXTENSIONS:
+                images[page] = Image(path_on_disk=os.path.join(self.dir_on_disk, page), **kwargs)
+        return images
+
+
     @property
     def images(self):
         """Retrives the images in the same directory as this page"""
-        basedir = os.path.split(self._path_on_disk)[0]
+        return self._get_images()
 
-        images = {}
-        for page in os.listdir(basedir):
-            if get_ext(page) in IMG_EXTENSIONS:
-                images[page] = Image(path_on_disk=os.path.join(basedir, page))
-        return images
 
     @property
     def srcdeps(self):
@@ -319,12 +332,22 @@ class Page(object):
             anchors.add(anch)
             return ""
 
+        def get_image(name):
+            try:
+                return self.images[name]
+            except KeyError:
+                if not query_deps:
+                    raise
+                else:
+                    # If we aren't rendering, we can pretend the image already exists (we assume it will be generated later)
+                    return self._get_images([name], need_exist=False)[name]
+
         # We are either (a) rendering the page,
         # (b) querying its type
         # (c) querying its anchors
         # (d) querying its dependencies
         # Both (a), (c), (d) require rendering the page
-        do_render = not query_type or query_anchors or query_deps
+        do_render = not query_type and not query_anchors and not query_deps
 
         env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True)
 
@@ -333,7 +356,10 @@ class Page(object):
         env.globals["add_srcdep"] = add_srcdep
         env.globals["add_rtdep"] = add_rtdep
         env.globals["add_anchor"] = add_anchor
+        env.globals["get_image"] = get_image
         env.globals["query_type"] = query_type
+        env.globals["query_anchors"] = query_anchors
+        env.globals["query_deps"] = query_deps
         env.globals["do_render"] = do_render
         env.globals["validate_anchors"] = not query_anchors # Avoid circular dependencies.
         env.globals["pages"] = get_pages()
@@ -354,7 +380,7 @@ class Page(object):
         if self.do_render_with_jinja:
             template = env.from_string(open(in_path).read())
             r = template.render().strip()
-        else:
+        elif do_render:
             # This is a binary file
             r = open(in_path, "rb").read()
 
@@ -371,7 +397,8 @@ class Page(object):
                 anchors.update(self._anchors)
             self._anchors = anchors
 
-        return r
+        if do_render:
+            return r
 
 class Author(object):
     def __init__(self, name):

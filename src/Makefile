@@ -1,6 +1,7 @@
 # Binaries:
-OPTIPNG=optipng
-JPGCRUSH=jpgcrush
+EPLOT=eplot
+OPTIPNG=optipng #Optional
+JPGCRUSH=jpgcrush #Optional
 
 # jpegoptim provides 3~4% improvement (w/ -s)
 # jpegrescan provides 6~7% (w/ -s)
@@ -28,7 +29,7 @@ $(BUILD_ROOT)/all.depincludes: $(BUILD_ROOT)/config.json
 	./make.py $@
 
 
-clean:
+clean: ## Remove ALL output files and temporaries, including dependency info
 	rm -rf $(BUILD_ROOT)
 
 ## Create a file that contains the constant IPNS key that we associate with the website
@@ -59,6 +60,11 @@ publish-ec2: publish-ipfs ## Pin the new build to the Amazon EC2 instance
 
 publish: publish-ipfs publish-cf publish-ipns publish-ec2 ## Publish the site everywhere
 	true
+
+## Plot PNGs
+%.png: %.eplot
+	@# The first line of the text file encodes flags to pass to eplot; the rest is data
+	tail -n +2 "$^" | exec eplot $(shell head -1 "$^") -P -o $@
 
 ## Build compressed png images
 $(BUILD_DIR)/%.png: pages/%.png
