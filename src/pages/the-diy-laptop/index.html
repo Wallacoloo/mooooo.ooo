@@ -60,7 +60,8 @@ Next step: figure out how much power this can source. This part was new to me - 
 
 {{ show_image(page.images["lapdock-power-load.jpg"], caption="A low-precision \"adjustable load\" for the hapless engineer.") }}
 
-I made the following measurements, by adjusting the load between 12 ohms and 3 ohms and using Ohm's {{ inline_code("P=I^2 R") }} relationship. I didn't push it beyond this point because 35 W should be enough for my application.
+I approximated the maximum power supply by adjusting the load between 12 ohms and 3 ohms, measuring the voltage across the load after 30 seconds and using Ohm's {{ inline_code("P=V^2/R") }} relationship.
+I stopped at 35 W as a precaution (it's enough for my application), but presumably one can extrapolate further based on these results plotted below.
 
 {{ show_image(get_image("voltage-vs-power.png")) }}
 
