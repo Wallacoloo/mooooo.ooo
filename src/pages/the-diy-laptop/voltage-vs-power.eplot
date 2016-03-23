@@ -1,0 +1,8 @@
+-w 2 -x "Power (W)" -y "Voltage (V)" -t "Supply Voltage as a Function of Power Draw"
+0.00 11.41
+10.4 11.16
+15.2 11.04
+19.7 10.86
+23.1 10.75
+27.7 10.52
+34.7 10.20

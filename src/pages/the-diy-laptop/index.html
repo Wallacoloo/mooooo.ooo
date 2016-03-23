@@ -51,14 +51,18 @@ So I figured my system should be capable of supplying at about 30 W, to accomoda
 
 <p>
 I was having a bit of trouble finding a good solution, so I went out on (what I thought was) a whim and decided to see how much power the Lapdock's battery could source, thinking that <i>maybe</i> I could piggyback off that and boost it up to 12-19 V.
-So I opened up the lapdock and hunted for the power rails using a multimeter. Much to my surprise, the power circuitry actually made use of 3 cells stacked in series... summing to a nominal voltage <i>just over</i> 12 V.
+So I opened up the lapdock and hunted for the power rails using a multimeter. Much to my surprise, the power circuitry actually made use of 3 cells stacked in series... summing to a nominal voltage of <i>almost</i> 12 V.
 </p>
 
 <p>
-Well that was rather convenient. Next step: figure out how much current this can source. This part was new to me - batteries are an intimidating thing when it comes to safety. I figured Motorola, being a fairly reputable company, had the proper protections very close to the cells, if not actually integrated into the batteries, so I just attached clips right near the base of the bus that transmits power from the battery circuitboard to the main circuit board, made a mental note of where my (electrical-)fire extinguisher was, attached an "adjustable load", and measured the voltage across the load as I adjusted it.
+Next step: figure out how much power this can source. This part was new to me - batteries are an intimidating thing when it comes to safety. I figured Motorola, being a fairly reputable company, had the proper protections very close to the cells, if not actually integrated into the batteries, so I just attached clips right near the base of the bus that transmits power from the battery circuitboard to the main circuit board, made a mental note of where my (electrical-)fire extinguisher was, attached an "adjustable load", and measured the voltage across the load as I adjusted it.
 </p>
 
 {{ show_image(page.images["lapdock-power-load.jpg"], caption="A low-precision \"adjustable load\" for the hapless engineer.") }}
+
+I made the following measurements, by adjusting the load between 12 ohms and 3 ohms and using Ohm's {{ inline_code("P=I^2 R") }} relationship. I didn't push it beyond this point because 35 W should be enough for my application.
+
+{{ show_image(get_image("voltage-vs-power.png")) }}
 
 {% endblock %}
 
