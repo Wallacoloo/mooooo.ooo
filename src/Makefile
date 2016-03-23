@@ -29,7 +29,10 @@ $(BUILD_ROOT)/all.depincludes: $(BUILD_ROOT)/config.json
 	./make.py $@
 
 
-clean: ## Remove ALL output files and temporaries, including dependency info
+clean: ## Removes the FINAL outputs of the build, but not cached versions stored elsewhere or dependency info
+	rm -rf $(BUILD_DIR)
+
+clean-all: ## Remove ALL output files and temporaries, including dependency info
 	rm -rf $(BUILD_ROOT)
 
 ## Create a file that contains the constant IPNS key that we associate with the website
@@ -114,5 +117,5 @@ help:
 	@grep -h -P '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 
-.PHONY: clean help publish-ipfs publish-ipns publish-cf publish
+.PHONY: clean clean-all help publish-ipfs publish-ipns publish-cf publish
 
