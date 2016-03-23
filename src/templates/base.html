@@ -28,12 +28,16 @@
 {{ add_rtdep(image) }}
 {% if do_render %}
 	<span class="image-container">
-	<a href="{{ image.path|to_rel_path }}">
-		<img src="{{ image.path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px" class="theater-image"/>
-	</a>
-	{% if caption %}
-		<i class="caption">{{ caption }}</i>
-	{% endif %}
+	<span class="centered" style="width: {{ image.size.0}}px;">
+		<a href="{{ image.path|to_rel_path }}">
+			<img src="{{ image.path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px" class="theater-image"/>
+		</a>
+		{% if caption %}
+			<span class="caption">
+				<i>{{ caption }}</i>
+			</span>
+		{% endif %}
+	</span>
 	</span>
 {% endif %}
 {% endmacro %}
