@@ -60,10 +60,29 @@ Next step: figure out how much power this can source. This part was new to me - 
 
 {{ show_image(page.images["lapdock-power-load.jpg"], caption="A low-precision \"adjustable load\" for the hapless engineer.") }}
 
+<p>
 I approximated the maximum power supply by adjusting the load between 12 ohms and 3 ohms, measuring the voltage across the load after 30 seconds and using Ohm's {{ inline_code("P=V^2/R") }} relationship.
 I stopped at 35 W as a precaution (it's enough for my application), but presumably one can extrapolate further based on these results plotted below.
+</p>
 
-{{ show_image(get_image("voltage-vs-power.png")) }}
+{{ show_image(get_image("voltage-vs-power.png"), caption="Voltage vs. Power measured at full-charge with ambient temperature around 25 C.") }}
+
+<p>
+I don't know much about battery chemistry, but if we model the battery and its control circuitry as a {{ offsite_link("https://en.wikipedia.org/wiki/Th%C3%A9venin's_theorem", "Thevenin circuit") }}, {{ inline_code("P=IV") }} we can infer that over 4 W are dissipated in the surrounding circuitry when the load reaches 35 W (i.e. 89% efficiency).
+I don't know the implications of this -- the lapdock's shell should serve as a giant heat-sink if necessary, and this heat is already spread over much more area than a single IC -- but I still wouldn't push it.
+Fortunately, power loss appears to have a <em>quadratic</em> relationship with the load (which is intuitive); a 20 W load causes only about 1.1 W in power loss, and that's our target operating range.
+</p>
+
+<p>
+Now, the NUC advertises an input voltage anywhere between 12 V and 19 V. I figure that the 12 V would be aimed at robotics - many of which are powered by batteries with a <em>nominal</em> voltage of 12 V.
+Hence, it wouldn't be unexpected if it's really designed for ~11.5 V, as the battery drains or heats up, and it's good practice for manufacturers to add error margins to this number on top of that.
+</p>
+
+<p>
+So in the spirit of error margins, or rather, <em>against</em> that spirit, I figured I'd at least <em>try</em> connecting the lapdock's power supply directly to the NUC. Lo and behold, it works!*
+</p>
+
+*<i> Well, on a full charge, anyway. The NUC has a tendency to shut off around the 40% battery level in warmer weather.</i>
 
 {% endblock %}
 
