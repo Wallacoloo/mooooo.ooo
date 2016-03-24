@@ -50,6 +50,8 @@ And... enter Motorola's failed Lapdock project:
 The Lapdock provides all the components I listed previously, plus a pair of (weak) speakers and exposes all those peripherals over a single USB connection + one HDMI connection. It was originally designed to be paired with a specific Motorola phone model, but that's irrelevant - it can be connected to <em>anything</em>.
 </p>
 
+{{ heading("Let's Get Hacking") }}
+
 <p>
 Naturally, these two products should pair with each other.
 The next thing to determine is whether the Lapdock could source enough power for the NUC or if I'd need an additional battery (the Lapdock is just designed to charge a phone and host a pair of USB devices - it might not be spec'd high enough for the NUC system).
@@ -82,10 +84,52 @@ Hence, it wouldn't be unexpected if it's really designed for ~11.5 V, as the bat
 </p>
 
 <p>
-So in the spirit of error margins, or rather, <em>against</em> that spirit, I figured I'd at least <em>try</em> connecting the lapdock's power supply directly to the NUC. Lo and behold, it worked!*
+So in the spirit of error margins, or rather, <em>against</em> that spirit, I figured I'd at least <em>try</em> connecting the lapdock's power supply directly to the NUC before trying to find where to hack on a voltage regulator.
 </p>
 
-*<i> Well, on a full charge, anyway. The NUC has a tendency to shut off around the 40% battery level in warmer weather.</i>
+{{ show_image(get_image("battery-to-nuc-1-cc.jpg"), caption="I only had green wire...") }}
+{{ show_image(get_image("battery-to-nuc-2.jpg"), caption="That blue light looks promising...") }}
+{{ show_image(get_image("battery-to-nuc-3.jpg"), caption="Tidy things up & connect HDMI + USB...") }}
+{{ show_image(get_image("battery-to-nuc-4.jpg")) }}
+
+<p>
+Lo and behold, it works!*
+<br>
+<sub>*<i>Well, on a full charge, anyway. The NUC has a tendency to shut off around the 40% battery level in warmer weather.</i></sub>
+</p>
+
+<p>
+Alright, so next up was to create a better mount. It's not exactly a "laptop" in the form shown above.
+The NUC actually has some hardware on the underside that's designed to interface with a {{ offsite_link("", "VESA mount") }}.
+{# TODO: link to info about VESA mounts above #}
+I considered gluing a VESA mount onto the Lapdock, but I felt that might become too restrictive in the future.
+</p>
+
+<p>
+Instead, I decided to create a set of "J"-shaped brackets that would fit around the lip of the lid and hold via a combination of gravity (when the lid is opened) and friction (when the lid is closed).
+</p>
+
+{# TODO: show a CAD rendering of the brackets. #}
+
+<p>
+These brackets have holes at the end that are larger than the screws holding the NUC's bottom on, but smaller than the screws' heads. This should allow them to be securely fastened onto the bottom of the NUC.
+</p>
+
+<p>
+Since I have access to a 3d printer, I figured it would make sense to use one to fabricate a prototype.
+</p>
+
+{{ show_image(get_image("mounting-bracket-on-bed.jpg")) }}
+
+{# TODO: show how they fasten onto the bottom of the NUC #}
+
+{# TODO: show how they fasten onto the back of the Lapdock #}
+
+{# TODO: describe the improved power routing #}
+
+
+{{ heading("Software") }}
+{# TODO: describe how to deal with the Lapdock's shortcomings in software #}
 
 {% endblock %}
 
