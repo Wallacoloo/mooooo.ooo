@@ -23,14 +23,17 @@ And barebones, easily upgradeable laptops are prohibitively expensive.
 </p>
 
 <p>
-So I looked into other options - especially in the DIY area. There's a fair amount of talk about "DIY laptops", but everyone interprets the phrase differently and there are very few actual results beyond somebody's ridiculously over-the-top plans.
+So I looked into other options - especially in the DIY area.
+There's a fair amount of talk about "DIY laptops", but everyone interprets the phrase differently and there are very few actual results beyond somebody's ridiculously over-the-top plans or really weak builds based on TV sticks.
 </p>
 
 <p>
 Enter Intel's NUC (I spent a good 2 months with research before deciding upon the NUC, but I'm skipping all the ideas I ditched for the sake of brevity).
 </p>
 
-{{ show_image(get_image("digital-trends-nuc-5i5ryk.jpg"), caption="The Intel NUC 5i5RYK. Source (along with an in-depth review): " + offsite_link("http://www.digitaltrends.com/desktop-computer-reviews/intel-nuc-core-i5-nuc5i5ryk-review/attachment/intel-nuc-core-i5-nuc5i5ryk-mini-pc-review-front-ports/", "Digital Trends")) }}
+{{ show_image(get_image("digital-trends-nuc-5i5ryk.jpg"),
+caption="The Intel NUC 5i5RYK. Source (along with an in-depth review): " +
+offsite_link("http://www.digitaltrends.com/desktop-computer-reviews/intel-nuc-core-i5-nuc5i5ryk-review/attachment/intel-nuc-core-i5-nuc5i5ryk-mini-pc-review-front-ports/", "Digital Trends") + ".") }}
 
 <p>
 The intel NUC is an unusually-powerful mini-PC. There's a whole class of PCs in this form factor, but the majority of them pack whimpy Atom processors and have soldered RAM or few connectivity options.
@@ -44,7 +47,7 @@ This particular model packs a 5th-generation i5-5250U dual-core (plus hyperthrea
 And... enter Motorola's failed Lapdock project:
 </p>
 
-{{ show_image(get_image("amazon-lapdock.jpg"), caption="Source: " + offsite_link("https://www.amazon.com/AT-Laptop-Dock-Motorola-ATRIX/dp/B004M17D62", "Amazon product page")) }}
+{{ show_image(get_image("amazon-lapdock.jpg"), caption="Source: " + offsite_link("https://www.amazon.com/AT-Laptop-Dock-Motorola-ATRIX/dp/B004M17D62", "Amazon product page") + ".") }}
 
 <p>
 The Lapdock provides all the components I listed previously, plus a pair of (weak) speakers and exposes all those peripherals over a single USB connection + one HDMI connection. It was originally designed to be paired with a specific Motorola phone model, but that's irrelevant - it can be connected to <em>anything</em>.
@@ -98,10 +101,12 @@ Lo and behold, it works!*
 <sub>*<i>Well, on a full charge, anyway. The NUC has a tendency to shut off around the 40% battery level in warmer weather.</i></sub>
 </p>
 
+{{ heading("A Better Mount") }}
+
 <p>
-Alright, so next up was to create a better mount. It's not exactly a "laptop" in the form shown above.
-The NUC actually has some hardware on the underside that's designed to interface with a {{ offsite_link("", "VESA mount") }}.
-{# TODO: link to info about VESA mounts above #}
+This doesn't exactly fit into the "laptop" category in the form shown above, so I needed a way to fix that.
+The NUC actually has some hardware on the underside that's designed to interface with a
+{{ offsite_link("https://en.wikipedia.org/wiki/Flat_Display_Mounting_Interface", "VESA mount") }}.
 I considered gluing a VESA mount onto the Lapdock, but I felt that might become too restrictive in the future.
 </p>
 
@@ -109,7 +114,7 @@ I considered gluing a VESA mount onto the Lapdock, but I felt that might become 
 Instead, I decided to create a set of "J"-shaped brackets that would fit around the lip of the lid and hold via a combination of gravity (when the lid is opened) and friction (when the lid is closed).
 </p>
 
-{# TODO: show a CAD rendering of the brackets. #}
+{{ show_image(get_image("mounting-bracket-openscad.png"), caption="A CAD model of the bracket, made with " + offsite_link("http://www.openscad.org/", "OpenSCAD") + ".") }}
 
 <p>
 These brackets have holes at the end that are larger than the screws holding the NUC's bottom on, but smaller than the screws' heads. This should allow them to be securely fastened onto the bottom of the NUC.
@@ -121,9 +126,23 @@ Since I have access to a 3d printer, I figured it would make sense to use one to
 
 {{ show_image(get_image("mounting-bracket-on-bed.jpg")) }}
 
-{# TODO: show how they fasten onto the bottom of the NUC #}
+<p>
+These brackets attach to the NUC like so:
+</p>
 
-{# TODO: show how they fasten onto the back of the Lapdock #}
+{{ show_image(get_image("bracket-attach-nuc-1.jpg")) }}
+{{ show_image(get_image("bracket-attach-nuc-2.jpg")) }}
+{{ show_image(get_image("bracket-attach-nuc-3.jpg")) }}
+{{ show_image(get_image("bracket-attach-nuc-4.jpg"),
+caption="Notice how there are two bracket sizes; the longer brackets connect to the top of the lapdock, whereas the shorter one clamps to the side.") }}
+
+<p>
+Then the whole thing fits snugly around the lapdock, and it still closes comfortably.
+</p>
+
+{{ show_image(get_image("bracket-attach-lapdock.jpg")) }}
+
+{# TODO: show an image of the lapdock closed w/ the brackets #}
 
 {# TODO: describe the improved power routing #}
 
