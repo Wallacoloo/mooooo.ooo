@@ -1,0 +1,59 @@
+{% from 'base.html' import heading %}
+{{ page.set_title("Fun with Magstripes and Thermal Printing") }}
+
+{% extends 'blog_entry.html' %}
+{% block entry_content %}
+
+<p>
+A few months ago, one of my more artistic friends posted the following on twitter:
+</p>
+
+{{ show_image("inspiration.png") }}
+
+<p>
+It elicited a laugh from me, but beyond that I didn't think much of it -- until just recently, that is.
+</p>
+
+{{ heading("Background") }}
+
+<p>
+It seems I may be a bit out-of-the-loop, but I only just learned about the Square credit-card readers.
+These are tiny and cheap ($0-$10) devices which plug into a <em>microphone line-in</em> (or a 2-way audio jack like those found in phones and designed for use with headsets).
+The unusual interface intrigued me, so I read up on it and learned that reading the magnetic stripes found on ID cards is <em>dead simple</em>.
+{{ offsite_link("http://andybromberg.com/credit-cards/", "(More info)") }}
+</p>
+
+<p>
+Essentially, one can just move a coil of wire across the magnetic stripe in order to induce a voltage that corresponds to the changing magnetic flux through the coil.
+Physics would suggest that the converse is also true - a changing voltage will induce a magnetic field which, if strong enough, <em>should</em> have a permanent effect on any magnetic strips nearby.
+I ordered a free Square reader with the intent of testing the above on some Low-Coercivity magstripe cards, but in the meantime, I discovered that one of my associates owned a commercial magstripe reader/encoder (they can be found for $100-$200 on eBay or Amazon). 
+</p>
+
+<p>
+With access to these tools, I figured my student ID would be the natural subject to experiment with, with a long-term goal to create a fully-functional clone that looks identical to the concept my friend created.
+</p>
+
+{{ heading("Magstripes for authentication") }}
+<p>
+Magstripes are a pretty lame authentication method, but it's massively popular, regardless.
+My school uses the magstripe on our IDs to control building access.
+I've heard of systems that alter the data stored on the card every time it's scanned (for example, incrementing a counter or issuing an entirely new access key), thus invalidating any clones.
+This would not be ideal, as I still need my original ID for the case where my card is actually used for identification.
+</p>
+
+<p>
+So I tried using my card around campus and read the data back after each operation. Fortunately, it's entirely static! (And it only uses track 2, which makes some even cheaper encoders relevant)
+</p>
+
+{# TODO: show image of the software #}
+{# TODO: explain the software setup #}
+
+<p>
+So I went ahead and cloned the magstripe. Surprise: it worked, and with no noticable impact on my original ID!
+</p>
+{# TODO: gif/images showing a successful scan #}
+
+{{ heading("Thermal printing") }}
+Next up: find a way to copy the artwork onto the PVC card.
+
+{% endblock %}
