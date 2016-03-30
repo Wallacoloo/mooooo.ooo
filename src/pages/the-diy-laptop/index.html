@@ -31,7 +31,7 @@ There's a fair amount of talk about "DIY laptops", but everyone interprets the p
 Enter Intel's NUC (I spent a good 2 months with research before deciding upon the NUC, but I'm skipping all the ideas I ditched for the sake of brevity).
 </p>
 
-{{ show_image(get_image("digital-trends-nuc-5i5ryk.jpg"),
+{{ show_image("digital-trends-nuc-5i5ryk.jpg",
 caption="The Intel NUC 5i5RYK. Source (along with an in-depth review): " +
 offsite_link("http://www.digitaltrends.com/desktop-computer-reviews/intel-nuc-core-i5-nuc5i5ryk-review/attachment/intel-nuc-core-i5-nuc5i5ryk-mini-pc-review-front-ports/", "Digital Trends") + ".") }}
 
@@ -47,7 +47,7 @@ This particular model packs a 5th-generation i5-5250U dual-core (plus hyperthrea
 And... enter Motorola's failed Lapdock project:
 </p>
 
-{{ show_image(get_image("amazon-lapdock.jpg"), caption="Source: " + offsite_link("https://www.amazon.com/AT-Laptop-Dock-Motorola-ATRIX/dp/B004M17D62", "Amazon product page") + ".") }}
+{{ show_image("amazon-lapdock.jpg", caption="Source: " + offsite_link("https://www.amazon.com/AT-Laptop-Dock-Motorola-ATRIX/dp/B004M17D62", "Amazon product page") + ".") }}
 
 <p>
 The Lapdock provides all the components I listed previously, plus a pair of (weak) speakers and exposes all those peripherals over a single USB connection + one HDMI connection. It was originally designed to be paired with a specific Motorola phone model, but that's irrelevant - it can be connected to <em>anything</em>.
@@ -73,7 +73,7 @@ I approximated the maximum power supply by adjusting the load between 12 ohms an
 I stopped at 35 W as a precaution (it's enough for my application), but presumably one can extrapolate further based on these results plotted below.
 </p>
 
-{{ show_image(get_image("voltage-vs-power.png"), caption="Voltage vs. Power measured at full-charge with ambient temperature around 25 C.") }}
+{{ show_image("voltage-vs-power.png", caption="Voltage vs. Power measured at full-charge with ambient temperature around 25 C.") }}
 
 <p>
 I don't know much about battery chemistry, but if we model the battery and its control circuitry as a {{ offsite_link("https://en.wikipedia.org/wiki/Th%C3%A9venin's_theorem", "Thevenin circuit") }},  we can infer that over 4 W are dissipated in the surrounding circuitry when the load reaches 35 W (i.e. 89% efficiency).
@@ -90,10 +90,10 @@ Hence, it wouldn't be unexpected if it's really designed for ~11.5 V, as the bat
 So in the spirit of error margins, or rather, <em>against</em> that spirit, I figured I'd at least <em>try</em> connecting the lapdock's power supply directly to the NUC before trying to find where to hack on a voltage regulator.
 </p>
 
-{{ show_image(get_image("battery-to-nuc-1-cc.jpg"), caption="I only had green wire...") }}
-{{ show_image(get_image("battery-to-nuc-2.jpg"), caption="That blue light looks promising...") }}
-{{ show_image(get_image("battery-to-nuc-3.jpg"), caption="Tidy things up & connect HDMI + USB...") }}
-{{ show_image(get_image("battery-to-nuc-4.jpg")) }}
+{{ show_image("battery-to-nuc-1-cc.jpg", caption="I only had green wire...") }}
+{{ show_image("battery-to-nuc-2.jpg", caption="That blue light looks promising...") }}
+{{ show_image("battery-to-nuc-3.jpg", caption="Tidy things up & connect HDMI + USB...") }}
+{{ show_image("battery-to-nuc-4.jpg") }}
 
 <p>
 Lo and behold, it works!*
@@ -114,7 +114,7 @@ I considered gluing a VESA mount onto the Lapdock, but I felt that might become 
 Instead, I decided to create a set of "J"-shaped brackets that would fit around the lip of the lid and hold via a combination of gravity (when the lid is opened) and friction (when the lid is closed).
 </p>
 
-{{ show_image(get_image("mounting-bracket-openscad.png"), caption="A CAD model of the bracket, made with " + offsite_link("http://www.openscad.org/", "OpenSCAD") + ".") }}
+{{ show_image("mounting-bracket-openscad.png", caption="A CAD model of the bracket, made with " + offsite_link("http://www.openscad.org/", "OpenSCAD") + ".") }}
 
 <p>
 These brackets have holes at the end that are larger than the screws holding the NUC's bottom on, but smaller than the screws' heads. This should allow them to be securely fastened onto the bottom of the NUC.
@@ -124,23 +124,23 @@ These brackets have holes at the end that are larger than the screws holding the
 Since I have access to a 3d printer, I figured it would make sense to use one to fabricate a prototype.
 </p>
 
-{{ show_image(get_image("mounting-bracket-on-bed.jpg")) }}
+{{ show_image("mounting-bracket-on-bed.jpg") }}
 
 <p>
 These brackets attach to the NUC like so:
 </p>
 
-{{ show_image(get_image("bracket-attach-nuc-1.jpg")) }}
-{{ show_image(get_image("bracket-attach-nuc-2.jpg")) }}
-{{ show_image(get_image("bracket-attach-nuc-3.jpg")) }}
-{{ show_image(get_image("bracket-attach-nuc-4.jpg"),
+{{ show_image("bracket-attach-nuc-1.jpg") }}
+{{ show_image("bracket-attach-nuc-2.jpg") }}
+{{ show_image("bracket-attach-nuc-3.jpg") }}
+{{ show_image("bracket-attach-nuc-4.jpg",
 caption="Notice how there are two bracket sizes; the longer brackets connect to the top of the lapdock, whereas the shorter one clamps to the side.") }}
 
 <p>
 Then the whole thing fits snugly around the lapdock, and it still closes comfortably.
 </p>
 
-{{ show_image(get_image("bracket-attach-lapdock.jpg")) }}
+{{ show_image("bracket-attach-lapdock.jpg") }}
 
 {# TODO: show an image of the lapdock closed w/ the brackets #}
 
@@ -159,7 +159,7 @@ An improvement would be to solder a permanent connection inside the lapdock and 
 So I re-opened the lapdock and soldered wires onto the <em>main</em> board this time, right near the point where its delivered over the ribbon cable.
 </p>
 
-{{ show_image(get_image("power-routing-solder.jpg"), caption="The two lanes on each edge of the connector carry power (i.e. 2+ and 2-). <b>Be sure to unplug the ribbon cable before doing this so there's no possibility of shorting the battery</b>.") }}
+{{ show_image("power-routing-solder.jpg", caption="The two lanes on each edge of the connector carry power (i.e. 2+ and 2-). <b>Be sure to unplug the ribbon cable before doing this so there's no possibility of shorting the battery</b>.") }}
 
 {# TODO: show the other end of the power cable here (requires taking another photo) #}
 
@@ -167,27 +167,27 @@ Now we need to bring this out the back of the lapdock.
 This area of the lapdock can be difficult to access.
 Most of the disassembly is straightforward, but note that there is a screw on either end of the rotating plastic piece that holds the connectors hidden under a cap that must be removed:
 
-{{ show_image(get_image("power-routing-access-1.jpg"), caption="The small plastic cover is glued on top of each screw and must be pried off.") }}
+{{ show_image("power-routing-access-1.jpg", caption="The small plastic cover is glued on top of each screw and must be pried off.") }}
 
 Also, <em>some</em> Lapdock versions have an extra piece of plastic that serves to hide a seam. It can be removed just by pulling with force:
 
-{{ show_image(get_image("power-routing-access-2.jpg")) }}
+{{ show_image("power-routing-access-2.jpg") }}
 
 Finally, the connector panel should look like this when it's opened:
 
-{{ show_image(get_image("power-routing-candidate-location.jpg")) }}
+{{ show_image("power-routing-candidate-location.jpg") }}
 
 For my version, there was a large enough gap inside the housing that we could fit another connector. So, start drilling:
 
-{{ show_image(get_image("power-routing-drilling.jpg"), caption="A 7/32\" bit seemed to be the perfect fit." ) }}
+{{ show_image("power-routing-drilling.jpg", caption="A 7/32\" bit seemed to be the perfect fit." ) }}
 
 Then just insert the other end of the connector:
 
-{{ show_image(get_image("power-routing-insertion.jpg")) }}
+{{ show_image("power-routing-insertion.jpg") }}
 
 And finally, route the wires out the gap in the side of the housing and close it up like so:
 
-{{ show_image(get_image("power-routing-closed-housing.jpg")) }}
+{{ show_image("power-routing-closed-housing.jpg") }}
 
 {# TODO: show the cable that connects this to the NUC #}
 

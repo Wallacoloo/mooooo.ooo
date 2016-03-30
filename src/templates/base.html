@@ -20,10 +20,14 @@
 </h{{ sublevel+1 }}>
 {% endmacro %}
 
-{% macro show_image(image, caption="") %}
+{% macro show_image() %}
+{# signature (jinja2's varargs are poorly designed):
+  show_image(*images, caption="") #}
 {# Used to show an image in the center of the screen.
    This also configures the link to a full-screen version.
    Note: srcdep is needed to know the image size at build time. #}
+{% for image_ in varargs %}
+{% set image=get_image(image_) %}
 {{ add_srcdep(image) }}
 {{ add_rtdep(image) }}
 {% if do_render %}
@@ -32,14 +36,15 @@
 		<a href="{{ image.path|to_rel_path }}">
 			<img src="{{ image.path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px" class="theater-image"/>
 		</a>
-		{% if caption %}
+		{% if kwargs.get("caption") and image_ == varargs[-1] %}
 			<span class="caption">
-				<i>{{ caption }}</i>
+				<i>{{ kwargs["caption"] }}</i>
 			</span>
 		{% endif %}
 	</span>
 	</span>
 {% endif %}
+{% endfor %}
 {% endmacro %}
 
 {% macro include_css(css_page) %}

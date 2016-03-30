@@ -333,6 +333,9 @@ class Page(object):
             return ""
 
         def get_image(name):
+            if isinstance(name, Image):
+                return name # we already found the image
+
             try:
                 return self.images[name]
             except KeyError:
