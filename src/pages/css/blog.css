@@ -19,3 +19,8 @@
 		margin-top: 1em;
 }
 
+/* If the text starts right after the title info, insert a gap */
+.blog-title-info + p
+{
+		margin-top: 2em;
+}

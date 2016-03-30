@@ -3,6 +3,7 @@
 {% extends 'base.html' %}
 
 {% block page_content %}
+<span class="blog-title-info">
 {{ heading(page.title, link=False) }}
 
 <div class="blog-author">
@@ -23,6 +24,7 @@ By {{ page.authors[0].name }}
 	<span><i>Draft</i></span>
 {% endif %}
 </div>
+</span>
 
 {# Provide a block for the blog entry to render its main content into #}
 {% block entry_content %}{% endblock %}
