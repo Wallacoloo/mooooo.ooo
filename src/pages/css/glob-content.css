@@ -85,14 +85,13 @@
 }
 .image-container > .centered
 {
-	text-align: left;
-	display: inline-block;
+		display: inline-block;
 }
 
 /* If a link isn't supposed to contain text, make sure the whitespace doesn't become underlined */
 .image-link
 {
-	text-decoration: none;
+		text-decoration: none;
 }
 
 .theater-image
@@ -110,17 +109,18 @@
 {
 		width: 50%;
 		/* Remove the implicit margins from the border */
-		margin: -4px;
+		margin: -2px;
 }
 
-.image-container  .caption
+.caption
 {
+		text-align: left;
 		display: block;
 }
 
 .caption:before
 {
-	/* Indent the first line of a caption */
-	content: "";
-	padding-left: 28px;
+		/* Indent the first line of a caption */
+		content: "";
+		padding-left: 28px;
 }
