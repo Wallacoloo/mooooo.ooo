@@ -112,6 +112,13 @@
 		margin: -2px;
 }
 
+/* For small displays: images should not displayed as just one column */
+@media (max-width: 600px)
+{
+		width: 100%;
+		margin: 0px;
+}
+
 .caption
 {
 		text-align: left;
