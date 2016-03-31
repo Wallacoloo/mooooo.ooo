@@ -42,3 +42,10 @@ p + p
 {
 		margin-top: 1em;
 }
+
+/* Images axes should be scaled *together* */
+img
+{
+		width: auto;
+		height: auto;
+}

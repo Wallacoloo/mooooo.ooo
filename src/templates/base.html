@@ -33,8 +33,8 @@
 {{ add_srcdep(image) }}
 {{ add_rtdep(image) }}
 {% if do_render %}
-		<a href="{{ image.path|to_rel_path }}">
-			<img src="{{ image.path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px" class="theater-image"/>
+		<a href="{{ image.path|to_rel_path }}" class="image-link">
+				<img src="{{ image.path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px" class="theater-image columns-{{ kwargs.get("columns", 1) }}"/>
 		</a>
 {% endif %}
 {% endfor %}

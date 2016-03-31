@@ -89,11 +89,28 @@
 	display: inline-block;
 }
 
+/* If a link isn't supposed to contain text, make sure the whitespace doesn't become underlined */
+.image-link
+{
+	text-decoration: none;
+}
+
 .theater-image
 {
-		height: auto;
 		border: 4px #686868 solid;
 		border-radius: 16px;
+}
+
+.columns-1
+{
+		width: 100%;
+}
+
+.columns-2
+{
+		width: 50%;
+		/* Remove the implicit margins from the border */
+		margin: -4px;
 }
 
 .image-container  .caption
