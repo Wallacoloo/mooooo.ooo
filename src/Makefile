@@ -19,6 +19,12 @@ IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 EC2_ID_FILE=../MOOOOOoooWebServer.pem
 EC2_USER_DOMAIN=root@ec2.mooooo.ooo
 
+define MKDIR_CP
+	@# Copies the prerequisite to the target
+	@mkdir -p $(dir $@)
+	cp $< $@
+endef
+
 
 all: $(BUILD_ROOT)/all.depincludes
 all: $(BUILD_DIR)/index.html
@@ -70,23 +76,24 @@ publish: publish-ipfs publish-cf publish-ipns publish-ec2 ## Publish the site ev
 	tail -n +2 "$^" | exec eplot $(shell head -1 "$^") -P -o $@
 
 ## Build compressed png images
-$(BUILD_DIR)/%.png: pages/%.png
-	@mkdir -p $(dir $@)
-	@# Copy the image, then run optipng (but don't abort if optipng isn't found.
-	cp $^ $@
+$(BUILD_ROOT)/images/%.png: pages/%.png
+	$(MKDIR_CP)
 	$(OPTIPNG) --quiet $@ || true
 
 ## Compress jpegs (losslessly), plus remove a lot of metadata
-$(BUILD_DIR)/%.jpg: pages/%.jpg
-	@mkdir -p $(dir $@)
-	@# Copy the image, then run jpegoptim (but don't abort if binary doesn't exist)
-	cp $^ $@
+$(BUILD_ROOT)/images/%.jpg: pages/%.jpg
+	$(MKDIR_CP)
 	$(JPGCRUSH) $@ || true
+
+$(BUILD_DIR)/%.jpg: $(BUILD_ROOT)/images/%.jpg
+	$(MKDIR_CP)
+
+$(BUILD_DIR)/%.png: $(BUILD_ROOT)/images/%.png
+	$(MKDIR_CP)
 
 # If the font already exists, just directly copy it
 $(BUILD_ROOT)/fonts/%: fonts/%
-	mkdir -p $(dir $@)
-	cp $< $@
+	$(MKDIR_CP)
 
 ## Build TTF fonts from OTF
 $(BUILD_ROOT)/fonts/%.ttf: fonts/%.otf
@@ -99,23 +106,29 @@ $(BUILD_ROOT)/fonts/%.woff $(BUILD_ROOT)/fonts/%.eot $(BUILD_ROOT)/fonts/%.svg: 
 	webify $<
 
 ## Build WOFF2 fonts from WOFF
-%.woff2: %.ttf
+$(BUILD_ROOT)/fonts/%.woff2: $(BUILD_ROOT)/fonts/%.ttf
 	woff2_compress $<
 
 ## Copy generated fonts to the published directory (as the font generators may create extra files)
 $(BUILD_DIR)/fonts/%: $(BUILD_ROOT)/fonts/%
-	mkdir -p $(dir $@)
-	cp $< $@
+	$(MKDIR_CP)
 
-## Build any resources (webpages, css, images, fonts, etc)
-$(BUILD_DIR)/%: pages/%
+define BUILD_PAGE
 	@mkdir -p $(dir $@)
 	./build_page.py pages/$(subst $(BUILD_DIR)/,,$@) $@
+endef
+
+## Build any resources (webpages, css, images, fonts, etc)
+$(BUILD_DIR)/%.html: pages/%.html
+	$(BUILD_PAGE)
+$(BUILD_DIR)/%.css: pages/%.css
+	$(BUILD_PAGE)
 
 # Self-documenting help function provided by http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 help:
 	@grep -h -P '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 
+.SECONDARY:
 .PHONY: clean clean-all help publish-ipfs publish-ipns publish-cf publish
 
