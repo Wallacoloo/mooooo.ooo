@@ -4,6 +4,14 @@
 		/* push the footer to the bottom */
 		min-height: calc(100% - 240px);
 }
+/* Decrease the horizontal content margin for small screens */
+@media (max-width: 600px)
+{
+.page-content
+{
+		margin: 30px 6px;
+}
+}
 .page-content > p
 {
 		text-align: justify;
@@ -115,8 +123,11 @@
 /* For small displays: images should not displayed as just one column */
 @media (max-width: 600px)
 {
+.columns-2
+{
 		width: 100%;
 		margin: 0px;
+}
 }
 
 .caption
