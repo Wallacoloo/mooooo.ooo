@@ -98,6 +98,12 @@
 
 .image-container  .caption
 {
-		margin-left: 28px;
-		/*margin-right: 28px;*/
+		display: block;
+}
+
+.caption:before
+{
+	/* Indent the first line of a caption */
+	content: "";
+	padding-left: 28px;
 }
