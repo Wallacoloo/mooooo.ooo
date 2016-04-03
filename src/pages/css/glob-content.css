@@ -1,6 +1,7 @@
 .page-content
 {
-		margin: 30px 10%;
+		/* Dynamically resize the margins; Make sure this is made to be fluid at the point the mobile layout kicks in */
+		margin: 30px calc(17% - 93px);
 		/* push the footer to the bottom */
 		min-height: calc(100% - 240px);
 }
@@ -15,6 +16,7 @@
 .page-content > p
 {
 		text-align: justify;
+		line-height: 1.5em;
 }
 
 /* A vertically-spaced list wherein each item is intended to fit on one line */
