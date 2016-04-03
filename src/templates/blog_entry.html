@@ -3,6 +3,7 @@
 {% extends 'base.html' %}
 
 {% block page_content %}
+<article>
 <span class="blog-title-info">
 {{ heading(page.title, link=False) }}
 
@@ -28,9 +29,11 @@ By {{ page.authors[0].name }}
 
 {# Provide a block for the blog entry to render its main content into #}
 {% block entry_content %}{% endblock %}
+</article>
 
 <div class="blog-footer">
 	{% if page.is_published %}
+		{# Display the same data AND TIMESTAMP as in the header #}
 		{% if page.pub_date|friendly_date == page.last_edit_date|friendly_date %}
 			{{ show_date(page.last_edit_date) }}
 		{% else %}
