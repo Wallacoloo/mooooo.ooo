@@ -13,9 +13,12 @@
 		margin: 30px 9px;
 }
 }
-.page-content > p
+.page-content p
 {
 		text-align: justify;
+}
+.page-content p, .page-content ul
+{
 		line-height: 1.5em;
 }
 
@@ -136,6 +139,7 @@
 {
 		text-align: left;
 		display: block;
+		line-height: 1.15em;
 }
 
 .caption:before
