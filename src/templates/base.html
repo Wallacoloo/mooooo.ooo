@@ -92,6 +92,7 @@
 			<meta name="viewport" content="width=device-width initial-scale=1" />
 			<meta name="description" content="Weblog/homepage for an artist/developer/engineer. DIY build logs, opinions and artwork" />
 			{{ include_css(pages["css/global.css"]) }}
+			<meta name="author" content="{{ page.authors|join(", ", "name") }}">
 			<title>{% block title %}{{ page.title }}{% endblock %}</title>
 			<style>
 {# Include absolutely essentially style in the header; things that prevent the page from looking outright horrible while loading #}
