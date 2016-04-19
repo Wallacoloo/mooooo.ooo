@@ -14,7 +14,7 @@
     font-family: 'quicksand';
 	src: local("Quicksand Regular"), local("Quicksand-Regular");
 	{{ incl_font_sources("Quicksand-Regular") }}
-    font-weight: normal;
+    font-weight: 400;
     font-style: normal;
 }
 
@@ -23,10 +23,10 @@
     font-family: 'quicksand';
 	src: local("Quicksand Bold"), local("Quicksand-Bold");
 	{{ incl_font_sources("Quicksand-Bold") }}
-    font-weight: bold;
+    font-weight: 700;
     font-style: normal;
 }
-
+{#
 /* Raleway font:
  * source: http://www.fontsquirrel.com/fonts/Raleway
  *       : https://www.google.com/fonts/specimen/Raleway
@@ -38,7 +38,7 @@
     font-family: 'raleway';
 	src: local("Raleway Regular"), local("Raleway-Regular");
 	{{ incl_font_sources("Raleway-Regular") }}
-    font-weight: normal;
+    font-weight: 400;
     font-style: normal;
 }
 
@@ -47,8 +47,84 @@
     font-family: 'raleway';
 	src: local("Raleway Bold"), local("Raleway-Bold");
 	{{ incl_font_sources("Raleway-Bold") }}
-    font-weight: bold;
+    font-weight: 700;
     font-style: normal;
+}
+#}
+
+/* Lora font:
+ * source: http://www.fontsquirrel.com/fonts/Lora
+ *       : https://www.google.com/fonts/specimen/Lora
+ * License: SIL Open Font License 1.1
+ * Author: Cyreal
+ */
+@font-face
+{
+    font-family: 'Lora';
+    font-style: normal;
+    font-weight: 400;
+	src: local('Lora'), local('Lora-Regular');
+	{{ incl_font_sources("Lora-Regular") }}
+}
+
+@font-face
+{
+    font-family: 'Lora';
+    font-style: normal;
+    font-weight: 700;
+	src: local('Lora Bold'), local('Lora-Bold');
+	{{ incl_font_sources("Lora-Bold") }}
+}
+
+@font-face
+{
+    font-family: 'Lora';
+    font-style: italic;
+    font-weight: 400;
+	src: local('Lora Italic'), local('Lora-Italic');
+	{{ incl_font_sources("Lora-Italic") }}
+}
+
+@font-face
+{
+    font-family: 'Lora';
+    font-style: italic;
+    font-weight: 700;
+	src: local('Lora Bold Italic'), local('Lora-BoldItalic');
+	{{ incl_font_sources("Lora-BoldItalic") }}
+}
+
+/* Cardo font:
+ * source: http://www.fontsquirrel.com/fonts/Cardo
+ *       : https://www.google.com/fonts/specimen/Cardo
+ * License: SIL Open Font License 1.1
+ * Author: David Perry
+ */
+@font-face
+{
+    font-family: 'Cardo';
+    font-style: normal;
+    font-weight: 400;
+	src: local('Lora'), local('Cardo-Regular');
+	{{ incl_font_sources("Cardo-Regular") }}
+}
+
+@font-face
+{
+    font-family: 'Cardo';
+    font-style: normal;
+    font-weight: 700;
+	src: local('Cardo Bold'), local('Cardo-Bold');
+	{{ incl_font_sources("Cardo-Bold") }}
+}
+
+@font-face
+{
+    font-family: 'Cardo';
+    font-style: italic;
+    font-weight: 400;
+	src: local('Cardo Italic'), local('Cardo-Italic');
+	{{ incl_font_sources("Cardo-Italic") }}
 }
 
 {{ include_inline(pages["css/font-awesome.css"]) }}

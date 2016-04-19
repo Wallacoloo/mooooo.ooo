@@ -26,6 +26,11 @@
 		{
 				"dir": "<BUILD_DIR>",
 				"root": "<BUILD_ROOT>"
+		},
+		"fonts":
+		{
+			"title": "Cardo",
+			"body": "Cardo"
 		}
 }
 

@@ -2,11 +2,11 @@
 	/* Embedded Open Type, for IE */
 	{% set f=Page("fonts/%s.eot"|format(fname), need_exist=False) %}
 	{{ add_rtdep(f) }}
-	src: url('{{ f.path|to_rel_path }}');
-	src: url('{{ f.path|to_rel_path }}?#iefix') format('embedded-opentype');
+	src: url({{ f.path|to_rel_path }});
+	src: url({{ f.path|to_rel_path }}?#iefix) format('embedded-opentype');
 	{% for ext in ("ttf", "woff", "woff2") %}
 		{% set f=Page("fonts/%s.%s"|format(fname, ext), need_exist=False) %}
 		{{ add_rtdep(f) }}
-		src: url('{{ f.path|to_rel_path }}');
+		src: url({{ f.path|to_rel_path }}) format('{{ext}}');
 	{% endfor %}
 {% endmacro %}

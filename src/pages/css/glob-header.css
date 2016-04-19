@@ -11,7 +11,7 @@
 		/* stack each navigation link horizontally, not vertically */
 		display: table-cell;
 		width: 1%;
-		font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+		font-family: Quicksand,"Helvetica Neue",Helvetica,Arial,sans-serif;
 		font-size: 26px;
 }
 .nav-ul > li.filler

@@ -365,6 +365,7 @@ class Page(object):
         env.globals["query_deps"] = query_deps
         env.globals["do_render"] = do_render
         env.globals["validate_anchors"] = not query_anchors # Avoid circular dependencies.
+        env.globals["config"] = config
         env.globals["pages"] = get_pages()
         #env.globals["resources"] = Pages("res/", [".css", ".scss"])
         env.filters["into_tag"] = filter_into_tag

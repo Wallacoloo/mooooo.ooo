@@ -18,12 +18,12 @@ html, body
 
 body
 {
-		font-family: Raleway,"Helvetica Neue",Helvetica,Arial,sans-serif;
+		font-family: "{{ config.fonts.body }}","Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 h1, h2
 {
-	font-family: "Quicksand","Helvetica Neue",Arial,sans-serif;
+	font-family: "{{ config.fonts.title }}","Helvetica Neue",Arial,sans-serif;
 	font-weight: bold;
 }
 
