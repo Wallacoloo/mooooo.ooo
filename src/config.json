@@ -29,8 +29,36 @@
 		},
 		"fonts":
 		{
-			"title": "Cardo",
-			"body": "Cardo"
+				"title": "Cardo",
+				"body": "Cardo"
+		},
+		"fontinfo":
+		{
+				"cardo":
+				{
+						"author": "David Perry",
+						"license": "SIL Open Font License",
+						"url": "https://www.fontsquirrel.com/fonts/cardo"
+				},
+				"fontawesome":
+				{
+						"author": "Dave Gandy",
+						"license": "SIL Open Font License",
+						"url": "https://fortawesome.github.io/Font-Awesome/"
+				},
+				"quicksand":
+				{
+						"author": "Andrew Paglinawan",
+						"license": "SIL Open Font License",
+						"url": "http://www.fontsquirrel.com/fonts/Quicksand"
+				}
+		},
+		"licenses":
+		{
+				"SIL Open Font License":
+				{
+						"url": "https://en.wikipedia.org/wiki/SIL_Open_Font_License"
+				}
 		}
 }
 

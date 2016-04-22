@@ -59,24 +59,14 @@ The exceptions to this include:
 </p>
 
 <ul class="list-single-lines">
-		<li>
-				<a href="https://fortawesome.github.io/Font-Awesome/">Font Awesome</a> by Dave Gandy (license: <a href="https://en.wikipedia.org/wiki/SIL_Open_Font_License">SIL Open Font License</a>);
-				used to display social media icons in the site footer.
-		</li>
-		<li>
-				<a href="http://www.fontsquirrel.com/fonts/Quicksand">Quicksand</a> by Andrew Paglinawan (license: <a href="https://en.wikipedia.org/wiki/SIL_Open_Font_License">SIL Open Font License</a>);
-				used as the font for most headers.
-		</li>
-{#
-		<li>
-				<a href="http://www.fontsquirrel.com/fonts/Raleway">Raleway</a> (license: <a href="https://en.wikipedia.org/wiki/SIL_Open_Font_License">SIL Open Font License</a>);
-				used as the default font.
-		</li>
-#}
-		<li>
-				<a href="http://www.fontsquirrel.com/fonts/Lora">Lora</a> by Cyreal (license: <a href="https://en.wikipedia.org/wiki/SIL_Open_Font_License">SIL Open Font License</a>);
-				used as the default font.
-		</li>
+		{% for font in ("Font Awesome", "Quicksand", "Cardo") %}
+		{% set fontinfo=config.fontinfo[font|lower|replace(" ", "")] %}
+			<li>
+					<a href="{{fontinfo.url}}">{{ font }}</a>
+					by {{ fontinfo.author }} (license: <a href="{{ config.licenses[fontinfo.license].url }}">
+							{{ fontinfo.license }}</a>).
+			</li>
+		{% endfor %}
 </ul>
 
 {% endblock %}
