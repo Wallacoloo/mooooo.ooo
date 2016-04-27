@@ -203,7 +203,6 @@ And finally, route the wires out the gap in the side of the housing and close it
 
 
 {{ heading("Software") }}
-{# TODO: describe how to deal with the Lapdock's shortcomings in software #}
 
 <p>
 After assembling all the hardware, I flashed an
@@ -216,21 +215,24 @@ although there are a few non-blocking issues:
 
 <ul class="list-single-lines">
 		<li>
-				Screen occasionally goes blank for 2-3 seconds under heavy combined GPU+CPU load.
+				1. Screen occasionally goes blank for 2-3 seconds under heavy combined GPU+CPU load.
 		</li>
 		<li>
-				Touchpad has no two-finger- or edge-scrolling.
+				2. Touchpad has no two-finger- or edge-scrolling.
 		</li>
 		<li>
-				Keyboard has no Super key.
+				3. Keyboard has no Super key.
 		</li>
 		<li>
-				No OS integration for the battery.
+				4. No OS integration for the battery.
+		</li>
+		<li>
+				5. Limited video output options.
 		</li>
 </ul>
 
 <p>
-Fortunately, the first issue is very difficult to trigger.
+1. Fortunately, the first issue is very difficult to trigger.
 I use this computer to compile large code projects, watch videos,
 write music with a DAW, share files over P2P, and play video games.
 Under all those scenarios except the last one, I encounter the
@@ -249,7 +251,7 @@ droops under heavy CPU+GPU loads.
 </p>
 
 <p>
-The second issue is interesting. The touchpad identifies itself as a
+2. The second issue is interesting. The touchpad identifies itself as a
 mouse and communicates over HID, so there's <em>nothing</em> that can
 be done to enable edge scrolling on the OS side. However, there's still
 a slight deadzone on the right hand side of the touchpad (and none on
@@ -270,18 +272,77 @@ implementation of the solution only works for X11 users).
 </p>
 
 <p>
-I addressed the lack of a super-key just by modifying my desktop
+3. I addressed the lack of a super-key just by modifying my desktop
 environment's shortcuts (I remapped Alt+/ to activate GNOME's program
 launcher). I imagine this is probably pretty easy to do for most linux
 desktop environments.
 </p>
 
 <p>
-Because the system doesn't know about the battery, it's impossible
+4. Because the system doesn't know about the battery, it's impossible
 to configure automatic power modes for when running on AC vs. battery.
 It also means the only battery info available is the 5-LED readout
 right below the touchpad, which offers very little resolution.
+I can't think of any easy workaround for this.
 </p>
+
+<p>
+5. The 5th generation NUC has 1 HDMI and 1 DisplayPort output. With the
+lapdock connected over HDMI, this means only one external display can be
+connected, and it must be over DisplayPort. Alternatively, one
+<em>can</em> disconnect the lapdock and use the HDMI interface (e.g. to
+connect to a project), but then the keyboard and touchpad become
+unusable - the lapdock disables its USB interface when it doesn't detect
+a device on the other end of the HDMI. A solution may be to alter the
+HDMI cable such that the hot plug signal is permanently shorted.
+</p>
+
+{{ heading("Bill of Materials") }}
+
+<ul class="list-single-lines">
+		<li>
+				1x {{offsite_link("Motorola Lapdock", "www.amazon.com/AT-Laptop-Dock-Motorola-ATRIX/dp/B004M17D62/") }}
+		</li>
+		<li>
+				1x {{offsite_link("Intel NUC5i5RYK", "http://www.newegg.com/Product/Product.aspx?Item=N82E16856102096") }}
+		</li>
+		<li>
+				1x {{offsite_link("Micro HDMI Female To Mini HDMI Male Cable", "http://www.ebay.com/itm/201380752340") }}
+		</li>
+		<li>
+				1x {{offsite_link("USB Micro Female to USB Male Cable", "www.amazon.com/AFUNTA-Quality-Standard-Extension-Transfer/dp/B00MEBEOW8/") }}
+		</li>
+		<li>
+				{# TODO: link to the adapters #}
+				1x (power cable)
+		</li>
+		<li>
+				{# TODO: verify correct ram #}
+				2x8 GB {{offsite_link("LPDDR3 RAM", "http://www.newegg.com/Product/Product.aspx?Item=N82E16820148614") }}
+		</li>
+		<li>
+				1x {{offsite_link("500 GB M.2 SSD", "http://www.newegg.com/Product/Product.aspx?Item=N82E16820147399") }}
+		</li>
+</ul>
+
+<p>
+Depending on where you source these components, the total cost is around $600.
+The most interesting alternative to using a NUC for this project is the
+{{ offsite_link("Kangaroo Plus Mobile Mini PC", "http://www.newegg.com/Product/Product.aspx?Item=N82E16856659001") }}.
+It's not as powerful, but it contains its own battery and is much smaller.
+</p>
+
+{{ heading("Closing Thoughts") }}
+<p>
+From a practical standpoint, there really isn't much point to owning a
+laptop like this. One can find similar (refurbished) laptops at a
+similar price point.
+From an artistic point of view, it's unique - it draws
+funny looks and silly questions every week. And its the <em>only</em>
+laptop that will ever give you this display when you power it down:
+</p>
+
+{# TODO: insert photo: no hdmi signal detected #}
 
 {% endblock %}
 
