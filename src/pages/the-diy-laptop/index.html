@@ -40,7 +40,13 @@ The intel NUC is an unusually-powerful mini-PC. There's a whole class of PCs in 
 </p>
 
 <p>
-This particular model packs a 5th-generation i5-5250U dual-core (plus hyperthreading) processor with intel HD 6000 graphics packing 768 GFLOPS {{ cite(url="https://en.wikipedia.org/wiki/Intel_HD_and_Iris_Graphics#Broadwell") }} all at a 15 W TDP. It also accepts 2x8GB LPDDR3 DIMMs and has one M.2 slot for your choice of SSD. The price tag is around $350. Couple this with a display, battery, keyboard and touchpad, and you've got a decent laptop.
+This particular model packs a 5th-generation i5-5250U dual-core
+processor with intel HD 6000 graphics capable of 768 GFLOPS
+{{ cite(url="https://en.wikipedia.org/wiki/Intel_HD_and_Iris_Graphics#Broadwell") }}
+all at a 15 W TDP. It also accepts 2x8GB LPDDR3 DIMMs and has one M.2
+slot for your choice of SSD. The price tag is around $350. Couple this
+with a display, battery, keyboard and touchpad, and you've got a decent
+laptop.
 </p>
 
 <p>
@@ -98,7 +104,7 @@ So in the spirit of error margins, or rather, <em>against</em> that spirit, I fi
 <p>
 Lo and behold, it works!*
 <br>
-<sub>*<i>Well, on a full charge, anyway. The NUC has a tendency to shut off around the 40% battery level in warmer weather.</i></sub>
+<sub>*<i>Well, on a full charge, anyway. There have been a handful of times over the past 9 months when the NUC powers down at around the 20-40% battery level. It seems to happen in warmer weather.</i></sub>
 </p>
 
 {{ heading("A Better Mount") }}
@@ -114,7 +120,13 @@ I considered gluing a VESA mount onto the Lapdock, but I felt that might become 
 Instead, I decided to create a set of "J"-shaped brackets that would fit around the lip of the lid and hold via a combination of gravity (when the lid is opened) and friction (when the lid is closed).
 </p>
 
-{{ show_image("mounting-bracket-openscad.png", caption="A CAD model of the bracket, made with " + offsite_link("http://www.openscad.org/", "OpenSCAD") + ".") }}
+{{ show_image("mounting-bracket-openscad.png",
+caption="A CAD model of the bracket, made with " +
+offsite_link("http://www.openscad.org/", "OpenSCAD") +
+". " +
+offsite_link("https://github.com/Wallacoloo/lapdock-NUC-mount", "Repository") +
+"."
+) }}
 
 <p>
 These brackets have holes at the end that are larger than the screws holding the NUC's bottom on, but smaller than the screws' heads. This should allow them to be securely fastened onto the bottom of the NUC.
@@ -157,7 +169,7 @@ An improvement would be to solder a permanent connection inside the lapdock and 
 So I re-opened the lapdock and soldered wires onto the <em>main</em> board this time, right near the point where its delivered over the ribbon cable.
 </p>
 
-{{ show_image("power-routing-solder.jpg", caption="The two lanes on each edge of the connector carry power (i.e. 2+ and 2-). <b>Be sure to unplug the ribbon cable before doing this so there's no possibility of shorting the battery</b>.") }}
+{{ show_image("power-routing-solder.jpg", caption="The two lanes on each edge of the connector carry power (i.e. 2 carry positive voltage and 2 carry ground). <b>Be sure to unplug the ribbon cable before doing this so there's no possibility of shorting the battery</b>.") }}
 
 {# TODO: show the other end of the power cable here (requires taking another photo) #}
 
@@ -207,7 +219,7 @@ And finally, route the wires out the gap in the side of the housing and close it
 <p>
 After assembling all the hardware, I flashed an
 {{ offsite_link("http://archlinux.org/", "Arch Linux") }}
-image to a flash drive & booted the system over USB.
+image to a flash drive and booted the system over USB.
 Everything worked more or less out-of-the-box after following the
 {{ offsite_link("https://wiki.archlinux.org/index.php/Installation_guid://wiki.archlinux.org/index.php/Installation_guide", "installation instructions") }},
 although there are a few non-blocking issues:
@@ -301,34 +313,36 @@ HDMI cable such that the hot plug signal is permanently shorted.
 
 <ul class="list-single-lines">
 		<li>
-				1x {{offsite_link("Motorola Lapdock", "www.amazon.com/AT-Laptop-Dock-Motorola-ATRIX/dp/B004M17D62/") }}
+				1x {{offsite_link("www.amazon.com/AT-Laptop-Dock-Motorola-ATRIX/dp/B004M17D62/", "Motorola Lapdock") }}
 		</li>
 		<li>
-				1x {{offsite_link("Intel NUC5i5RYK", "http://www.newegg.com/Product/Product.aspx?Item=N82E16856102096") }}
+				1x {{offsite_link("http://www.newegg.com/Product/Product.aspx?Item=N82E16856102096", "Intel NUC5i5RYK") }}
 		</li>
 		<li>
-				1x {{offsite_link("Micro HDMI Female To Mini HDMI Male Cable", "http://www.ebay.com/itm/201380752340") }}
+				1x {{offsite_link("http://www.ebay.com/itm/201380752340", "Micro HDMI Female To Mini HDMI Male Cable") }}
 		</li>
 		<li>
-				1x {{offsite_link("USB Micro Female to USB Male Cable", "www.amazon.com/AFUNTA-Quality-Standard-Extension-Transfer/dp/B00MEBEOW8/") }}
+				1x {{offsite_link("www.amazon.com/AFUNTA-Quality-Standard-Extension-Transfer/dp/B00MEBEOW8/", "USB Micro Female to USB Male Cable") }}
 		</li>
 		<li>
-				{# TODO: link to the adapters #}
-				1x (power cable)
+				1x {{offsite_link("https://www.amazon.com/gp/product/B018636D44/", "Male DC Power Connector") }}
+		</li>
+		<li>
+				1x {{offsite_link("https://www.amazon.com/gp/product/B014H36SI8/", "Male to Female DC Power Adapter") }}
 		</li>
 		<li>
 				{# TODO: verify correct ram #}
-				2x8 GB {{offsite_link("LPDDR3 RAM", "http://www.newegg.com/Product/Product.aspx?Item=N82E16820148614") }}
+				2x8 GB {{offsite_link("http://www.newegg.com/Product/Product.aspx?Item=N82E16820148614", "LPDDR3 RAM") }}
 		</li>
 		<li>
-				1x {{offsite_link("500 GB M.2 SSD", "http://www.newegg.com/Product/Product.aspx?Item=N82E16820147399") }}
+				1x {{offsite_link("http://www.newegg.com/Product/Product.aspx?Item=N82E16820147399", "500 GB M.2 SSD") }}
 		</li>
 </ul>
 
 <p>
 Depending on where you source these components, the total cost is around $600.
 The most interesting alternative to using a NUC for this project is the
-{{ offsite_link("Kangaroo Plus Mobile Mini PC", "http://www.newegg.com/Product/Product.aspx?Item=N82E16856659001") }}.
+{{ offsite_link("http://www.newegg.com/Product/Product.aspx?Item=N82E16856659001", "Kangaroo Plus Mobile Mini PC") }}.
 It's not as powerful, but it contains its own battery and is much smaller.
 </p>
 
@@ -343,6 +357,7 @@ laptop that will ever give you this display when you power it down:
 </p>
 
 {# TODO: insert photo: no hdmi signal detected #}
+{{ show_image("no-signal-hdmi.jpg") }}
 
 {% endblock %}
 
