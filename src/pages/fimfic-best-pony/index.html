@@ -1,0 +1,117 @@
+{% from 'base.html' import heading %}
+{{ page.set_title("Best pony, as told by Fimfiction") }}
+
+{% extends 'blog_entry.html' %}
+{% block entry_content %}
+
+
+{{ heading("Background") }}
+
+<p>
+When JockeTF released his
+{{ offsite_link("https://www.reddit.com/r/mylittlepony/comments/4l5o3p/fimfarchive_20160525_released_all_stories_on/", "archive of every single story on Fimfiction") }}
+a few weeks ago, I immediately realized the potential for calculating
+some interesting statistics.
+({{ offsite_link("http://www.fimfiction.net/", "Fimfiction") }},
+for the uninitiated, is the brony community's premier platform for
+sharing fan fiction. If this confuses you more, read
+{{ offsite_link("https://en.wikipedia.org/wiki/My_Little_Pony:_Friendship_Is_Magic_fandom", "this") }},
+or just continue on and laugh at how absurdly niche the contents of this
+article are).
+The dump consists of a whopping 135000 stories published over the last
+5 years, totalling 8.5 GB of uncompressed text. It's a huge sample
+size and is largely representative of all but the earliest of the
+fandom's written works. But where to start?
+</p>
+
+<p>
+The one question that gets brought up more often than anything else
+in this fandom is, <em>by far</em>, "who is best pony?"
+So, why not start there? Who, <em>really</em>, is best pony?
+</p>
+
+<p>
+But how do we answer that question? What does it mean to be "best pony"?
+Is it simply the most frequently-mentioned character? Perhaps the
+character most often portrayed in a positive light? The question really
+isn't defined in a way to be answered in any other way besides a poll, so
+(spoiler) I don't actually answer it in this blog post.
+</p>
+
+<p>
+But I do come close! The question serves as a great starting point for
+determining interesting quantities to measure. In attempting to
+calculate something vaguely similar to how positively a character
+is portrayed, I measure the positivity of the <em>sentiment</em> of
+each sentence in which the character appears by name (across all 135000
+stores). The result is that
+"Rainbow Dash is a bad flier" and "Rainbow Dash thinks they're bad
+fliers" both have negative sentiments, whereas only the former is really
+portraying her character in a bad light. So there is some inaccuracy,
+and it doesn't capture instances where the character is mentioned via a
+pronoun, but hopefully the results aren't <em>too</em> inaccurate.
+The sentiment analysis is done using
+{{ offsite_link("https://github.com/cjhutto/vaderSentiment", "VADER") }}
+and the {{ offsite_link("http://www.nltk.org/", "Natural Language
+Toolkit") }} (NLTK).
+</p>
+
+<p>
+The ability to perform sentiment analysis allows for some other
+interesting measurements as well:
+</p>
+
+<ul>
+		<li>
+				Are original characters (OCs) associated with different
+				sentiment than canon characters?
+		</li>
+		<li>
+				Which race (earth pony, pegasus, unicorn) is portrayed
+				the most positively?
+		</li>
+		<li>
+				How does the way a character is portrayed depend on the
+				year/season in which the story was published?
+		</li>
+		<li>
+				Have the fandoms' writings generally become more or less
+				positive throughout the years?
+		</li>
+		<li>
+				How does the mood of a fimfiction story change throughout
+				the text (i.e. from beginning to end)?
+		</li>
+		<li>
+				Do authors tend to write with similar sentiments across
+				each of their works, or are the overall sentiments
+				largely uncorrelated?
+		</li>
+</ul>
+
+<p>
+Some other measurements I want to make include:
+</p>
+<ul>
+		<li>
+				Which characters appear the most often by name? (For
+				example, if authors spend a lot of words writing about
+				Twilight Sparkle, one could make an argument that she
+				is best pony).
+		</li>
+		<li>
+				What is the longest instance of alliteration used in
+				any story on fimfiction?
+		</li>
+		<li>
+				Which story includes the most non-words/typos?
+		</li>
+		<li>
+				Which <em>word</em> (besides common articles) appears
+				most frequently alongside each different character?
+		</li>
+</ul>
+
+
+{% endblock %}
+
