@@ -1,7 +1,11 @@
 #Build Requirements
 In order to build the website, the following tools/libraries are needed:
+```
+# pacman -S python python-jinja python-pillow python-dateutil python-requests
+```
 
-Python: Jinja2, Pillow (or PIL - Python Imaging Library), python-dateutil, requests
+If the `python-<x>` packages aren't available in your distribution, they may be
+installed via pip instead:
 ```
 $ pip install jinja2 Pillow python-dateutil requests
 ```
