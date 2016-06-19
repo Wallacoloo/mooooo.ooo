@@ -16,8 +16,13 @@ BUILD_DIR=$(BUILD_ROOT)/mooooo
 IPFSID_FILE=$(BUILD_ROOT)/mooooo.ipfsid
 IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 
-EC2_ID_FILE=../MOOOOOoooWebServer.pem
-EC2_USER_DOMAIN=root@ec2.mooooo.ooo
+# For publishing to Amazon EC2:
+#HOST_ID_FILE=-i ../MOOOOOoooWebServer.pem
+#HOST_USER_DOMAIN=root@ec2.mooooo.ooo
+# For publish to Raspberry Pi:
+HOST_ID_FILE=
+#HOST_USER_DOMAIN=colin@host.mooooo.ooo
+HOST_USER_DOMAIN=colin@192.168.1.129
 
 define MKDIR_CP
 	@# Copies the prerequisite to the target
@@ -64,10 +69,10 @@ publish-ipns: publish-ipfs ## Update the IPNS link to point to the newest versio
 publish-cf: publish-ipfs ## Update the DNS records for a cloudflare server
 	./publish_cloudflare.py $(shell cat ../cloudflare_apikey) $(shell cat $(IPFSID_FILE))
 
-publish-ec2: publish-ipfs ## Pin the new build to the Amazon EC2 instance
-	ssh -i $(EC2_ID_FILE) $(EC2_USER_DOMAIN) "ipfs pin add /ipfs/$(shell cat $(IPFSID_FILE))"
+publish-host: publish-ipfs ## Pin the new build to the remote host
+	ssh $(HOST_ID_FILE) $(HOST_USER_DOMAIN) "ipfs pin add /ipfs/$(shell cat $(IPFSID_FILE))"
 
-publish: publish-ipfs publish-cf publish-ipns publish-ec2 ## Publish the site everywhere
+publish: publish-ipfs publish-cf publish-ipns publish-host ## Publish the site everywhere
 	true
 
 ## Plot PNGs
