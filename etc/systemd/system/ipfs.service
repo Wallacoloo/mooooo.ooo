@@ -1,0 +1,10 @@
+[Unit]
+Description=IPFS server daemon
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/su colin --command="/usr/bin/ipfs daemon"
+
+[Install]
+WantedBy=multi-user.target
+
