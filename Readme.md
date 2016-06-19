@@ -12,3 +12,18 @@ $ pip install jinja2 Pillow python-dateutil requests
 
 Note: All python code is written for Python 3, *not* Python 2.x.
 
+#Hosting Requirements
+To host on IPFS, just install (and initialize) ipfs and pin the build directory:
+```
+# pacman -S go-ipfs
+$ ipfs init
+```
+
+Then
+```
+$ ipfs add -r build/
+[...]
+/ipfs/Qmxxxxx
+$ ipfs pin add /ipfs/Qmxxxxx
+```
+
