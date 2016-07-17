@@ -46,6 +46,10 @@ clean: ## Removes the FINAL outputs of the build, but not cached versions stored
 clean-all: ## Remove ALL output files and temporaries, including dependency info
 	rm -rf $(BUILD_ROOT)
 
+clean-deps: ## Remove dependency information, forcing it to be recomputed in the future
+	rm -rf $(BUILD_ROOT)/all.depincludes $(BUILD_ROOT)/deps
+
+
 ## Create a file that contains the constant IPNS key that we associate with the website
 $(IPNSID_FILE):
 	@mkdir -p $(dir $@)
@@ -135,5 +139,5 @@ help:
 
 
 .SECONDARY:
-.PHONY: clean clean-all help publish-ipfs publish-ipns publish-cf publish
+.PHONY: clean clean-all clean-deps help publish-ipfs publish-ipns publish-cf publish
 
