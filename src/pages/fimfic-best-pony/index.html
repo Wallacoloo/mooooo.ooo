@@ -30,14 +30,127 @@ in this fandom is, <em>by far</em>, "who is best pony?"
 So, why not start there? Who, <em>really</em>, is best pony?
 </p>
 
+{{ show_image(page.images["rating_vs_char.png"], caption="The average rating of all stories on fimfiction, when filtered based on character appearance. Since fimfiction doesn't expose a one-dimensional rating field, we
+rank stories based on (likes-dislikes)/(likes+dislikes).") }}
+
 <p>
-But how do we answer that question? What does it mean to be "best pony"?
-Is it simply the most frequently-mentioned character? Perhaps the
-character most often portrayed in a positive light? The question really
-isn't defined in a way to be answered in any other way besides a poll, so
-(spoiler) I don't actually answer it in this blog post.
+Well ah'll be - wouldja look at that? The set of stories in which
+Applejack appears (by name) has a higher average rating than the set of
+stories in which any other given character appears. That is to say, if
+you randomly pick one story in which Applejack appears and a different
+story in which one of the other mane 6 appears, you can expect the
+former to be rated higher.
 </p>
 
+<p>
+By the way, here's the same figure extended for more characters. If you
+want to read a good story, pick one about Nightmare Moon!
+</p>
+
+{{ show_image(page.images["rating_vs_char_all.png"], caption="Extended
+character ratings. Each character has at least 4000 stories, except for
+Babs Seed (1436) and Flurry Heart (173).") }}
+
+<p>
+So that's <i>one</i> interpretation of the "best pony" question (and
+probably the best approach for the data we have available), but why stop
+there? Maybe being the best pony isn't about having the highest story
+ratings. Maybe it's about being written of the most frequently, or being
+portayed in the most positive light? The question is rather
+ill-defined, which is what makes it so much fun in the first place.
+</p>
+
+<p>
+So, here we go.
+</p>
+
+{{ show_image(page.images["character_mentions_in_a_story.png"],
+caption="Hah! Take that, Applejack.") }}
+
+<p>
+When I say a character "appears" in a story, I mean that their name,
+or nickname, appears in the text. For example, if the text contains
+"Rainbow", "Dash", or "Dashie" (case-insensitive), then I say that
+Rainbow Dash makes an appearance in that story. This is flawed, as it
+could be that a different character is actually speaking about RD
+instead, but I think it's <em>reasonably</em> accurate.
+</p>
+
+<p>
+Using the same method, we can also infer something about the fandom's
+favorite ship. Spoiler, it's Twilight Sparkle/Rainbow Dash.
+</p>
+
+{{ show_image(page.images["char_pairs.png"]) }}
+
+<p>
+If we go back to the frequency of character appearances, there's something
+a little odd: although Celestia appears in as many <em>stories</em> as
+Twilight, Twilight appears in far more <em>sentences</em> than anyone else.
+This could mean that Celestia tends to play a less important role in the
+stories she's mentioned in, while Twilight plays more central roles (or
+plays central roles in lengthier stories). Or it could mean that - for
+whatever reason - authors tend to mention Twilight by her name, using
+fewer pronouns or non-name titles (e.g. "the librarian")
+than with other characters.
+</p>
+
+{{ show_image(page.images["character_mentions_in_a_sentence.png"]) }}
+
+<p>
+Next up, how has the quality (or expectations) of fandom writing
+changed with time?
+</p>
+
+{{ show_image(page.images["rating_vs_date_linear.png"], caption="Because
+fimfiction allows publishing chapters individually and at different dates,
+and the ratings apply to entire stories (not chapters), I took publication
+date of a story to be the average publication date of all its chapters."
+) }}
+
+<p>
+I'll say that this is not a trend I expected. Unfortunately, it's
+difficult to determine if the peaks correspond to creative bursts within
+the fandom, or readers becoming more liberal in their "likes". However,
+the big peak around Sept. 2013 - Jan. 2014 <em>does</em> correspond
+to the premiere of Season 4, and specifically, "Princess Twilight". That
+might not be an anomaly.
+</p>
+
+<p>
+More interestingly, there's an unmistakable trend for longer stories to
+have higher ratings. Note: stories with 0 votes (likes and dislikes) were
+removed from the dataset for all these plots that mention rating.
+</p>
+
+{{ show_image(page.images["rating_vs_length_linear.png"],
+caption="Lengthier stories tend to have higher ratings. Story length seems
+to be a better predictor of rating than publication date."
+)}}
+
+<p>
+Here's the same thing as a scatterplot, and before you ask, yes - I
+checked by work and that sharp edge at 1000 words doesn't seem to be
+an error! Perhaps fimfiction has (or used to have) a minimum word
+requirement for stories?
+<p>
+
+{{ show_image(page.images["rating_vs_length.png"]) }}
+
+{{ show_image(page.images["story_lengths.png"], caption="Number of stories
+published, grouped by word count. The histogram bins are logarithmically
+sized.") }}
+
+<p>
+Ok, let's get back on track. Can we figure out which character is
+written of in the most positive manner? Even though stories containing
+Appljack have the highest ratings, it would be questionable to proclaim
+her as best pony if all these stories were about how hilariously boring
+she is.
+<p>
+
+
+{#
 <p>
 But I do come close! The question serves as a great starting point for
 determining interesting quantities to measure. In attempting to
@@ -117,8 +230,11 @@ Some other measurements I want to make include:
 				How long do authors take between releasing their first
 				and last chapter?
 		</li>
+		<li>
+				What's the most common story (or chapter) title?
+		</li>
 </ul>
-
+#}
 
 {% endblock %}
 
