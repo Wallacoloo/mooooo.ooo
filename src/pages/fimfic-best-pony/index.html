@@ -10,15 +10,15 @@
 <p>
 When JockeTF released his
 {{ offsite_link("https://www.reddit.com/r/mylittlepony/comments/4l5o3p/fimfarchive_20160525_released_all_stories_on/", "archive of every single story on Fimfiction") }}
-a few weeks ago, I immediately realized the potential for calculating
-some interesting statistics.
-({{ offsite_link("http://www.fimfiction.net/", "Fimfiction") }},
+two months ago, I immediately realized the potential for calculating
+some interesting statistics, though apparently, I took my time.
+({{ offsite_link("http://www.Fimfiction.net/", "Fimfiction") }},
 for the uninitiated, is the brony community's premier platform for
 sharing fan fiction. If this confuses you more, read
-{{ offsite_link("https://en.wikipedia.org/wiki/My_Little_Pony:_Friendship_Is_Magic_fandom", "this") }},
+{{ offsite_link("https://en.wikipedia.org/wiki/My_Little_Pony:_Friendship_Is_Magic_fandom", "this") }} Wikipedia page,
 or just continue on and laugh at how absurdly niche the contents of this
 article are).
-The dump consists of a whopping 135000 stories published over the last
+The dump consists of a whopping 135,000 stories published over the last
 5 years, totalling 8.5 GB of uncompressed text. It's a huge sample
 size and is largely representative of all but the earliest of the
 fandom's written works. But where to start?
@@ -30,7 +30,9 @@ in this fandom is, <em>by far</em>, "who is best pony?"
 So, why not start there? Who, <em>really</em>, is best pony?
 </p>
 
-{{ show_image(page.images["rating_vs_char.png"], caption="The average rating of all stories on fimfiction, when filtered based on character appearance. Since fimfiction doesn't expose a one-dimensional rating field, we
+{{ heading("Best pony by story votes") }}
+
+{{ show_image(page.images["rating_vs_char.png"], caption="The average rating of all stories on Fimfiction, when filtered based on character appearance. Since Fimfiction doesn't expose a one-dimensional rating field, we
 rank stories based on (likes-dislikes)/(likes+dislikes).") }}
 
 <p>
@@ -65,12 +67,12 @@ So, here we go.
 </p>
 
 {{ show_image(page.images["character_mentions_in_a_story.png"],
-caption="Hah! Take that, Applejack.") }}
+caption="Hah! Take that, Applejack. Of the mane 6, AJ appears in the fewest stories.") }}
 
 <p>
 When I say a character "appears" in a story, I mean that their name,
 or nickname, appears in the text. For example, if the text contains
-"Rainbow", "Dash", or "Dashie" (case-insensitive), then I say that
+"Rainbow", "Dash", or "Dashie" (case-sensitive, to avoid attributing the verb use of "dash" to the character), then I say that
 Rainbow Dash makes an appearance in that story. This is flawed, as it
 could be that a different character is actually speaking about RD
 instead, but I think it's <em>reasonably</em> accurate.
@@ -103,7 +105,7 @@ changed with time?
 </p>
 
 {{ show_image(page.images["rating_vs_date_linear.png"], caption="Because
-fimfiction allows publishing chapters individually and at different dates,
+Fimfiction allows publishing chapters individually and at different dates,
 and the ratings apply to entire stories (not chapters), I took publication
 date of a story to be the average publication date of all its chapters."
 ) }}
@@ -112,7 +114,7 @@ date of a story to be the average publication date of all its chapters."
 I'll say that this is not a trend I expected. Unfortunately, it's
 difficult to determine if the peaks correspond to creative bursts within
 the fandom, or readers becoming more liberal in their "likes". However,
-the big peak around Sept. 2013 - Jan. 2014 <em>does</em> correspond
+the large bump around Sept. 2013 - Jan. 2014 <em>does</em> correspond
 to the premiere of Season 4, and specifically, "Princess Twilight". That
 might not be an anomaly.
 </p>
@@ -124,14 +126,14 @@ removed from the dataset for all these plots that mention rating.
 </p>
 
 {{ show_image(page.images["rating_vs_length_linear.png"],
-caption="Lengthier stories tend to have higher ratings. Story length seems
+caption="Story length seems
 to be a better predictor of rating than publication date."
 )}}
 
 <p>
 Here's the same thing as a scatterplot, and before you ask, yes - I
-checked by work and that sharp edge at 1000 words doesn't seem to be
-an error! Perhaps fimfiction has (or used to have) a minimum word
+checked my work and that sharp edge at 1000 words doesn't seem to be
+an error! Perhaps Fimfiction has (or used to have) a minimum word
 requirement for stories?
 <p>
 
@@ -141,97 +143,136 @@ requirement for stories?
 published, grouped by word count. The histogram bins are logarithmically
 sized.") }}
 
+{{ heading("Best pony by sentiment analysis") }}
+
 <p>
 Ok, let's get back on track. Can we figure out which character is
-written of in the most positive manner? Even though stories containing
-Appljack have the highest ratings, it would be questionable to proclaim
+written in the most positive manner? Even though stories containing
+Applejack have the highest ratings, it would be questionable to proclaim
 her as best pony if all these stories were about how hilariously boring
 she is.
 <p>
 
+<p>
+To some degree, we <em>can</em>, using something called Sentiment Analysis.
+A very simple form of sentiment analysis is to take a look at a single sentence
+and attach some number indicating how "positive" the sentence is. For example,
+on a scale from -1 to +1, <i>"your smile fills me with glee"</i> might score +0.8 because
+that's a happy thought. On the other hand, <i>"cows are terrifying because they're fat
+and they talk a lot"</i> might get -0.6. The exact process is hard to define, since we're
+attempting to quantify a qualitative and subjective measurement. It's also fairly
+limited. Consider <i>"Pinkie moved out today. Thank God - she was <em>so</em> annoying."</i> Each
+sentence would score negatively on its own, even though the overall meaning depicts
+something that's (subjectively) good. Regardless, sentiment analysis can still be
+useful.
+</p>
+
+<p>
+If we take every sentence in which a given character appears (by name) and
+measure the sentiment, we can infer something about how "positively" that character
+is spoken of. Of course, the scope is pretty limited - a character can be cheerful
+and happy, or determined and hard-working, yet unbearably shallow, and sentiment analysis
+wouldn't have anything to say for the latter attribute.
+</p>
+
+<p>
+I would expect Rainbow Dash and Pinkie Pie to be associated with the most positive sentiments - 
+the former because of how "awesome" she is and the latter because of all the parties and "fun"
+she likes to have. Rarity would probably be the lowest, as drama doesn't tend to go over well
+and she is known to frequently exaggerate the "worst possible things". Surprisingly, this isn't quite the case:
+</p>
+
+{{ show_image(page.images["char_senti_by_month_smooth.png"], caption="Average character sentiment
+across all stories on Fimfiction plotted against the month in which each story was published.") }}
+
+<p>
+I'm glad I decided to look at the sentiments as a function of time, rather than averaging all
+the text in one go. I wish I would have thought to do that with the ratings earlier. In any case,
+Rainbow Dash actually comes out <em>on bottom</em>, with Rarity in 2nd for most of the time.
+It looks like the antics of Rarity and Pinkie Pie have been chronicled in a noticably more pleasant
+manner over the years. The trend is also evident for Twilight Sparkle, though the other characters -
+especially Applejack - appear remarkably consistent. Noteworthy is that no character has a
+<em>downward</em> trend. Perhaps the general upward motion is due to the many trollfics that were
+astoundingly popular in the early days. At least to my knowledge, these seem to have faded.
+</p>
+
+<p>
+On the other hand, these trends aren't quite the same when we look at the sentiment of <em>every</em>
+sentence within a story (not just the ones in which a specific character is mentioned). This doesn't
+support the trollfic idea, since topics like murder would absolutely bring down the sentiment of a text.
+</p>
+
+{{ show_image(page.images["text_senti_by_month_smooth.png"]) }}
+
+<p>
+Next, take a look at the sentiment as a function of location within a given story.
+</p>
+
+{{ show_image(page.images["text_senti_by_storyarc.png"]) }}
+
+<p>
+And with short, medium-length, and long stories plotted separately:
+</p>
+
+{{ show_image(page.images["text_senti_by_storyarc_binned.png"]) }}
+
+<p>
+The takeaway here is that Fimfiction authors love happy endings.
+</p>
+
+{{ heading("The state of Fimfiction") }}
+
+<p>
+That's it for the best pony 
+{{ offsite_link("https://youtu.be/Cp5H0weyjYk?list=PLNC_sRuPtMoleIIzoeJ6GMCLj0UGufkf3", "nanalysis") }}.
+But while I was gathering those statistics, I found some
+others worthy of mention as well.
+</p>
+
+{{ show_image(page.images["most_common_titles.png"], caption="Yes. There really are nearly 30
+stories all titled exactly 'The Trotting Dead'.") }}
+
+<p>
+I suppose that with 135,000 stories, it's inevitable that a few will share the same title.
+Additionally, Fimfiction has more incomplete stories than completed stories, though I would expect
+this to be the case for fanfiction in general.
+</p>
+
+{{ show_image(page.images["story_status_distr.png"]) }}
+
+<p>
+Finally, I'll leave you with the most common words found in sentences mentioning each given character.
+This ignores all words that occur less than 50% above the baseline (i.e. across <em>all</em> the text
+on Fimfiction) in order to weed out uninteresting words like "the" and "it". Have fun with your
+stereotyping! (Click for larger versions).
+</p>
+
+{{ show_image("most_common_words_aj.png", "most_common_words_fs.png", "most_common_words_pp.png", "most_common_words_ra.png", "most_common_words_rd.png", "most_common_words_ts.png", 
+columns=2) }}
+
+<p>
+<i>
+The code to perform these analyses and generate all the plots found in this article is available publicly on
+{{ offsite_link("https://github.com/Wallacoloo/fimfic-stats", "Github") }}.
+</i>
+</p>
 
 {#
-<p>
-But I do come close! The question serves as a great starting point for
-determining interesting quantities to measure. In attempting to
-calculate something vaguely similar to how positively a character
-is portrayed, I measure the positivity of the <em>sentiment</em> of
-each sentence in which the character appears by name (across all 135000
-stores). The result is that
-"Rainbow Dash is a bad flier" and "Rainbow Dash thinks they're bad
-fliers" both have negative sentiments, whereas only the former is really
-portraying her character in a bad light. So there is some inaccuracy,
-and it doesn't capture instances where the character is mentioned via a
-pronoun, but hopefully the results aren't <em>too</em> inaccurate.
-The sentiment analysis is done using
-{{ offsite_link("https://github.com/cjhutto/vaderSentiment", "VADER") }}
-and the {{ offsite_link("http://www.nltk.org/", "Natural Language
-Toolkit") }} (NLTK).
-</p>
-
-<p>
-The ability to perform sentiment analysis allows for some other
-interesting measurements as well:
-</p>
-
-<ul>
-		<li>
-				Are original characters (OCs) associated with different
-				sentiment than canon characters?
-		</li>
-		<li>
-				Which race (earth pony, pegasus, unicorn) is portrayed
-				the most positively?
-		</li>
-		<li>
-				How does the way a character is portrayed depend on the
-				year/season in which the story was published?
-		</li>
-		<li>
-				Have the fandoms' writings generally become more or less
-				positive throughout the years?
-		</li>
-		<li>
-				How does the mood of a fimfiction story change throughout
-				the text (i.e. from beginning to end)?
-		</li>
-		<li>
-				Do authors tend to write with similar sentiments across
-				each of their works, or are the overall sentiments
-				largely uncorrelated?
-		</li>
-</ul>
 
 <p>
 Some other measurements I want to make include:
 </p>
 <ul>
 		<li>
-				Which characters appear the most often by name? (For
-				example, if authors spend a lot of words writing about
-				Twilight Sparkle, one could make an argument that she
-				is best pony).
-		</li>
-		<li>
 				What is the longest instance of alliteration used in
-				any story on fimfiction?
+				any story on Fimfiction?
 		</li>
 		<li>
 				Which story includes the most non-words/typos?
 		</li>
 		<li>
-				Which <em>word</em> (besides common articles) appears
-				most frequently alongside each different character?
-		</li>
-		<li>
-				How do story length and rating correlate?
-		</li>
-		<li>
 				How long do authors take between releasing their first
 				and last chapter?
-		</li>
-		<li>
-				What's the most common story (or chapter) title?
 		</li>
 </ul>
 #}
