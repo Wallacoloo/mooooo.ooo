@@ -44,3 +44,8 @@ p + p
 		margin-top: 1em;
 }
 
+/* Emphasis within italics should be bold */
+i > em
+{
+		font-weight: bold;
+}
