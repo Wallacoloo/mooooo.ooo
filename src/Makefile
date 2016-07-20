@@ -22,7 +22,7 @@ IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 # For publish to Raspberry Pi:
 HOST_ID_FILE=
 #HOST_USER_DOMAIN=colin@host.mooooo.ooo
-HOST_USER_DOMAIN=colin@192.168.1.129
+HOST_USER_DOMAIN=colin@192.168.1.11
 
 define MKDIR_CP
 	@# Copies the prerequisite to the target
