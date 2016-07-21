@@ -1,5 +1,6 @@
 {% from 'base.html' import heading %}
 {{ page.set_title("Best pony, as told by Fimfiction") }}
+{{ page.offsite_comments("https://www.reddit.com/r/mylittlepony/comments/4tp1co/best_pony_as_told_by_fimfiction/") }}
 
 {% extends 'blog_entry.html' %}
 {% block entry_content %}
@@ -120,7 +121,14 @@ might not be an anomaly.
 </p>
 
 <p>
-More interestingly, there's an unmistakable trend for longer stories to
+As pointed out by <i>TheOtherHarryPotter</i>, Fimfiction no longer exposes
+vote counts for stories with fewer than 10 votes,
+{{ offsite_link("https://www.fimfiction.net/blog/516997/vote-hiding-for-stories-with-low-vote-counts",
+"as of July 2015") }}. This may account for the current upward trend if we assume
+that these stories have disproportionally poor ratings.
+
+<p>
+Additionally, there's an unmistakable trend for longer stories to
 have higher ratings. Note: stories with 0 votes (likes and dislikes) were
 removed from the dataset for all these plots that mention rating.
 </p>
@@ -133,8 +141,11 @@ to be a better predictor of rating than publication date."
 <p>
 Here's the same thing as a scatterplot, and before you ask, yes - I
 checked my work and that sharp edge at 1000 words doesn't seem to be
-an error! Perhaps Fimfiction has (or used to have) a minimum word
-requirement for stories?
+an error! <strike>Perhaps Fimfiction has (or used to have) a minimum word
+requirement for stories?</strike> Several readers have comfirmed that Fimfiction
+<i>does</i> have a 1000 word requirement for new stories. By the way, the
+strong horizontal lines in the plot below are due to quantization - the number
+of different possible ratings for stories with few votes is small.
 <p>
 
 {{ show_image(page.images["rating_vs_length.png"]) }}
@@ -163,7 +174,7 @@ and they talk a lot"</i> might get -0.6. The exact process is hard to define, si
 attempting to quantify a qualitative and subjective measurement. It's also fairly
 limited. Consider <i>"Pinkie moved out today. Thank God - she was <em>so</em> annoying."</i> Each
 sentence would score negatively on its own, even though the overall meaning depicts
-something that's (subjectively) good. Regardless, sentiment analysis can still be
+something that's (arguably) good. Regardless, sentiment analysis can still be
 useful.
 </p>
 
@@ -235,7 +246,7 @@ stories all titled exactly 'The Trotting Dead'.") }}
 <p>
 I suppose that with 135,000 stories, it's inevitable that a few will share the same title.
 Additionally, Fimfiction has more incomplete stories than completed stories, though I would expect
-this to be the case for fanfiction in general.
+this to be the case for fan fiction in general.
 </p>
 
 {{ show_image(page.images["story_status_distr.png"]) }}
@@ -253,6 +264,15 @@ columns=2) }}
 <p>
 The code to perform these analyses and generate all the plots found in this article is available publicly on
 {{ offsite_link("https://github.com/Wallacoloo/fimfic-stats", "Github") }}.
+</p>
+
+<p>
+<i>
+		[Update] It turns out I'm not the only one out there doing analyses on Fimfiction.
+		Chinchillax recently
+		{{ offsite_link("https://www.fimfiction.net/blog/640911/20160525-fimfiction-archive-release-statistics", "published") }}
+		one as well! Let me know if you come across any others & I'll link them here.
+</i>
 </p>
 
 {#
