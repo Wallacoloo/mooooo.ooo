@@ -6,6 +6,7 @@ import json, os, subprocess
 
 import dateutil.parser, jinja2, PIL.Image
 from jinja2 import Environment, PackageLoader
+from urllib.parse import urlsplit
 
 
 CONFIG_PATH = "../build/config.json"
@@ -127,6 +128,7 @@ def get_pub_date_of_file(filename):
 
 
 class Page(object):
+    comments = {}
     def __init__(self, path_on_disk=None, title=None, need_exist=True):
         if need_exist: assert os.path.exists(path_on_disk)
 
@@ -218,6 +220,14 @@ class Page(object):
 
     def set_type(self, type):
         self.__class__ = type
+        return ""
+
+    def offsite_comments(self, url):
+        domain_name = urlsplit(url).netloc
+        nick = domain_name.lstrip("www.").rstrip(".com")
+        comments = self.comments or {}
+        comments[nick] = url
+        self.comments = comments
         return ""
 
 
@@ -439,7 +449,7 @@ class BlogEntry(Page):
     def comment_email_subject(self):
         """The subject tagline that should be used to identify a comment to this article"""
         return "[%s]" %self.friendly_path
-
+    
 
 class HomePage(Page):
     do_render_with_jinja = True
