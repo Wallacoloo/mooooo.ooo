@@ -74,7 +74,8 @@ publish-cf: publish-ipfs ## Update the DNS records for a cloudflare server
 	./publish_cloudflare.py $(shell cat ../cloudflare_apikey) $(shell cat $(IPFSID_FILE))
 
 publish-host: publish-ipfs ## Pin the new build to the remote host
-	ssh $(HOST_ID_FILE) $(HOST_USER_DOMAIN) "ipfs pin add /ipfs/$(shell cat $(IPFSID_FILE))"
+	ssh $(HOST_ID_FILE) $(HOST_USER_DOMAIN) "ipfs get $(shell cat $(IPFSID_FILE)) && ipfs pin add /ipfs/$(shell cat $(IPFSID_FILE))"
+	#ssh $(HOST_ID_FILE) $(HOST_USER_DOMAIN) "ipfs pin add /ipfs/$(shell cat $(IPFSID_FILE))"
 
 publish: publish-ipfs publish-cf publish-ipns publish-host ## Publish the site everywhere
 	true
