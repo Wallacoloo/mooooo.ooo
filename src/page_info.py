@@ -3,6 +3,7 @@
 # python-dateutil, jinja2
 
 import json, os, subprocess
+import re
 
 import dateutil.parser, jinja2, PIL.Image
 from jinja2 import Environment, PackageLoader
@@ -16,6 +17,9 @@ BLOG_ENTRY_DIR="blog_entries"
 TEMPLATE_DIR="templates"
 
 IMG_EXTENSIONS = ".jpg", ".jpeg", ".png", ".svg"
+VID_EXTENSIONS = ".webm",
+# Anything visual
+GFX_EXTENSIONS = IMG_EXTENSIONS + VID_EXTENSIONS
 FONT_EXTENSIONS = ".eot", ".ttf", ".woff", ".woff2"
 
 # Config file read from .json on disk
@@ -145,7 +149,7 @@ class Page(object):
         else:
             self._path = path_on_disk
 
-        if get_ext(self._path) in IMG_EXTENSIONS:
+        if get_ext(self._path) in GFX_EXTENSIONS:
             # If this resource is an image, cast it as such for the extra data
             self.set_type(Image)
         elif get_ext(self._path) in FONT_EXTENSIONS:
@@ -284,6 +288,8 @@ class Page(object):
         for page in names:
             if get_ext(page) in IMG_EXTENSIONS:
                 images[page] = Image(path_on_disk=os.path.join(self.dir_on_disk, page), **kwargs)
+            if get_ext(page) in VID_EXTENSIONS:
+                images[page] = Image(path_on_disk=os.path.join(self.dir_on_disk, page), is_video=True, **kwargs)
         return images
 
 
@@ -291,6 +297,7 @@ class Page(object):
     def images(self):
         """Retrives the images in the same directory as this page"""
         return self._get_images()
+
 
 
     @property
@@ -425,12 +432,25 @@ class Author(object):
 class Image(Page):
     do_render_with_jinja = False
     def __init__(self, **kwargs):
+        self._is_video = kwargs.pop("is_video", False)
         super().__init__(**kwargs)
+    @property
+    def is_video(self):
+        return self._is_video
     @property
     def size(self):
         """Returns the size of the image in pixels (width, height)"""
-        im = PIL.Image.open(self._path_on_disk)
-        return im.size
+        if self.is_video:
+            cmd = "avconv -i %s" % self._path_on_disk
+            p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            di = p.communicate()
+            for line in di:
+                if str(line).rfind("Video") > 0:
+                    resolution = re.findall("(\d+x\d+)", str(line))[0]
+            return [int(dim) for dim in resolution.split("x")]
+        else:
+            im = PIL.Image.open(self._path_on_disk)
+            return im.size
 
 class Font(Page):
     do_render_with_jinja = False
@@ -522,7 +542,7 @@ class Pages(object):
 
 def get_pages():
     ext = [".html", ".css"]
-    ext.extend(IMG_EXTENSIONS)
+    ext.extend(GFX_EXTENSIONS)
     ext.extend(FONT_EXTENSIONS)
     return Pages("pages/", ext)
 

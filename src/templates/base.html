@@ -47,6 +47,24 @@
 </span>
 {% endmacro %}
 
+{% macro show_video(video, caption="") %}
+{{ add_srcdep(video) }}
+{{ add_rtdep(video) }}
+<span class="image-container">
+<span class="centered">
+{% if do_render %}
+		<video src="{{ video.path|to_rel_path }}" width="{{ video.size.0 }}" height="{{ video.size.1 }}" controls class="theater-video">
+		</video>
+{% endif %}
+{% if caption %}
+	<span class="caption">
+		<i>{{ caption }}</i>
+	</span>
+{% endif %}
+</span>
+</span>
+{% endmacro %}
+
 {% macro include_css(css_page) %}
 {{ add_rtdep(css_page) }}
 {% if do_render %}
@@ -81,7 +99,7 @@
 {% endmacro %}
 
 {% macro multiline_code(code) %}
-<code class="multiline-code">{{ code }}</code>
+<code class="multiline-code">{{ code.strip() }}</code>
 {% endmacro %}
 
 {% if do_render or query_anchors or query_deps %}

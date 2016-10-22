@@ -112,6 +112,11 @@
 		border: 2px #686868 solid;
 		border-radius: 16px;
 }
+.theater-video
+{
+		/* Prevent horizontally-compressed videos from using their old box height */
+		height: auto;
+}
 
 .columns-1
 {

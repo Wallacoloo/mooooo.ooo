@@ -101,6 +101,10 @@ $(BUILD_DIR)/%.jpg: $(BUILD_ROOT)/images/%.jpg
 $(BUILD_DIR)/%.png: $(BUILD_ROOT)/images/%.png
 	$(MKDIR_CP)
 
+## Copy webm videos
+$(BUILD_DIR)/%.webm: pages/%.webm
+	$(MKDIR_CP)
+
 # If the font already exists, just directly copy it
 $(BUILD_ROOT)/fonts/%: fonts/%
 	$(MKDIR_CP)
