@@ -1,11 +1,98 @@
 {% from 'base.html' import heading, offsite_link, show_image %}
-{{ page.set_title("An Interactive Desktop Background for Stargazing with Stellarium") }}
+{{ page.set_title("An interactive stargazing desktop background") }}
 
 {% extends 'blog_entry.html' %}
 
 {% block entry_content %}
 
-{{ heading("Draft") }}
+{{ show_video(page.images["stellarium-demo.webm"], caption="The end result (video).") }}
+<p>
+As described on the project's homepage, {{ offsite_link("http://stellarium.org", "Stellarium") }}
+"is a free open source planetarium for your computer. It shows a realistic sky in 3D, just like what you see with the naked eye, binoculars or a telescope."
+</p>
+
+<p>
+It's a really cool application, and we're going to use some tools to make it an always-present
+component of a desktop computer environment. The end result will be a "desktop background" that
+displays a model of the sky in your location, updates in real-time, and allows interactive navigation of the night sky with the arrow keys or mouse.
+</p>
+
+<p>
+Disclaimer: This is all assuming a Linux environment running X11. It <em>does not</em> work on Wayland (though tips for Wayland support would be appreciated), and although Stellarium is cross-platform, the other tools used are Linux-only.
+Furthermore, it assumes only 1 display (or possibly multiple displays of the same resolution).
+</p>
+
+<p>
+The process is pretty straightforward:
+</p>
+<ul class="list-single-lines">
+		<li>
+				1. Create a Stellarium window.
+		<li>
+				2. Remove any window decoration (menu buttons).
+		<li>
+				3. Resize it to occupy the full screen.
+		<li>
+				4. Position it permanently underneath all other windows.
+		<li>
+				5. Remove it from the window list (i.e. alt+tab), and
+		<li> 
+				6. instruct the window manager to display it on all workspaces.
+</ul>
+
+<p>
+This effectively repurposes an application window as a background, and we can use a tool called
+{{ offsite_link("https://github.com/gnome/devilspie", "Devil's Pie") }} to automate steps 2-6 whenever
+Stellarium is started. After installing Devil's Pie,
+create {{ inline_code("~/.devilspie/stellarium.ds") }} and populate it with the following:
+</p>
+
+{{ multiline_code("""
+(if
+	(matches (window_name) \"Stellarium\")
+	(begin
+		(undecorate)
+		(geometry \"1920x1056\")
+		(below)
+		(skip_tasklist)
+		(pin)
+    )
+)
+""") }}
+
+<p>
+Be sure to update the "geometry" settings to match your display resolution, minus whatever
+horizontal or vertical space is occupied by your system menu bars.
+Devil's Pie will load this file at startup, and the first two lines instruct it to only apply the
+rest of the script to Stellarium windows.
+Each line inside the "(begin ... )" block then executes steps 2-6, in order.
+</p>
+
+<p>
+Next, we modify Stellarium config files in order to avoid excessive CPU/GPU use while we aren't
+actively interacting with it. 
+First, install Stellarium, and then locate the following lines inside {{ inline_code("~/.stellarium/config.ini") }}:
+</p>
+
+{{ multiline_code("""
+[video]
+fullscreen                             = false
+horizontal_offset                      = 0
+maximum_fps                            = 60
+minimum_fps                            = 20
+""") }}
+
+<p>
+Change the value of "minimum_fps" from "20" (default) to "1". This will make it so that when you aren't
+adjusting the view with your keyboard/mouse, Stellarium redraws everything at 1 fps. The downside is that
+initial input will lag by <em>up to</em> 1 second, and if you click on an object to monitor its
+trajectory, the crosshairs animation will appear jerky.
+Note: Stellarium doesn't appear to support fractional fps values - 1 fps is the lowest accepted. Also, config changes are correctly preserved across version upgrades.
+</p>
+
+<p>
+Finally, instruct your desktop environment to start Stellarium and Devil's Pie at login, and you're set!
+<p>
 
 {% endblock %}
 
