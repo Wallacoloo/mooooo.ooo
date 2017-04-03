@@ -1,5 +1,4 @@
 # Binaries:
-EPLOT=eplot
 OPTIPNG=optipng #Optional
 JPGCRUSH=jpgcrush #Optional
 
@@ -79,11 +78,6 @@ publish-host: publish-ipfs ## Pin the new build to the remote host
 
 publish: publish-ipfs publish-cf publish-ipns publish-host ## Publish the site everywhere
 	true
-
-## Plot PNGs
-%.png: %.eplot
-	@# The first line of the text file encodes flags to pass to eplot; the rest is data
-	tail -n +2 "$^" | exec eplot $(shell head -1 "$^") -P -o $@
 
 ## Build compressed png images
 $(BUILD_ROOT)/images/%.png: pages/%.png
