@@ -21,6 +21,7 @@ VID_EXTENSIONS = ".webm",
 # Anything visual
 GFX_EXTENSIONS = IMG_EXTENSIONS + VID_EXTENSIONS
 FONT_EXTENSIONS = ".eot", ".ttf", ".woff", ".woff2"
+CSS_EXTENSIONS = ".css",
 
 # Config file read from .json on disk
 config = json.loads(open(CONFIG_PATH, "r").read())
@@ -138,14 +139,12 @@ class Page(object):
 
         self._path_on_disk = path_on_disk
         self._title = title
+        self._desc = None
         self._srcdeps = None # Haven't calculated the dependencies
         self._rtdeps = None # Haven't calculated the dependencies
         self._anchors = None # Haven't enumerated the page's anchors
         if path_on_disk and path_on_disk.startswith("pages/"):
             self._path = path_on_disk[len("pages/"):]
-        elif path_on_disk and get_ext(path_on_disk) == ".scss":
-            # SASS files are compiled to CSS in the build directory
-            self._path = path_on_disk[:-len(".scss")] + ".css"
         else:
             self._path = path_on_disk
 
@@ -246,6 +245,15 @@ class Page(object):
         return ""
 
     @property
+    def desc(self):
+        return self._desc
+    def set_desc(self, desc):
+        # Only makes sense to set the description once
+        assert self._desc == None or desc == self._desc
+        self._desc = desc
+        return ""
+
+    @property
     def authors(self):
         authors = get_authors_of_file(self._path_on_disk)
         # For now, we only have one author
@@ -299,6 +307,23 @@ class Page(object):
         return self._get_images()
 
 
+    # Commented out because unused.
+    #def _get_css(self, names=None, **kwargs):
+    #    """Returns all the css in the same source directory as the object,
+    #    or the css in the directory indicated by names, regardless of if they exist"""
+    #    if not names:
+    #        names = os.listdir(self.dir_on_disk)
+
+    #    css = {}
+    #    for page in names:
+    #        if get_ext(page) in CSS_EXTENSIONS:
+    #            images[page] = Page(path_on_disk=os.path.join(self.dir_on_disk, page), **kwargs)
+    #    return css
+
+    #@property
+    #def css(self):
+    #    """Retrieves the css files in the same directory as this page"""
+    #    return self._get_css()
 
     @property
     def srcdeps(self):
@@ -538,9 +563,6 @@ class Pages(object):
         elif os.path.join(key, "index.html") in self.all:
             return self.all[os.path.join(key, "index.html")]
         else:
-            #if os.path.splitext(key)[1] == ".css":
-            #    # SASS files are compiled into normal CSS
-            #    return self[key[:-len(".css")] + ".scss"]
             raise KeyError(key)
 
     @property

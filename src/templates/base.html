@@ -103,15 +103,16 @@
 {% endmacro %}
 
 {% if do_render or query_anchors or query_deps %}
+{% block document %}
 <!DOCTYPE html>
 <html>
 		<head>
 			<meta charset="utf-8">
 			<meta name="viewport" content="width=device-width initial-scale=1" />
-			<meta name="description" content="Weblog/homepage for an artist/developer/engineer. DIY build logs, opinions and artwork" />
+			<meta name="description" content="{{ page.desc or "Weblog/homepage for an artist/developer/engineer. DIY build logs, opinions and artwork." }}" />
 			{{ include_css(pages["css/global.css"]) }}
 			<meta name="author" content="{{ page.authors|join(", ", "name") }}">
-			<title>{% block title %}{{ page.title }}{% endblock %}</title>
+			<title>{{ page.title }}</title>
 			<style>
 {# Include absolutely essentially style in the header; things that prevent the page from looking outright horrible while loading #}
 
@@ -125,9 +126,12 @@ img
 {
 		height: auto;
 }
+			{% block extra_style %}
+			{% endblock %}
 			</style>
 		</head>
 		<body>
+			{% block body %}
 			<header class="nav-header">
 					{# Derivative templates are expected to
 						{% set is_page_xxx = True %} for at least one page #}
@@ -156,7 +160,9 @@ img
 							{{ onsite_link(pages["about"], "More info", anchor="License / Attributions"|into_tag) }}.
 					</p>
 			</footer>
+			{% endblock %}
 		</body>
 </html>
+{% endblock %}
 {% endif %}
 

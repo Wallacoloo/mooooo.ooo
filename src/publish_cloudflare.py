@@ -19,11 +19,16 @@
 
 import json, requests, sys
 
-# Cloudflare Name for the website (this might not be the DOMAIN name)
-zone_name = "mooooo.ooo"
-# Cloudflare Name for the DNS TXT entry that we wish to link to IPFS
-#ipfs_subdomain = "ipfs.mooooo.ooo"
-dnslink_subdomains = ("_dnslink.mooooo.ooo", "ipfs.mooooo.ooo", "mooooo.ooo")
+# Cloudflare Name for the DNS TXT entries that we wish to link to IPFS, plus the root address relative to the ipfs folder we publish.
+dnslink_subdomains = {
+    "mooooo.ooo": {
+        "mooooo.ooo": ""
+        # "test.mooooo.ooo": "" # Example for subdomains.
+    },
+    "pinkie.party": {
+        "pinkie.party": "/pinkie-party"
+    }
+}
 
 user_email = "wallacoloo@gmail.com"
 
@@ -62,9 +67,11 @@ if __name__ == "__main__":
     api_key = sys.argv[1]
     ipfs_id = sys.argv[2]
     
-    zone_id = get_zone_id(api_key, zone_name)
-    for sub in dnslink_subdomains:
-        dns_entry = get_dns_txt_info(api_key, zone_id, sub)
-        dns_entry["content"] = "dnslink=/ipfs/%s" %ipfs_id
-        update_txt_record(api_key, zone_id, dns_entry)
+    for zone_name, dnslinks in dnslink_subdomains.items():
+        zone_id = get_zone_id(api_key, zone_name)
+        for sub, leaf in dnslinks.items():
+            print("updating", sub, "for", zone_name)
+            dns_entry = get_dns_txt_info(api_key, zone_id, sub)
+            dns_entry["content"] = "dnslink=/ipfs/%s" %ipfs_id + leaf
+            update_txt_record(api_key, zone_id, dns_entry)
 
