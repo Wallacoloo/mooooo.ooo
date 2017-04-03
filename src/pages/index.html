@@ -15,5 +15,12 @@
 {% for entry in pages.blog_entries.values()|selectattr("is_published", "even") %}
 <!-- Super-secret unpublished article! {{ heading(entry.title, link_to=entry, show_icon=False, sublevel=1) }} -->
 {% endfor %}
+
+<!-- Other secrets
+		{{ show_video(page.images["colin.webm"]) }}
+		{{ show_video(page.images["rick.webm"]) }}
+-->
+
+
 {% endblock %}
 

@@ -7,9 +7,11 @@
 <span class="blog-title-info">
 {{ heading(page.title, link=False) }}
 
+{% if page.authors %}
 <div class="blog-author">
 By {{ page.authors[0].name }}
 </div>
+{% endif %}
 
 <div class="blog-pubdate">
 {% if page.is_published %}

@@ -101,6 +101,9 @@ $(BUILD_DIR)/%.jpg: $(BUILD_ROOT)/images/%.jpg
 $(BUILD_DIR)/%.png: $(BUILD_ROOT)/images/%.png
 	$(MKDIR_CP)
 
+## Copy gifs
+$(BUILD_DIR)/%.gif: pages/%.gif
+	$(MKDIR_CP)
 ## Copy webm videos
 $(BUILD_DIR)/%.webm: pages/%.webm
 	$(MKDIR_CP)

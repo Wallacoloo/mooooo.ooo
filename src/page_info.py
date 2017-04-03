@@ -16,7 +16,7 @@ BLOG_ENTRY_DIR="blog_entries"
 # Directory in which Jinja2 templates are stored
 TEMPLATE_DIR="templates"
 
-IMG_EXTENSIONS = ".jpg", ".jpeg", ".png", ".svg"
+IMG_EXTENSIONS = ".gif", ".jpg", ".jpeg", ".png", ".svg"
 VID_EXTENSIONS = ".webm",
 # Anything visual
 GFX_EXTENSIONS = IMG_EXTENSIONS + VID_EXTENSIONS
@@ -249,7 +249,7 @@ class Page(object):
     def authors(self):
         authors = get_authors_of_file(self._path_on_disk)
         # For now, we only have one author
-        assert len(authors) == 1 and all(a.name == "Colin Wallace" for a in authors)
+        #assert len(authors) == 1 and all(a.name == "Colin Wallace" for a in authors)
         return authors
 
     @property
@@ -326,18 +326,30 @@ class Page(object):
         rtdeps = set()
         anchors = set() # html anchors, e.g. mypage.html#heading1 - "heading1" is an anchor
         def to_rel_path(abs_path):
-            prefix = "../"*out_path.count("/")
-            rel = os.path.join(prefix, abs_path)
-            if "#" in rel:
-                base, anchor = rel.split("#")
+            # Separate the anchor, if it was provided
+            if "#" in abs_path:
+                abs_path, anchor = abs_path.split("#")
             else:
-                base, anchor = rel, None
+                anchor = ""
+            # Remove any stem that is common to (abs_path, out_path).
+            parts_out, parts_abs = out_path.split("/"), abs_path.split("/")
+            while parts_out and parts_abs and parts_out[0] == parts_abs[0]:
+                del parts_out[0]
+                del parts_abs[0]
+            
+            # add necessary ../ parents
+            prefix = "../"*(len(parts_out)-1)
+            # Add the leaf
+            base = os.path.join(prefix, "/".join(parts_abs))
             # Remove index.html from the path if configured to.
-            # Note: Need to remove any html anchor before doing this (done above)
             if base.endswith("index.html") and config["omit_index_from_url"]:
                 base = base[:-len("index.html")]
             # Re-add the anchor, if there was one
-            return base if anchor is None else "#".join((base, anchor))
+            retstr = "#".join((base, anchor)) if anchor else base
+            if retstr == "":
+                # old web browsers misinterpret empty href. See http://stackoverflow.com/questions/5637969/is-an-empty-href-valid
+                retstr = "#"
+            return retstr
         def add_srcdep(dep):
             srcdeps.add(dep)
             # Return empty string so this expression won't write to the output stream
