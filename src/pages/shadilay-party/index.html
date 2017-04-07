@@ -1,9 +1,17 @@
 {{ page.set_desc("♪Shadilay♪") }}
 {{ page.set_title("♪Shadilay♪") }}
+{% set dancing_pepe=page.images["dancing-pepe.gif"] %}
+{{ add_srcdep(dancing_pepe) }}
+{% set kekistan=page.images["kekistan.jpg"] %}
 
-{% macro bg_image(image) %}
+{% macro show_bg_image(image, class) %}
 {{ add_rtdep(image) }}
-<div class="bg-image" style="background-image: url({{ image.path|to_rel_path }});"></div>
+<div class="{{ class }}" style="background-image: url({{ image.path|to_rel_path }});"></div>
+{% endmacro %}
+{% macro show_image(image, class) %}
+{{ add_srcdep(image) }}
+{{ add_rtdep(image) }}
+<img class="{{ class }}" src="{{ image.path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px"/>
 {% endmacro %}
 
 {% macro bg_audio(audio) %}
@@ -15,7 +23,7 @@
 
 {% extends 'blank_html.html' %}
 {% block head %}
-<!-- SEE ALSO: pinkie.party -->
+<!-- SEE ALSO: http://pinkie.party -->
 <meta name="viewport" content="width=device-width initial-scale=1" />
 <meta name="description" content="{{ page.desc }}" />
 <meta name="author" content="Rare Dancing Pepe">
@@ -34,17 +42,44 @@ html,body
 	padding: 0px;
 	border: 0px;
 }
-.bg-image
+@keyframes bg-scroll
+{
+	from { background-position: 0px 0px; }
+	to { background-position: {{ dancing_pepe.size.0}}px -{{ dancing_pepe.size.1}}px; }
+}
+.bg-pepe
 {
 	height: 100%;
 	background-repeat: repeat;
-	background-position: 50% 50%;
+	animation-name: bg-scroll;
+    animation-duration: 6s;
+	animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+.fg-kekistan
+{
+	width: 500px;
+	height: auto;
+	max-width: 55%;
+	min-width: 25%;
+	position: absolute;
+	left: 0px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-top: auto;
+	margin-bottom: auto;
+	border: 6px #ffffff solid;
+	border-radius: 3px;
 }
 </style>
 {% endblock %}
 
 {% block body %}
-{{ bg_image(page.images["dancing-pepe.gif"]) }}
+{{ show_bg_image(dancing_pepe, "bg-pepe") }}
+{{ show_image(kekistan, "fg-kekistan") }}
 {{ bg_audio(page.audio["shadilay_loop.ogg"]) }}
 {% endblock %}
 
