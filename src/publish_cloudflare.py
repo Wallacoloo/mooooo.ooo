@@ -62,6 +62,10 @@ def update_txt_record(api_key, zone_id, record_data):
     """Update the TXT dns record to direct to the given ipfs object"""
     r = api_call(api_key, "/zones/%s/dns_records/%s" %(zone_id, record_data["id"]), method="PUT", data=record_data)
 
+def purge_cache(api_key, zone_id):
+    """Purge all files in the given zone from Cloudflare's cache"""
+    r = api_call(api_key, "/zones/%s/purge_cache" %zone_id, method="DELETE", data={"purge_everything": True})
+
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: %s <API Key> <IPFS id of website root>" %(sys.argv[0] if sys.argv else "update_cloudflare.py"))
@@ -77,4 +81,5 @@ if __name__ == "__main__":
             dns_entry = get_dns_txt_info(api_key, zone_id, sub)
             dns_entry["content"] = "dnslink=/ipfs/%s" %ipfs_id + leaf
             update_txt_record(api_key, zone_id, dns_entry)
+        purge_cache(api_key, zone_id)
 
