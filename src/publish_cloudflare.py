@@ -27,6 +27,9 @@ dnslink_subdomains = {
     },
     "pinkie.party": {
         "pinkie.party": "/pinkie-party"
+    },
+    "shadilay.party": {
+        "shadilay.party": "/shadilay-party"
     }
 }
 
