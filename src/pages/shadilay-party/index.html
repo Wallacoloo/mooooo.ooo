@@ -2,7 +2,7 @@
 {{ page.set_title("♪Shadilay♪") }}
 {% set dancing_pepe=page.images["dancing-pepe.gif"] %}
 {{ add_srcdep(dancing_pepe) }}
-{% set kekistan=page.images["kekistan.jpg"] %}
+{% set kekistan=page.images["kekistan-bordered.jpg"] %}
 
 {% macro show_bg_image(image, class) %}
 {{ add_rtdep(image) }}
@@ -60,8 +60,10 @@ html,body
 {
 	width: 500px;
 	height: auto;
-	max-width: 55%;
 	min-width: 25%;
+	max-width: 70%;
+	max-height: 42%;
+	object-fit: contain;
 	position: absolute;
 	left: 0px;
 	right: 0px;
@@ -71,8 +73,6 @@ html,body
 	margin-right: auto;
 	margin-top: auto;
 	margin-bottom: auto;
-	border: 6px #ffffff solid;
-	border-radius: 3px;
 }
 </style>
 {% endblock %}
