@@ -18,6 +18,7 @@ TEMPLATE_DIR="templates"
 
 IMG_EXTENSIONS = ".gif", ".jpg", ".jpeg", ".png", ".svg"
 VID_EXTENSIONS = ".webm",
+SND_EXTENSIONS = ".ogg",
 # Anything visual
 GFX_EXTENSIONS = IMG_EXTENSIONS + VID_EXTENSIONS
 FONT_EXTENSIONS = ".eot", ".ttf", ".woff", ".woff2"
@@ -155,6 +156,8 @@ class Page(object):
             self.set_type(Font)
         elif get_ext(self._path) == ".css":
             self.set_type(Css)
+        elif get_ext(self._path) in SND_EXTENSIONS:
+            self.set_type(Audio)
         else:
             assert get_ext(self._path) == ".html"
             self.do_render_with_jinja = True
@@ -288,7 +291,7 @@ class Page(object):
 
     def _get_images(self, names=None, **kwargs):
         """Returns all the images in the same source directory as the object,
-        or the images in the directory indicated by names, regardless of if they exist"""
+        or the images in the files indicated by names, regardless of if they exist"""
         if not names:
             names = os.listdir(self.dir_on_disk)
 
@@ -306,6 +309,23 @@ class Page(object):
         """Retrives the images in the same directory as this page"""
         return self._get_images()
 
+    def _get_audio(self, names=None, **kwargs):
+        """Returns all audio files in the same source directory as the object,
+        or the audio in the files indicated by names, regardless of if they exist"""
+        if not names:
+            names = os.listdir(self.dir_on_disk)
+
+        audio = {}
+        for page in names:
+            if get_ext(page) in SND_EXTENSIONS:
+                audio[page] = Audio(path_on_disk=os.path.join(self.dir_on_disk, page), **kwargs)
+        return audio
+
+
+    @property
+    def audio(self):
+        """Retrives the audio in the same directory as this page"""
+        return self._get_audio()
 
     # Commented out because unused.
     #def _get_css(self, names=None, **kwargs):
@@ -488,6 +508,9 @@ class Image(Page):
         else:
             im = PIL.Image.open(self._path_on_disk)
             return im.size
+
+class Audio(Page):
+    do_render_with_jinja = False
 
 class Font(Page):
     do_render_with_jinja = False

@@ -1,6 +1,7 @@
 # Binaries:
 OPTIPNG=optipng #Optional
 JPGCRUSH=jpgcrush #Optional
+#GIFSICLE=gifsicle #Optional
 
 # jpegoptim provides 3~4% improvement (w/ -s)
 # jpegrescan provides 6~7% (w/ -s)
@@ -20,8 +21,8 @@ IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 #HOST_USER_DOMAIN=root@ec2.mooooo.ooo
 # For publish to Raspberry Pi:
 HOST_ID_FILE=
-HOST_USER_DOMAIN=alarm@ssh.mooooo.ooo
-#HOST_USER_DOMAIN=colin@192.168.1.11
+#HOST_USER_DOMAIN=alarm@ssh.mooooo.ooo
+HOST_USER_DOMAIN=alarm@192.168.1.11
 
 define MKDIR_CP
 	@# Copies the prerequisite to the target
@@ -89,17 +90,26 @@ $(BUILD_ROOT)/images/%.jpg: pages/%.jpg
 	$(MKDIR_CP)
 	$(JPGCRUSH) $@ || true
 
+## Compress gifs (losslessly)
+$(BUILD_ROOT)/images/%.gif: pages/%.gif
+	$(MKDIR_CP)
+#	$(GIFSICLE) -O3 -b $@
+
 $(BUILD_DIR)/%.jpg: $(BUILD_ROOT)/images/%.jpg
 	$(MKDIR_CP)
 
 $(BUILD_DIR)/%.png: $(BUILD_ROOT)/images/%.png
 	$(MKDIR_CP)
 
-## Copy gifs
-$(BUILD_DIR)/%.gif: pages/%.gif
+$(BUILD_DIR)/%.gif: $(BUILD_ROOT)/images/%.gif
 	$(MKDIR_CP)
+
 ## Copy webm videos
 $(BUILD_DIR)/%.webm: pages/%.webm
+	$(MKDIR_CP)
+
+## Copy ogg audio files
+$(BUILD_DIR)/%.ogg: pages/%.ogg
 	$(MKDIR_CP)
 
 # If the font already exists, just directly copy it

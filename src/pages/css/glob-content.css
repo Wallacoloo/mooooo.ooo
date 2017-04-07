@@ -85,7 +85,7 @@
 		text-decoration: underline;
 }
 
-/* Contains an image and an optional caption (which will be aligned accordingle) */
+/* Contains an image and an optional caption (which will be aligned accordingly) */
 .image-container
 {
 		display: block;

@@ -65,6 +65,16 @@
 </span>
 {% endmacro %}
 
+{% macro audio(audio, autoplay=False, loop=False, controls=False) %}
+{{ add_rtdep(audio) }}
+<audio src="{{ audio.path|to_rel_path }}"
+	{% if loop %} loop="loop" {% endif %}
+	{% if autoplay %} autoplay="autoplay" {% endif %}
+	{% if controls %} controls="controls" {% endif %}
+>
+</audio>
+{% endmacro %}
+
 {% macro include_css(css_page) %}
 {{ add_rtdep(css_page) }}
 {% if do_render %}

@@ -1,0 +1,16 @@
+{% if do_render or query_anchors or query_deps %}
+{% block document %}
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		{% block head %}
+		{% endblock %}
+	</head>
+	<body>
+		{% block body %}
+		{% endblock %}
+	</body>
+</html>
+{% endblock %}
+{% endif %}
