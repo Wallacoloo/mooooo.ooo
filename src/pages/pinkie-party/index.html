@@ -2,7 +2,6 @@
 {{ page.set_title("Pinkie.Party()") }}
 
 {% macro bg_image(image) %}
-{{ add_srcdep(image) }}
 {{ add_rtdep(image) }}
 <div class="bg-image" style="background-image: url({{ image.path|to_rel_path }});"></div>
 {% endmacro %}
