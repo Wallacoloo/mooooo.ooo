@@ -112,6 +112,10 @@ $(BUILD_DIR)/%.webm: pages/%.webm
 $(BUILD_DIR)/%.ogg: pages/%.ogg
 	$(MKDIR_CP)
 
+## Copy ICC color profiles
+$(BUILD_DIR)/%.icc: pages/%.icc
+	$(MKDIR_CP)
+
 # If the font already exists, just directly copy it
 $(BUILD_ROOT)/fonts/%: fonts/%
 	$(MKDIR_CP)

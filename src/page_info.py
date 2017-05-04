@@ -23,6 +23,8 @@ SND_EXTENSIONS = ".ogg",
 GFX_EXTENSIONS = IMG_EXTENSIONS + VID_EXTENSIONS
 FONT_EXTENSIONS = ".eot", ".ttf", ".woff", ".woff2"
 CSS_EXTENSIONS = ".css",
+# non-categorical; usually meant to be downloaded.
+OTHER_EXTENSIONS = ".icc",
 
 # Config file read from .json on disk
 config = json.loads(open(CONFIG_PATH, "r").read())
@@ -158,6 +160,8 @@ class Page(object):
             self.set_type(Css)
         elif get_ext(self._path) in SND_EXTENSIONS:
             self.set_type(Audio)
+        elif get_ext(self._path) in OTHER_EXTENSIONS:
+            self.set_type(Other)
         else:
             assert get_ext(self._path) == ".html"
             self.do_render_with_jinja = True
@@ -327,23 +331,24 @@ class Page(object):
         """Retrives the audio in the same directory as this page"""
         return self._get_audio()
 
-    # Commented out because unused.
-    #def _get_css(self, names=None, **kwargs):
-    #    """Returns all the css in the same source directory as the object,
-    #    or the css in the directory indicated by names, regardless of if they exist"""
-    #    if not names:
-    #        names = os.listdir(self.dir_on_disk)
+    def _get_other(self, names=None, **kwargs):
+        """Returns all etc files in the same source directory as the object,
+        or the etc in the files indicated by names, regardless of if they exist"""
+        if not names:
+            names = os.listdir(self.dir_on_disk)
 
-    #    css = {}
-    #    for page in names:
-    #        if get_ext(page) in CSS_EXTENSIONS:
-    #            images[page] = Page(path_on_disk=os.path.join(self.dir_on_disk, page), **kwargs)
-    #    return css
+        etc = {}
+        for page in names:
+            if get_ext(page) in OTHER_EXTENSIONS:
+                etc[page] = Other(path_on_disk=os.path.join(self.dir_on_disk, page), **kwargs)
+        return etc
 
-    #@property
-    #def css(self):
-    #    """Retrieves the css files in the same directory as this page"""
-    #    return self._get_css()
+
+    @property
+    def other(self):
+        """Retrives the unclassified files in the same directory as this page"""
+        return self._get_other()
+
 
     @property
     def srcdeps(self):
@@ -518,6 +523,9 @@ class Font(Page):
 class Css(Page):
     do_render_with_jinja = True
 
+class Other(Page):
+    do_render_with_jinja = False
+
 class BlogEntry(Page):
     do_render_with_jinja = True
     @property
@@ -536,17 +544,6 @@ class HomePage(Page):
 
 class AboutPage(Page):
     do_render_with_jinja = True
-
-class Comment(Page):
-    def __init__(self, page, body):
-        """page = the Page object to which this comment belongs to."""
-        self._page = page
-        self._body = body
-    def save(self):
-        """Save the comment to disk.
-        Note: this will not implicitly regenerate any affected content
-        """
-        print("[FIXME] Comment.save() not implemented")
 
 class Pages(object):
     def __init__(self, basedir, extensions):
