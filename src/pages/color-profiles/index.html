@@ -1,0 +1,33 @@
+{% from 'base.html' import heading, offsite_link, show_image %}
+{{ page.set_title("V7 L23600WHS-9N ICC Profile") }}
+
+{% extends 'blog_entry.html' %}
+
+{% block entry_content %}
+
+<p>
+Back when I was on a tighter budget I bought a cheap
+{{ offsite_link("https://www.newegg.com/Product/Product.aspx?Item=N82E16824216052", "display") }}
+by V7 (or "Vseven").
+For the price, it's actually pretty decent. But unsurprisingly it looks washed out and the blue is overemphasized.
+This can mostly be corrected in software if you know the true response of the display, but the vendor does
+not provide that info, nor do any 3rd parties.
+</p>
+
+<p>
+But today I made these measurements myself and am publishing the color profile {{ onsite_link(page.other["V7-L23600WHS-GCM.icc"], "here") }}! You can add this file to most desktop environments, or color-sensitive applications like Photoshop, to get more accurate color reproduction (the display looks MUCH better).
+</p>
+
+<p>
+I made these measurements using a Colorimeter, specifically the {{ offsite_link("http://www.xrite.com/categories/calibration-profiling/colormunki-display", "Colormunki Display") }}.
+Ironically, it set me back more than the actual display.
+The measurements were made with the display at stock settings, except for the brightness bumped to 100%,
+and with just a little bit of light leaking in through the blinds. To make the ICC profile,
+I followed the instructions on the {{ offsite_link("https://wiki.archlinux.org/index.php/ICC_profiles#Manually", "ArchLinux Wiki") }}.
+I'm told displays change significantly as they age, and there's even measurement variance between
+panels of the same model, so YMMV using the profile calibrated to my display (though I expect
+it will still be better than stock).
+</p>
+
+{% endblock %}
+
