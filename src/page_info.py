@@ -518,8 +518,8 @@ class Image(Page):
                 # Width and Height are stored as attributes on the root SVG element.
                 tree = ElementTree.parse(self._path_on_disk)
                 root = tree.getroot()
-                width = int(root.attrib["width"])
-                height = int(root.attrib["height"])
+                width = int(root.attrib["width"].replace("pt", ""))
+                height = int(root.attrib["height"].replace("pt", ""))
                 return (width, height)
             else:
                 im = PIL.Image.open(self._path_on_disk)
