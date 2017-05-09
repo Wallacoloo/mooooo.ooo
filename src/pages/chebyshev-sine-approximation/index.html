@@ -1,5 +1,5 @@
 {% from 'base.html' import heading, offsite_link, show_image %}
-{{ page.set_title("Approximating sin(x) to 6 ULP with Chebyshev polynomials") }}
+{{ page.set_title("Approximating sin(x) to 5 ULP with Chebyshev polynomials") }}
 
 {% extends 'blog_entry.html' %}
 
@@ -8,12 +8,12 @@
 {{ multiline_code("""
 fn sine(x: f32) -> f32 {
     let coeffs = [
-        -0.99999999708226169269357792387896077290175440567272155f32, // x
-         0.0653454616675179879325123271391979732993359723450347664f32, // x^3
-        -0.00171242628318431121149246551606740816920148478738367486f32, // x^5
-         0.0000248940277523565270075164091811365414423262202769440752f32, // x^7
-        -2.30137360037117700001456783725981576185678955642394186e-7f32, // x^9
-         1.31180313525500403649581979815056543944503621987677802e-9f32, // x^11
+        -0.101321183346709072589001712988183609230944236760490476f32, // x
+         0.00662087952180793343258682906697112938547424931632185616f32, // x^3
+        -0.000173505057912483501491115906801116298084629719204655552f32, // x^5
+         2.52229235749396866288379170129828403876289663605034418e-6f32, // x^7
+        -2.33177897192836082466066115718536782354224647348350113e-8f32, // x^9
+         1.32913446369766718120324917415992976452154154051525892e-10f32, // x^11
     ];
     let x2 = x*x;
     let p11 = coeffs[5];
@@ -22,9 +22,8 @@ fn sine(x: f32) -> f32 {
     let p5  = p7*x2  + coeffs[2];
     let p3  = p5*x2  + coeffs[1];
     let p1  = p3*x2  + coeffs[0];
-    p1*x * 
-    (x - 3.1415927410125732f32 + 0.00000008742277657347586f32)*0.3183098861837907f32 *
-    (x + 3.1415927410125732f32 - 0.00000008742277657347586f32)*0.3183098861837907f32
+    (x - 3.1415927410125732f32 + 0.00000008742277657347586f32) *
+    (x + 3.1415927410125732f32 - 0.00000008742277657347586f32) * p1 * x
 }
 """) }}
 <p>
@@ -175,13 +174,7 @@ Likewise, the plot for our relative error measurement: (sine[x] - Sin[x])/Sin[x]
 {{ show_image(page.images["relative_error_plot.svg"], caption="Relative error of our sine(x) approximation from (-Pi, Pi).") }}
 
 <p>
-The error is very uniform! It doesn't <em>quite</em> reach our target of 2^-25.
-We could slap on another Chebyshev term and it would, but it turns out that doing so
-has no observable effect when we carry out our calculations using 32-bit floats.
-I'll return to this later.
-</p>
-
-<p>
+The error is very uniform and it reaches the target of 2^-25!
 For completeness, here's the polynomial approximation. Chebyshev functions are themselves polynomials,
 so expanding the function gives an ordinary polynomial.
 </p>
@@ -228,7 +221,10 @@ So how does this perform?
 
 <p>
 Not very well, but why?
-As I hinted earlier, we've reached the point where our low-error approximation is only accurate
+</p>
+
+<p>
+It turns out we've reached the point where the low-error approximation is only accurate
 when evaluated with infinite precision. When we perform the computations using 32-bit floats,
 we're plagued by rounding errors. You see that first coefficient: 0.999999999973088f32?
 </p>
@@ -239,13 +235,58 @@ true
 """) }}
 
 <p>
-Yup, we chose coefficients that can't be represented in our number system.
+Yup, we chose coefficients that can't even be represented in our number system.
 Of course the results have error.
 As for what we can do about it, notice <em>where</em> the error occurs.
 It only becomes excessive as x approaches +/- pi, at which point sin(x) <em>should</em> approach 0.
 But the slight bit of error in the coefficients makes it so it doesn't approach 0 at quite the right place.
 Our polynomial already has a factor of x explicitly factored in order to create a root at x=0.
-My instincts are to pull out a factor of (x-Pi) and (x+Pi) as well:
+My instincts are to pull out a factor of (x-Pi) and (x+Pi) as well.
+</p>
+
+
+{{ show_image(page.images["fact_sine_as_poly.png"], caption="sin(x) approximation divided by (x-Pi)(x+Pi).") }}
+
+<p>
+Now if I multiplied by (x+Pi)(x-Pi) <em>in 32-bit float</em> to undo the division, that wouldn't be quite right, because the float
+closest to Pi isn't exactly equal to the true value of Pi. The result is that sin(f32::consts::PI) <em>shouldn't be 0</em>,
+so we don't want a root at (x-f32::consts::PI).
+</p>
+
+<p>
+Instead, I'll make a root at (x+Pi+delta), where Pi is the closest f32 to the real pi, and delta is a small
+correction factor that's approximately the true Pi minus the f32 Pi. Because the correction factor is close to 0,
+the net value being subtracted is true to more decimal places.
+</p>
+
+{{ multiline_code("""
+let coeffs = [
+    -0.101321183346709072589001712988183609230944236760490476f32, // x
+     0.00662087952180793343258682906697112938547424931632185616f32, // x^3
+    -0.000173505057912483501491115906801116298084629719204655552f32, // x^5
+     2.52229235749396866288379170129828403876289663605034418e-6f32, // x^7
+    -2.33177897192836082466066115718536782354224647348350113e-8f32, // x^9
+     1.32913446369766718120324917415992976452154154051525892e-10f32, // x^11
+];
+let x2 = x*x;
+let p11 = coeffs[5];
+let p9  = p11*x2 + coeffs[4];
+let p7  = p9*x2  + coeffs[3];
+let p5  = p7*x2  + coeffs[2];
+let p3  = p5*x2  + coeffs[1];
+let p1  = p3*x2  + coeffs[0];
+(x - 3.1415927410125732f32 + 0.00000008742277657347586f32) *
+(x + 3.1415927410125732f32 - 0.00000008742277657347586f32) * p1 * x
+""") }}
+
+{{ show_image(page.images["factored_ulp_no_invpi.svg"], caption="Average ULP error v.s. x. Max error is 5 ULP, at x=2.6183214.") }}
+
+<p>
+And there you have it. Some clever trickery could probably reduce the maximum error further, but it's not worth it to me. Knocking the maximum error down from 7 ULP, to 6 ULP to 5 ULP
+took me a good 3-4 hours, and the offending values were clustered in a different area each time.
+If I needed to reduce it even further, I would search for ways to address the fact that these polynomial coefficients aren't machine representable:
+either a brute-force search near these coefficients, or locking them in one at a time and recomputing the remaining ones for a least-error fit.
+But for my purposes, there's no shame in 5 ULP.
 </p>
 
 
