@@ -45,7 +45,7 @@ so the remainder of this article will discuss my approach to deriving the sine(x
 {{ heading("Sin(x) as a sum of Chebyshev polynomials") }}
 
 <p>
-The first step is to re-express sine(x) over the domain of interest as an infinite polynomial.
+The first step is to re-express sin(x) over the domain of interest as an infinite polynomial.
 One could use a Taylor series, but convergence is very slow.
 Instead, we use Chebyshev polynomials.
 </p>
@@ -107,6 +107,86 @@ being off by just 0.01 ULP in our model could cause incorrect rounding that actu
 full 0.5 ULP error. I imagine optimizing for 0.5 ULP error requires more novel techniques.
 </p>
 
+{# Even intel only advertizes something like 0.56 ULP, right? Would be an interesting aside. #}
+
+{{ heading("Optimizing relative error") }}
+<p>
+To optimize for relative error, we first scale sin(x) by some easily-reversible function
+in order to make the result have less dynamic range. For example, if we scale sin(x) by
+[8/(3 Pi) (x) - 8/(3 Pi^3) (x)^3]^-1, we get something that looks like the below plot.
+</p>
+
+{{ show_image(page.images["scaled_sine.svg"], caption="Scaled sine function with a dynamic range of ~2, plotted from (-Pi, Pi).") }}
+
+<p>
+The advantage of this is that if we optimize the <em>absolute</em> error of the above function to 2^-24 / 2, then we can apply the inverse scaling function and obtain a sin(x) approximation that's accurate to a <em>relative</em> error of 2^-24 everywhere.
+I derived the scaling function by solving the min-degree odd polynomial that has a zero at x=0 and x=Pi, and a one at x=Pi/2.
+</p>
+
+<p>
+Let's now project our scaled sine function onto the Chebyshev basis polynomials.
+To do this, I followed pages 7-8 of {{ offsite_link("http://www.mhtl.uwaterloo.ca/courses/me755/web_chap6.pdf", "this") }} University of Waterloo pdf.
+
+Specifically, it shows the following property for Chebyshev functions, which arise from their
+orthogonality.
+</p>
+
+{{ show_image(page.images["cheby_proj1.png"], caption="Chebyshev inner-product equality") }}
+
+<p>
+If our scaled sine function can be represented in terms of the Chebyshev basis functions (it can),
+i.e. f(x) = \sum_n A_n T_n(x), then the integral
+\int_{-1}^1 \frac{T_n(x) f(x)}{\sqrt{1-x^2}} dx
+is exactly equal to
+\int_{-1}^1 \frac{T_n(x) A_n T_n(x)}{\sqrt{1-x^2}} dx
+
+When we move A_n outside the integral, we find that the value of the integral is known from the previous equation.
+Hence, we have a way to solve for each A_n and thereby re-express our scaled sine function
+in terms of the Chebyshev basis.
+</p>
+
+<p>
+I compute the first 9 terms of the series with the following Mathematica code.
+I omit solving for A_1, A_3, A_5, and A_7 because they are zero.
+In order to keep the function's domain as [-1, 1], I scale the parameter to sin(x) by Pi.
+This way, we get coefficients to a function that computes one full cycle of sin(Pi x).
+I'll undo the x scaling later.
+</p>
+
+{{ show_image(page.images["solve_cheb_coeffs.png"], caption="Solve for the Chebyshev coefficients to the scaled sine function. WorkingPrecision needs to be raised for NIntegrate to converge (or just use Integrate, if you're more patient).") }}
+
+<p>
+Now that we have our Chebyshev coefficients, we can reconstruct an approximation to sin(x), and also undo the scaling of the x parameter:
+</p>
+
+{{ show_image(page.images["sine_from_coeffs.png"], caption="Reconstructing sine(x) = A_0 T_0(x) + A_1 T_1(x) + ...") }}
+
+
+<p>
+A quick plot of the reconstructed sine(x) function looks promising:
+</p>
+
+{{ show_image(page.images["reconstructed_sine_plot.svg"], caption="Plot of reconstructed sine(x) approximation from (-Pi, Pi).") }}
+
+<p>
+Likewise, the plot for our relative error measurement: (sine[x] - Sin[x])/Sin[x].
+</p>
+
+{{ show_image(page.images["relative_error_plot.svg"], caption="Relative error of our sine(x) approximation from (-Pi, Pi).") }}
+
+<p>
+The error is very uniform! It doesn't <em>quite</em> reach our target of 2^-25.
+We could slap on another Chebyshev term and it would, but it turns that doing so
+has no observable effect when we carry out our calculations using 32-bit floats.
+I'll return to this later.
+</p>
+
+For completeness, here's the polynomial approximation. Chebyshev functions are themselves polynomials,
+so expanding the function gives an ordinary polynomial.
+{{ show_image(page.images["sine_as_poly.png"], caption="Polynomial approximation to sin(x).") }}
+
+{{ heading("Evaluating the polynomial approximation") }}
 
 {% endblock %}
+
 
