@@ -6,6 +6,7 @@ import json, os, subprocess
 import re
 
 import dateutil.parser, jinja2, PIL.Image
+import xml.etree.ElementTree as ElementTree
 from jinja2 import Environment, PackageLoader
 from urllib.parse import urlsplit
 
@@ -511,8 +512,18 @@ class Image(Page):
                     resolution = re.findall("(\d+x\d+)", str(line))[0]
             return [int(dim) for dim in resolution.split("x")]
         else:
-            im = PIL.Image.open(self._path_on_disk)
-            return im.size
+            if self._path_on_disk.endswith(".svg"):
+                # PIL doesn't support SVG.
+                # Instead, parse as XML.
+                # Width and Height are stored as attributes on the root SVG element.
+                tree = ElementTree.parse(self._path_on_disk)
+                root = tree.getroot()
+                width = int(root.attrib["width"])
+                height = int(root.attrib["height"])
+                return (width, height)
+            else:
+                im = PIL.Image.open(self._path_on_disk)
+                return im.size
 
 class Audio(Page):
     do_render_with_jinja = False

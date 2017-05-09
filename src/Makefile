@@ -90,6 +90,9 @@ $(BUILD_ROOT)/images/%.jpg: pages/%.jpg
 	$(MKDIR_CP)
 	$(JPGCRUSH) $@ || true
 
+$(BUILD_DIR)/%.svg: pages/%.svg
+	$(MKDIR_CP)
+
 ## Compress gifs (losslessly)
 $(BUILD_ROOT)/images/%.gif: pages/%.gif
 	$(MKDIR_CP)
