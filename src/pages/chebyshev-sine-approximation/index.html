@@ -176,16 +176,78 @@ Likewise, the plot for our relative error measurement: (sine[x] - Sin[x])/Sin[x]
 
 <p>
 The error is very uniform! It doesn't <em>quite</em> reach our target of 2^-25.
-We could slap on another Chebyshev term and it would, but it turns that doing so
+We could slap on another Chebyshev term and it would, but it turns out that doing so
 has no observable effect when we carry out our calculations using 32-bit floats.
 I'll return to this later.
 </p>
 
+<p>
 For completeness, here's the polynomial approximation. Chebyshev functions are themselves polynomials,
 so expanding the function gives an ordinary polynomial.
+</p>
+
 {{ show_image(page.images["sine_as_poly.png"], caption="Polynomial approximation to sin(x).") }}
 
+
+
+
+
 {{ heading("Evaluating the polynomial approximation") }}
+
+<p>
+We have our polynomial coefficients; to evaluate the polynomial, we can just use Horner's method (aka "nested multiplication"):
+</p>
+
+{{ multiline_code("""
+fn horner_sine_13(x: f32) -> f32 {
+    let coeffs = [
+        0.999999999973088f32, // x
+        -0.1666666663960699f32, // x^3
+        0.00833333287058762f32, // x^5
+        -0.0001984123883227529f32, // x^7,
+        2.755627491096882e-6f32, // x^9
+        -2.503262029557047e-8f32, // x^11
+        1.58535563425041e-10f32, // x^13
+    ];
+    let p13 = coeffs[6];
+    let p11 = p13*x*x + coeffs[5];
+    let p9  = p11*x*x + coeffs[4];
+    let p7  = p9*x*x  + coeffs[3];
+    let p5  = p7*x*x  + coeffs[2];
+    let p3  = p5*x*x  + coeffs[1];
+    let p1  = p3*x*x  + coeffs[0];
+    p1*x
+}
+""") }}
+
+<p>
+So how does this perform?
+</p>
+
+{{ show_image(page.images["horner_ulp.svg"], caption="Average ULP error v.s. x") }}
+
+<p>
+Not very well, but why?
+As I hinted earlier, we've reached the point where our low-error approximation is only accurate
+when evaluated with infinite precision. When we perform the computations using 32-bit floats,
+we're plagued by rounding errors. You see that first coefficient: 0.999999999973088f32?
+</p>
+
+{{ multiline_code("""
+> println!(\"{}\", 0.999999999973088f32 == 1.0f32);
+true
+""") }}
+
+<p>
+Yup, we chose coefficients that can't be represented in our number system.
+Of course the results have error.
+As for what we can do about it, notice <em>where</em> the error occurs.
+It only becomes excessive as x approaches +/- pi, at which point sin(x) <em>should</em> approach 0.
+But the slight bit of error in the coefficients makes it so it doesn't approach 0 at quite the right place.
+Our polynomial already has a factor of x explicitly factored in order to create a root at x=0.
+My instincts are to pull out a factor of (x-Pi) and (x+Pi) as well:
+</p>
+
 
 {% endblock %}
 
