@@ -12,7 +12,8 @@
 		display: table-cell;
 		width: 1%;
 		font-family: Quicksand,"Helvetica Neue",Helvetica,Arial,sans-serif;
-		font-size: 26px;
+		font-size: 1.67em;
+		padding-top: 0.2em;
 }
 .nav-ul > li.filler
 {
@@ -28,6 +29,7 @@
 		font-weight: bold;
 		border-bottom: rgba(216,216,216,0) 2px solid;
 		transition: all 0.15s ease 0s;
+		font-variant: all-small-caps;
 }
 .nav-ul > li > a:hover
 {

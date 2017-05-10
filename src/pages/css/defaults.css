@@ -31,11 +31,13 @@ h1
 {
 	margin: 1em 0px 0px 0px;
 	font-size: 2em;
+	color: #352e21;
 }
 
 h2
 {
 	margin: 0.75em 0px 0px 0px;
+	font-size: 1.5em;
 }
 
 /* Successive paragraphs should have empty lines between them */

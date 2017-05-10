@@ -1,8 +1,8 @@
 {# Provide some common macros #}
 
-{% macro heading(text, link=True, link_to=None, show_icon=True, sublevel=0) %}
+{% macro heading(text, link=True, link_to=None, show_icon=True, sublevel=0, class="") %}
 {# sublevel=0 for an ordinary header, 1 for a sub-heading, 2 for a sub-sub-heading, etc #}
-<h{{ sublevel+1 }} class="anchored-header" id="{{ text|into_tag }}">
+<h{{ sublevel+1 }} class="anchored-header {{ class }}" id="{{ text|into_tag }}">
 {{ add_anchor(text|into_tag) }}
 		{% if link %}
 			{% if link_to != None %}{# Link to other page #}

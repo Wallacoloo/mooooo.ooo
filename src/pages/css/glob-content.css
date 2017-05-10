@@ -52,11 +52,12 @@
 		color: inherit;
 		/* Remove default `a` underline style */
 		text-decoration: inherit;
+		font-style: italic;
 }
 .anchored-header > a:hover
 {
 		/* Reduce the contrast to indicate it's a link */
-		opacity: 0.75;
+		opacity: 0.87;
 }
 
 .anchored-header .fa-paragraph
@@ -83,6 +84,14 @@
 .anchored-header:target .header-text
 {
 		text-decoration: underline;
+}
+
+.title *
+{
+		font-variant: small-caps;
+		font-style: normal;
+		font-size: 1.1em;
+		color: #000000;
 }
 
 /* Contains an image and an optional caption (which will be aligned accordingly) */
