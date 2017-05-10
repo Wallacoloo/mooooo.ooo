@@ -1,6 +1,11 @@
 {% from 'base.html' import heading, offsite_link, show_image %}
 {{ page.set_title("Approximating sin(x) to 5 ULP with Chebyshev polynomials") }}
 
+{# Note:
+def tof32(f):
+...     return struct.unpack('>f', struct.pack('>f', f))[0]
+#}
+
 {% extends 'blog_entry.html' %}
 
 {% block entry_content %}
@@ -25,105 +30,113 @@ fn sine(x: f32) -> f32 {
     (x - 3.1415927410125732f32 + 0.00000008742277657347586f32) *
     (x + 3.1415927410125732f32 - 0.00000008742277657347586f32) * p1 * x
 }
-""") }}
+""", "rust") }}
 <p>
-That code above will compute the sine of any IEEE single-precision float in the range of (-Pi, Pi)
-to within 6 Units of Least Precision ({{ offsite_link("https://en.wikipedia.org/wiki/Unit_in_the_last_place", "ULP") }}).
+That code above will compute the sine of any IEEE single-precision float in the range of {{"(-\\pi, \\pi)"|tex}}
+to within 5 Units of Least Precision ({{ offsite_link("https://en.wikipedia.org/wiki/Unit_in_the_last_place", "ULP") }}).
 A ULP is a useful way to measure relative error in a floating point computation. Given two adjacent floating point numbers, their difference
 in terms of ULP is essentially equivalent to the number of floats that lie between them (plus one).
 </p>
 
 <p>
-Given that IEEE single-precision floats have 24 bits of precision, this sine function is accurate to within 0.000036% (i.e. 6/2^24).
+Given that IEEE single-precision floats have 24 bits of precision, this sine function is accurate to within 0.000036% (i.e. {{"5/2^{24}"|tex}}).
 Achieving this precision over a domain <em>this</em> large was a challenge for me.
-Many polynomial approximations to sin(x) operate only over (-Pi/4, Pi/4) or (-Pi/2, Pi/2).
+Many polynomial approximations to {{"\\sin(x)"|tex}} operate only over {{"(-\\pi/4, \\pi/4)"|tex}} or {{"(-\\pi/2, \\pi/2)"|tex}}.
 These methods require modifications to work with larger ranges that I had not seen published before,
-so the remainder of this article will discuss my approach to deriving the sine(x) function above.
+so the remainder of this article will discuss my approach to deriving the sine function above.
+
+<p>
+When I need to distinguish between the approximation of {{"\\sin(x)"|tex}} and the true {{"\\sin(x)"|tex}},
+I'll be using {{"\\widehat{\\sin}(x)"|tex}} to represent the approximation.
 </p>
 
 {{ heading("Sin(x) as a sum of Chebyshev polynomials") }}
 
 <p>
-The first step is to re-express sin(x) over the domain of interest as an infinite polynomial.
+The first step is to re-express {{"\\sin(x)"|tex}} over the domain of interest as an infinite polynomial.
 One could use a Taylor series, but convergence is very slow.
 Instead, we use Chebyshev polynomials.
 </p>
 
 <p>
 For me, it helps to view these things using concepts from linear algebra.
-Any continuous and smooth function can be expressed as a polynomial.
-P(x) = a_0 + a_1 x + a_2 x^2 + ...
+Any continuous and smooth function can be expressed as a polynomial:
+{{"P(x) = a_0 + a_1 x + a_2 x^2 + \\dots"|tex}}.
 
-This is a weighted sum of powers of x, and because {1, x, x^2, ...} are all orthogonal,
+This is a weighted sum of powers of {{"x"|tex}}, and because {{"\\{1, x, x^2, \\dots\\}"|tex}} are all orthogonal,
 we can think of this set as a <em>basis</em> for our function.
 </p>
 
 <p>
-Instead of representing our function in terms of the most familiar basis for polynomials ({1, x, x^2, ...}),
-we can instead use {T_0(x), T_1(x), T_2(x), ...}, where T_n(x) is the
+Instead of representing our function in terms of the most familiar basis for polynomials ({{"\\{1, x, x^2, \\dots\\}"|tex}}),
+we can instead use {{"\\{T_0(x), T_1(x), T_2(x), \\dots\\}"|tex}}, where {{"T_n(x)"|tex}} is the
 {{ offsite_link("https://en.wikipedia.org/wiki/Chebyshev_polynomials#First_kind", "Chebyshev polynomial of the first kind") }}.
 </p>
 
 {{ show_image(page.images["chebyshev_basis.svg"], caption="The first five Chebyshev polynomials. From Wikipedia (public domain).") }}
 
 <p>
-Chebyshev polynomials have the property that all their local extrema lie within -1.0 < x < 1.0, and each such extrema
-is at exactly +/- 1.
-For those familiar with Fourier series, this should look somewhat familiar. We're projecting our sin(x) function onto
+Chebyshev polynomials have the property that all their local extrema lie within {{"-1 < x < 1"|tex}}, and each such extrema
+is at exactly {{"\\pm 1"|tex}}.
+For those familiar with Fourier series, this should look somewhat familiar. We're projecting the sine function onto
 a basis where each basis function is oscillating at an increasing rate.
-It's intuitive, then, that the smoother our function is, the more rapidly the coefficients of its projection
-onto {T_0(x), T_1(x), ...} will decay (e.g. sin(x) doesn't oscillate rapidly over the interval (-1, 1), so any
-rapidly-oscillating T_n(x) component would have to be small).
+It's intuitive, then, that the smoother a function is, the more rapidly the coefficients of its projection onto
+{{"\\{T_0(x), T_1(x), \\dots\\}"|tex}} will decay (e.g. {{"\\sin(x)"|tex}} doesn't oscillate rapidly over the interval {{"(-1, 1)"|tex}}, so any
+rapidly-oscillating {{"T_n(x)"|tex}} component would have to be small).
 
-Although our basis has infinite cardinality, most energy is located in the lower components.
-We can truncate the basis to {T_0(x), ... T_N(x)} for a relatively small value of N and achieve
-a <em>very</em> good approximation of sin(x) over the interval (-1.0, 1.0).
+Although the basis has infinite cardinality, most energy is located in the lower components.
+We can truncate the basis to {{"\\{T_0(x), \\dots, T_N(x)\\}"|tex}} for a relatively small value of N and achieve
+a <em>very</em> good approximation of {{"\\sin(x)"|tex}} over the interval {{"(-1, 1)"|tex}}.
 </p>
 
 <p>
 Notice that for a function approximated with a finite set of Chebyshev polynomials,
 the error is spread in a fairly uniform manner. The approximation isn't intrinsically more accurate
 near 0 and less accurate at the extremeties, for example. We can say that
-|E(x)| < B for all -1 < x < 1, where E(x) is the error of our approximation function (E(x) = sin^(x) - sin(x)),
-and B is some bound that decreases as we increase the number of terms in our approximation.
+{{"|E(x)| < B"|tex}} for all {{"-1 < x < 1"|tex}}, where {{"E(x)"|tex}} is the error of the approximation function 
+({{"E(x) = \\widehat{\\sin}(x) - \\sin(x)"|tex}}),
+and {{"B"|tex}} is some bound that decreases as we increase the number of terms in the approximation.
 </p>
 
 <p>
-This is good. If we approximated sin(x) with 6 chebyshev terms, we might well get
-the error bound, B, down to 10^-9. However, optimizing for <em>absolute</em> error is generally
+This is good. If we approximated {{"\\sin(x)"|tex}} with 6 chebyshev terms, we might well get
+the error bound, {{"B"|tex}}, down to {{"10^{-9}"|tex}}. However, optimizing for <em>absolute</em> error is generally
 not what we want! The nature of floating point numbers is such that precision
-is as much as 10^-45 near zero, and as little as 10^-8 near one.
+is as much as {{"10^{-45}"|tex}} near zero, and as little as {{"10^{-8}"|tex}} near one.
 What we really want to minimize is the <em>relative error</em>. As long as
-|E(x) / sin(x)| < 2^-24, we know that there is no closer float to the true value than what
+{{"|E(x) / \\sin(x)| < 2^{-24}"|tex}}, we know that there is no closer float to the true value than what
 we've approximated*.
 </p>
 
 <p>
-* The catch is that achieving |E(x) / sin(x)| < 2^-24 only ensures we're off by less than 1 ULP.
+* The catch is that achieving {{"|E(x) / \\sin(x)| < 2^{-24}"|tex}} only ensures we're off by less than 1 ULP.
 If the true answer falls in between two floats, this isn't enough to guarantee that we round to the
 correct one. If the answer is nearly the average of the two adjacent floats,
 being off by just 0.01 ULP in our model could cause incorrect rounding that actually bumps us to a
 full 0.5 ULP error. I imagine optimizing for 0.5 ULP error requires more novel techniques.
 </p>
 
-{# Even intel only advertizes something like 0.56 ULP, right? Would be an interesting aside. #}
+{# TODO: Even intel only advertizes something like 0.56 ULP, right? Would be an interesting aside. #}
 
 {{ heading("Optimizing relative error") }}
 <p>
-To optimize for relative error, we first scale sin(x) by some easily-reversible function
-in order to make the result have less dynamic range. For example, if we scale sin(x) by
-[8/(3 Pi) (x) - 8/(3 Pi^3) (x)^3]^-1, we get something that looks like the below plot.
+To optimize for relative error, we first scale {{"\\sin(x)"|tex}} by some easily-reversible function
+in order to make the result have less dynamic range. For example, if we scale {{"\\sin(x)"|tex}} by
+{{"[\\frac{8}{3\\pi}(x) - \\frac{8}{3\\pi^3}(x^3)]^{-1}"|tex}},
+we get something that looks like the below plot.
 </p>
 
-{{ show_image(page.images["scaled_sine.svg"], caption="Scaled sine function with a dynamic range of ~2, plotted from (-Pi, Pi).") }}
+{{ show_image(page.images["scaled_sine.svg"], caption="Scaled sine function with a dynamic range of ~2, plotted from " + "(-\\pi, \\pi)"|tex + ".") }}
 
 <p>
-The advantage of this is that if we optimize the <em>absolute</em> error of the above function to 2^-24 / 2, then we can apply the inverse scaling function and obtain a sin(x) approximation that's accurate to a <em>relative</em> error of 2^-24 everywhere.
-I derived the scaling function by solving the min-degree odd polynomial that has a zero at x=0 and x=Pi, and a one at x=Pi/2.
+The advantage of this is that if we optimize the <em>absolute</em> error of the above function to {{"2^{-24}/2"|tex}},
+then we can apply the inverse scaling function and obtain a {{"\\sin(x)"|tex}} approximation that's accurate to a <em>relative</em>
+error of {{"2^{-24}"|tex}} everywhere.
+I derived the scaling function by solving the min-degree odd polynomial that has a zero at {{"x=0"|tex}} and {{"x=\\pi"|tex}}, and a one at {{"x=\\pi/2"|tex}}.
 </p>
 
 <p>
-Let's now project our scaled sine function onto the Chebyshev basis polynomials.
+Let's now project the scaled sine function onto the Chebyshev basis polynomials.
 To do this, I followed pages 7-8 of {{ offsite_link("http://www.mhtl.uwaterloo.ca/courses/me755/web_chap6.pdf", "this") }} University of Waterloo pdf.
 
 Specifically, it shows the following property for Chebyshev functions, which arise from their
@@ -133,53 +146,53 @@ orthogonality.
 {{ show_image(page.images["cheby_proj1.png"], caption="Chebyshev inner-product equality") }}
 
 <p>
-If our scaled sine function can be represented in terms of the Chebyshev basis functions (it can),
-i.e. f(x) = \sum_n A_n T_n(x), then the integral
-\int_{-1}^1 \frac{T_n(x) f(x)}{\sqrt{1-x^2}} dx
+If the scaled sine function can be represented in terms of the Chebyshev basis functions (it can),
+i.e. {{"f(x) = \\sum_n A_n T_n(x)"|tex}}, then the integral
+{{"\\int_{-1}^1 \\frac{T_n(x) f(x)}{\\sqrt{1-x^2}} dx"|tex}}
 is exactly equal to
-\int_{-1}^1 \frac{T_n(x) A_n T_n(x)}{\sqrt{1-x^2}} dx
+{{"\\int_{-1}^1 \\frac{T_n(x) A_n T_n(x)}{\\sqrt{1-x^2}} dx"|tex}}.
 
-When we move A_n outside the integral, we find that the value of the integral is known from the previous equation.
-Hence, we have a way to solve for each A_n and thereby re-express our scaled sine function
+When we move {{"A_n"|tex}} outside the integral, we find that the value of the integral is known from the previous equation.
+Hence, we have a way to solve for each {{"A_n"|tex}} and thereby re-express the scaled sine function
 in terms of the Chebyshev basis.
 </p>
 
 <p>
 I compute the first 9 terms of the series with the following Mathematica code.
-I omit solving for A_1, A_3, A_5, and A_7 because they are zero.
-In order to keep the function's domain as [-1, 1], I scale the parameter to sin(x) by Pi.
-This way, we get coefficients to a function that computes one full cycle of sin(Pi x).
-I'll undo the x scaling later.
+I omit solving for {{"A_1, A_3, A_5"|tex}} and {{"A_7"|tex}} because they are zero.
+In order to keep the function's domain as {{"(-1, 1)"|tex}}, I scale the parameter to {{"\\sin(x)"|tex}} by {{"\\pi"|tex}}.
+This way, we get coefficients to a function that computes one full cycle of {{"\\sin(\\pi x)"|tex}}.
+I'll undo the scaling of {{"x"|tex}} later.
 </p>
 
 {{ show_image(page.images["solve_cheb_coeffs.png"], caption="Solve for the Chebyshev coefficients to the scaled sine function. WorkingPrecision needs to be raised for NIntegrate to converge (or just use Integrate, if you're more patient).") }}
 
 <p>
-Now that we have our Chebyshev coefficients, we can reconstruct an approximation to sin(x), and also undo the scaling of the x parameter:
+Now that we have the Chebyshev coefficients, we can reconstruct an approximation to {{"\\sin(x)"|tex}}, and also undo the scaling of the {{"x"|tex}} parameter:
 </p>
 
-{{ show_image(page.images["sine_from_coeffs.png"], caption="Reconstructing sine(x) = A_0 T_0(x) + A_1 T_1(x) + ...") }}
+{{ show_image(page.images["sine_from_coeffs.png"], caption="Reconstructing " + "\\widehat{\\sin}(x) = A_0 T_0(x) + A_1 T_1(x) + \\dots"|tex) }}
 
 
 <p>
-A quick plot of the reconstructed sine(x) function looks promising:
+A quick plot of the reconstructed sine function looks promising:
 </p>
 
-{{ show_image(page.images["reconstructed_sine_plot.svg"], caption="Plot of reconstructed sine(x) approximation from (-Pi, Pi).") }}
+{{ show_image(page.images["reconstructed_sine_plot.svg"], caption="Plot of reconstructed sine approximation from " + "(-\\pi, \\pi)"|tex + ".") }}
 
 <p>
-Likewise, the plot for our relative error measurement: (sine[x] - Sin[x])/Sin[x].
+Likewise, the plot for the relative error measurement: {{"(\\widehat{\\sin}(x) - \\sin(x))/\\sin(x)"|tex}}.
 </p>
 
-{{ show_image(page.images["relative_error_plot.svg"], caption="Relative error of our sine(x) approximation from (-Pi, Pi).") }}
+{{ show_image(page.images["relative_error_plot.svg"], caption="Relative error of the sine approximation on " + "(-\\pi, \\pi)"|tex + ".") }}
 
 <p>
-The error is very uniform and it reaches the target of 2^-25!
+The error is very uniform and it reaches the target of {{"2^{-25}"|tex}}!
 For completeness, here's the polynomial approximation. Chebyshev functions are themselves polynomials,
 so expanding the function gives an ordinary polynomial.
 </p>
 
-{{ show_image(page.images["sine_as_poly.png"], caption="Polynomial approximation to sin(x).") }}
+{{ show_image(page.images["sine_as_poly.png"], caption="Polynomial approximation to " + "\\sin(x)"|tex + ".") }}
 
 
 
@@ -188,7 +201,7 @@ so expanding the function gives an ordinary polynomial.
 {{ heading("Evaluating the polynomial approximation") }}
 
 <p>
-We have our polynomial coefficients; to evaluate the polynomial, we can just use Horner's method (aka "nested multiplication"):
+We have the polynomial coefficients; to evaluate the polynomial, we can just use Horner's method (aka "nested multiplication"):
 </p>
 
 {{ multiline_code("""
@@ -211,7 +224,7 @@ fn horner_sine_13(x: f32) -> f32 {
     let p1  = p3*x*x  + coeffs[0];
     p1*x
 }
-""") }}
+""", "rust") }}
 
 <p>
 So how does this perform?
@@ -232,31 +245,31 @@ we're plagued by rounding errors. You see that first coefficient: 0.999999999973
 {{ multiline_code("""
 > println!(\"{}\", 0.999999999973088f32 == 1.0f32);
 true
-""") }}
+""", "rust") }}
 
 <p>
 Yup, we chose coefficients that can't even be represented in our number system.
 Of course the results have error.
 As for what we can do about it, notice <em>where</em> the error occurs.
-It only becomes excessive as x approaches +/- pi, at which point sin(x) <em>should</em> approach 0.
+It only becomes excessive as {{"x"|tex}} approaches {{"\\pm \\pi"|tex}}, at which point {{"\\widehat{\\sin}(x)"|tex}} <em>should</em> approach 0.
 But the slight bit of error in the coefficients makes it so it doesn't approach 0 at quite the right place.
-Our polynomial already has a factor of x explicitly factored in order to create a root at x=0.
-My instincts are to pull out a factor of (x-Pi) and (x+Pi) as well.
+Our polynomial already has a factor of {{"x"|tex}} explicitly factored in order to create a root at {{"x=0"|tex}}.
+My instincts are to pull out a factor of {{"(x-\\pi)"|tex}} and {{"(x+\\pi)"|tex}} as well.
 </p>
 
 
-{{ show_image(page.images["fact_sine_as_poly.png"], caption="sin(x) approximation divided by (x-Pi)(x+Pi).") }}
+{{ show_image(page.images["fact_sine_as_poly.png"], caption="sin(x) approximation divided by " + "(x-\\pi)(x+\\pi)"|tex + ".") }}
 
 <p>
-Now if I multiplied by (x+Pi)(x-Pi) <em>in 32-bit float</em> to undo the division, that wouldn't be quite right, because the float
-closest to Pi isn't exactly equal to the true value of Pi. The result is that sin(f32::consts::PI) <em>shouldn't be 0</em>,
+Now if I multiplied by {{"(x+\\pi)(x-\\pi)"|tex}} <em>in 32-bit float</em> to undo the division, that wouldn't be quite right, because the float
+closest to {{"\\pi"|tex}} isn't exactly equal to the true value of {{"\\pi"|tex}}. The result is that sin(f32::consts::PI) <em>shouldn't be 0</em>,
 so we don't want a root at (x-f32::consts::PI).
 </p>
 
 <p>
-Instead, I'll make a root at (x+Pi+delta), where Pi is the closest f32 to the real pi, and delta is a small
-correction factor that's approximately the true Pi minus the f32 Pi. Because the correction factor is close to 0,
-the net value being subtracted is true to more decimal places.
+Instead, I'll make a root at {{"x+\\hat{\\pi}+\\Delta"|tex}}, where {{"\\hat{\\pi}"|tex}} is the closest f32 to the real {{"\\pi"|tex}}, and {{"\Delta"|tex}} is a small
+correction factor that's approximately the true {{"\\pi"|tex}} minus the f32 {{"\\hat{\\pi}"|tex}}. Because the correction factor, {{"\Delta"|tex}}, is close to 0,
+the net value being subtracted is accurate to more decimal places.
 </p>
 
 {{ multiline_code("""
@@ -277,9 +290,22 @@ let p3  = p5*x2  + coeffs[1];
 let p1  = p3*x2  + coeffs[0];
 (x - 3.1415927410125732f32 + 0.00000008742277657347586f32) *
 (x + 3.1415927410125732f32 - 0.00000008742277657347586f32) * p1 * x
-""") }}
+""", "rust") }}
 
-{{ show_image(page.images["factored_ulp_no_invpi.svg"], caption="Average ULP error v.s. x. Max error is 5 ULP, at x=2.6183214.") }}
+{{ show_image(page.images["factored_ulp.svg"], caption="Average ULP error v.s. x. Max error is 5 ULP, at x=2.6183214.") }}
+
+<p>
+At this point, it helps to look at the error bounds, rather than just their averages:
+</p>
+
+{{ show_image(page.images["factored_ulp_bounds.svg"], caption="Max & min error v.s. x. Error is positive where " + "\\widehat{\\sin}(x) > \\sin(x)"|tex + ".") }}
+
+<p>
+This reveals a <em>slight</em> tendency for the estimate to be further away from zero than it should be. But it also shows that the error oscillates
+over a large range, and rapidly - the plot was made by taking the min/max over each group of 1024 adjacent floats, so we see that the signed error changes by
+as much as 9 ULPs over the course of just 1024 adjacent floats. It doesn't seem that the error could be addressed by adding more Chebyshev terms, then -
+it's essentially noise.
+</p>
 
 <p>
 And there you have it. Some clever trickery could probably reduce the maximum error further, but it's not worth it to me. Knocking the maximum error down from 7 ULP, to 6 ULP to 5 ULP
