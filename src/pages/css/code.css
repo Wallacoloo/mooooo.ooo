@@ -28,11 +28,10 @@
 		padding-right: 5px;
 		padding-top: 3px;
 		padding-bottom: 3px;
-		border: 1px solid rgba(128, 128, 128, 0.55);
-		border-radius: 7px;
-		/* either lighten or darken this block to add contrast */
-		background-color: rgba(128, 128, 128, 0.15);
-		color: #368C4C;
+		border: 1px solid #E0D8D0;
+		border-radius: 2px;
+		background-color: #F8F8F8;
+		color: #408080;
 		font-weight: bold;
 }
 
