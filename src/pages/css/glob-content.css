@@ -26,9 +26,9 @@
 .list-single-lines > li:before
 {
 		/* Bullet-point before each list item */
-		content: "◉";
+		content: "-";
 		text-align: right;
-		font-size: 0.8em;
+		font-size: 0.85em;
 		/* Item indentation */
 		width: 10%;
 		min-width: 20px;
