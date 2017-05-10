@@ -46,23 +46,25 @@
  * to `mypage.html#my-anchor`.
  * This ability is indicated by changing the color of the link & showing a
  * symbol upon hover */
-.anchored-header *
+.anchored-header a
 {
 		/* Remove the (blue) link coloring */
 		color: inherit;
 		/* Remove default `a` underline style */
 		text-decoration: inherit;
 		font-style: italic;
+		transition: all 0.1s ease 0s;
 }
-.anchored-header > a:hover
+.anchored-header a:hover
 {
 		/* Reduce the contrast to indicate it's a link */
-		opacity: 0.87;
+		opacity: 0.8;
+		color: #0C3A61;
+		transition: all 0.1s ease 0s;
 }
 
 .anchored-header .fa-paragraph
 {
-		/*color: #101010;*/
 		opacity: 0.85;
 		visibility: hidden;
 		/* Make it so the P icon will be displayed to the left of the boundary
@@ -70,14 +72,14 @@
 		 * being shifted right even when the P icon is invisible */
 		margin-left: -38px;
 }
-.anchored-header > a:hover .fa-paragraph
+.anchored-header a:hover .fa-paragraph
 {
 		visibility: visible;
 }
 
 /* Stylize the header if we were linked directly to it,
   ala page.html#someId */
-.anchored-header:target *
+.anchored-header:target a
 {
 		color: #BA0000;
 }
@@ -86,12 +88,20 @@
 		text-decoration: underline;
 }
 
-.title *
+.title a
 {
 		font-variant: small-caps;
 		font-style: normal;
 		font-size: 1.1em;
-		color: #000000;
+		color: #101010;
+}
+.title a:hover
+{
+		opacity: 1.0;
+		/*color: #337AB7;*/
+		/*color: #094C83;*/
+		/*color: #1266AB;*/
+		color: #105C9B;
 }
 
 /* Contains an image and an optional caption (which will be aligned accordingly) */
