@@ -126,7 +126,7 @@ in order to make the result have less dynamic range. For example, if we scale {{
 we get something that looks like the below plot.
 </p>
 
-{{ show_image(page.images["scaled_sine.svg"], caption="Scaled sine function with a dynamic range of ~2, plotted from " + "(-\\pi, \\pi)"|tex + ".") }}
+{{ show_image(page.images["scaled_sine.svg"], caption="Scaled sine function with a dynamic range of ~2, plotted on " + "(-\\pi, \\pi)"|tex + ".") }}
 
 <p>
 The advantage of this is that if we optimize the <em>absolute</em> error of the above function to {{"2^{-24}/2"|tex}},
@@ -139,14 +139,14 @@ I derived the scaling function by solving the min-degree odd polynomial that has
 Let's now project the scaled sine function onto the Chebyshev basis polynomials.
 To do this, I followed pages 7-8 of {{ offsite_link("http://www.mhtl.uwaterloo.ca/courses/me755/web_chap6.pdf", "this") }} University of Waterloo pdf.
 
-Specifically, it shows the following property for Chebyshev functions, which arise from their
+Specifically, it shows the following property for Chebyshev functions, which arises from their
 orthogonality.
 </p>
 
 {{ show_image(page.images["cheby_proj1.png"], caption="Chebyshev inner-product equality") }}
 
 <p>
-If the scaled sine function can be represented in terms of the Chebyshev basis functions (it can),
+If the scaled sine function is representable in terms of the Chebyshev basis functions,
 i.e. {{"f(x) = \\sum_n A_n T_n(x)"|tex}}, then the integral
 {{"\\int_{-1}^1 \\frac{T_n(x) f(x)}{\\sqrt{1-x^2}} dx"|tex}}
 is exactly equal to
@@ -159,13 +159,13 @@ in terms of the Chebyshev basis.
 
 <p>
 I compute the first 9 terms of the series with the following Mathematica code.
-I omit solving for {{"A_1, A_3, A_5"|tex}} and {{"A_7"|tex}} because they are zero.
+I omit solving for {{"A_1, A_3, A_5"|tex}} and {{"A_7"|tex}} because symmetry requires they be zero.
 In order to keep the function's domain as {{"(-1, 1)"|tex}}, I scale the parameter to {{"\\sin(x)"|tex}} by {{"\\pi"|tex}}.
 This way, we get coefficients to a function that computes one full cycle of {{"\\sin(\\pi x)"|tex}}.
 I'll undo the scaling of {{"x"|tex}} later.
 </p>
 
-{{ show_image(page.images["solve_cheb_coeffs.png"], caption="Solve for the Chebyshev coefficients to the scaled sine function. WorkingPrecision needs to be raised for NIntegrate to converge (or just use Integrate, if you're more patient).") }}
+{{ show_image(page.images["solve_cheb_coeffs.png"], caption="Solve for the Chebyshev coefficients to the scaled sine function. WorkingPrecision needs to be raised for NIntegrate to converge (or use Integrate, if you're patient).") }}
 
 <p>
 Now that we have the Chebyshev coefficients, we can reconstruct an approximation to {{"\\sin(x)"|tex}}, and also undo the scaling of the {{"x"|tex}} parameter:
@@ -178,7 +178,7 @@ Now that we have the Chebyshev coefficients, we can reconstruct an approximation
 A quick plot of the reconstructed sine function looks promising:
 </p>
 
-{{ show_image(page.images["reconstructed_sine_plot.svg"], caption="Plot of reconstructed sine approximation from " + "(-\\pi, \\pi)"|tex + ".") }}
+{{ show_image(page.images["reconstructed_sine_plot.svg"], caption="Plot of reconstructed sine approximation on " + "(-\\pi, \\pi)"|tex + ".") }}
 
 <p>
 Likewise, the plot for the relative error measurement: {{"(\\widehat{\\sin}(x) - \\sin(x))/\\sin(x)"|tex}}.
@@ -230,7 +230,7 @@ fn horner_sine_13(x: f32) -> f32 {
 So how does this perform?
 </p>
 
-{{ show_image(page.images["horner_ulp.svg"], caption="Average ULP error v.s. x") }}
+{{ show_image(page.images["horner_ulp.svg"], caption="Average error (in ULP) v.s. x.") }}
 
 <p>
 Not very well, but why?
@@ -258,7 +258,7 @@ My instincts are to pull out a factor of {{"(x-\\pi)"|tex}} and {{"(x+\\pi)"|tex
 </p>
 
 
-{{ show_image(page.images["fact_sine_as_poly.png"], caption="sin(x) approximation divided by " + "(x-\\pi)(x+\\pi)"|tex + ".") }}
+{{ show_image(page.images["fact_sine_as_poly.png"], caption="\\sin(x)"|tex + " approximation divided by " + "(x-\\pi)(x+\\pi)"|tex + ".") }}
 
 <p>
 Now if I multiplied by {{"(x+\\pi)(x-\\pi)"|tex}} <em>in 32-bit float</em> to undo the division, that wouldn't be quite right, because the float
@@ -292,7 +292,7 @@ let p1  = p3*x2  + coeffs[0];
 (x + 3.1415927410125732f32 - 0.00000008742277657347586f32) * p1 * x
 """, "rust") }}
 
-{{ show_image(page.images["factored_ulp.svg"], caption="Average ULP error v.s. x. Max error is 5 ULP, at x=2.6183214.") }}
+{{ show_image(page.images["factored_ulp.svg"], caption="Average error (in ULP) v.s. x. Max error is 5 ULP, at x=2.6183214.") }}
 
 <p>
 At this point, it helps to look at the error bounds, rather than just their averages:
