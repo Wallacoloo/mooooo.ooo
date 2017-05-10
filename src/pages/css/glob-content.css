@@ -88,12 +88,20 @@
 		text-decoration: underline;
 }
 
-.title a
+.title *
 {
 		font-variant: small-caps;
 		font-style: normal;
-		font-size: 1.1em;
-		color: #101010;
+}
+
+.title > *
+{
+		font-size: 1.13em;
+}
+
+.title a
+{
+		color: #0C0C0C;
 }
 .title a:hover
 {
