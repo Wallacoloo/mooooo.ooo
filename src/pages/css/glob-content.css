@@ -109,8 +109,9 @@
 
 .theater-image
 {
-		border: 2px #686868 solid;
-		border-radius: 16px;
+		/* border: 2px #686868 solid; */
+		border: 2px solid #C8C0B8;
+		border-radius: 11px;
 }
 .theater-video
 {
@@ -130,7 +131,7 @@
 		margin: -2px;
 }
 
-/* For small displays: images should not displayed as just one column */
+/* For small displays: images should be displayed as just one column */
 @media (max-width: 600px)
 {
 .columns-2
