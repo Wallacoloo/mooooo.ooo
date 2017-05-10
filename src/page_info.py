@@ -5,10 +5,12 @@
 import json, os, subprocess
 import re
 
-import dateutil.parser, jinja2, PIL.Image
+import dateutil.parser, jinja2, joblib, PIL.Image, pygments
 import xml.etree.ElementTree as ElementTree
 from jinja2 import Environment, PackageLoader
 from urllib.parse import urlsplit
+from pygments.lexers import guess_lexer, get_lexer_by_name
+from pygments.formatters import HtmlFormatter
 
 
 CONFIG_PATH = "../build/config.json"
@@ -30,6 +32,7 @@ OTHER_EXTENSIONS = ".icc",
 # Config file read from .json on disk
 config = json.loads(open(CONFIG_PATH, "r").read())
 
+persistent = joblib.Memory(cachedir="../build/joblib", verbose=0)
 
 def recursive_listdir(path):
     """Same as os.listdir, but recurses into subdirectories.
@@ -93,6 +96,19 @@ def filter_url_with_args(path, **kwargs):
     """
     urlargs = "?" + jinja2.filters.do_urlencode(kwargs) if kwargs else ""
     return path + urlargs
+
+@persistent.cache
+def filter_tex_to_svg(tex):
+    """Convert LaTeX into an inline svg.
+    e.g. "e=mc^2"|tex
+    """
+    # TODO: don't render if do_render == False
+    # Note: we prepend a space to fix bug in tex2svg when input is a number or starts with '-'
+    p = subprocess.Popen(["/usr/bin/tex2svg", "--inline", " " + tex], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    res = "\n".join(line.decode() for line in p.communicate())
+    assert "<svg" in res.lower() #Is tex2svg installed? Install via 'npm install -g tex-equation-to-svg'
+    return res.strip()
+
 
 def get_unparsed_commits(filename):
     """Returns an array of commit dicts, where each entry looks like:
@@ -453,6 +469,7 @@ class Page(object):
         env.filters["detailed_date"] = filter_detailed_date
         env.filters["drop_null_values"] = filter_drop_null_values
         env.filters["url_with_args"] = filter_url_with_args
+        env.filters["tex"] = filter_tex_to_svg
         env.filters["to_rel_path"] = to_rel_path
         env.globals["page"] = self
         # Expose these types for passing to the `set_page_type` macro
@@ -483,6 +500,17 @@ class Page(object):
 
         if do_render:
             return r
+
+    def highlight_code(self, code, filetype=None):
+        if filetype:
+            lexer = get_lexer_by_name(filetype)
+        else:
+            lexer = guess_lexer(code)
+        return pygments.highlight(code, lexer, HtmlFormatter())
+    def get_highlight_css(self):
+        """Return the CSS needed to perform syntax highlighting"""
+        return HtmlFormatter().get_style_defs('.highlight')
+
 
 class Author(object):
     def __init__(self, name):

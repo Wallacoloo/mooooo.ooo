@@ -108,8 +108,8 @@
 <code class="inline-code">{{ code }}</code>
 {% endmacro %}
 
-{% macro multiline_code(code) %}
-<code class="multiline-code">{{ code.strip() }}</code>
+{% macro multiline_code(code, filetype) %}
+<code class="multiline-code">{{ page.highlight_code(code, filetype, **kwargs) }}</code>
 {% endmacro %}
 
 {% if do_render or query_anchors or query_deps %}
