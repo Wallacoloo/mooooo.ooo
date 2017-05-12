@@ -83,7 +83,7 @@ we can use {{"\\{T_0(x), T_1(x), T_2(x), \\dots\\}"|tex}}, where {{"T_n(x)"|tex}
 
 <p>
 Chebyshev polynomials have the property that all their local extrema lie within {{"-1 < x < 1"|tex}}, and each such extrema
-is at exactly {{"\\pm 1"|tex}}.
+has a value of exactly {{"\\pm 1"|tex}}.
 For those familiar with Fourier series, this should look somewhat familiar. We're projecting the sine function onto
 a basis where each basis function is oscillating at an increasing rate.
 It's intuitive, then, that the smoother a function is, the more rapidly the coefficients of its projection onto
@@ -96,7 +96,7 @@ a <em>very</em> good approximation of {{"\\sin(x)"|tex}} over the interval {{"(-
 </p>
 
 <p>
-Notice that for a function approximated with a finite set of Chebyshev polynomials,
+Note that for a smooth function approximated with a finite set of Chebyshev polynomials,
 the error is spread in a fairly uniform manner. The approximation isn't intrinsically more accurate
 near 0 and less accurate at the extremeties, for example. We can say that
 {{"|E(x)| < B"|tex}} for all {{"-1 < x < 1"|tex}}, where {{"E(x)"|tex}} is the error of the approximation function 
@@ -182,7 +182,7 @@ I'll undo the scaling of {{"x"|tex}} later.
 {{ show_image(page.images["solve_cheb_coeffs.png"], caption="Solve for the Chebyshev coefficients to the scaled sine function. WorkingPrecision needs to be raised for NIntegrate to converge (or use Integrate, if you're patient).") }}
 
 <p>
-Now that we have the Chebyshev coefficients, we can reconstruct an approximation to {{"\\sin(x)"|tex}}, and also undo the scaling of the {{"x"|tex}} parameter:
+Now that we have the Chebyshev coefficients, we can reconstruct an approximation to {{"\\sin(x)"|tex}} and also undo the scaling of the {{"x"|tex}} parameter:
 </p>
 
 {{ show_image(page.images["sine_from_coeffs.png"], caption="Reconstructing " + "\\widehat{\\sin}(x) = A_0 T_0(x) + A_1 T_1(x) + \\dots"|tex) }}
