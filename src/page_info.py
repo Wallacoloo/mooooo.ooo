@@ -104,7 +104,13 @@ def filter_tex_to_svg(tex):
     """
     # TODO: don't render if do_render == False
     # Note: we prepend a space to fix bug in tex2svg when input is a number or starts with '-'
-    res = subprocess.check_output(["tex2svg", "--inline", " " + tex])
+    tex = subprocess.Popen(["tex2svg", "--inline", " " + tex], stdout=subprocess.PIPE)
+    res = subprocess.check_output(["scour", "-q", "-p" "10",
+            "--strip-xml-prolog",
+            "--enable-comment-stripping",
+            "--enable-id-stripping",
+            "--create-groups",
+        ], stdin=tex.stdout)
     res = res.decode().strip()
     if not "<svg" in res.lower():
         print("ERROR IN filter_tex_to_svg: %r", res)

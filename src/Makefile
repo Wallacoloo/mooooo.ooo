@@ -2,7 +2,7 @@
 OPTIPNG=optipng #Optional
 JPGCRUSH=jpgcrush #Optional
 #GIFSICLE=gifsicle #Optional
-SVGCLEANER=svgcleaner #Optional tool to compress svgs.
+SCOUR=scour #Optional tool to compress svgs.
 
 # jpegoptim provides 3~4% improvement (w/ -s)
 # jpegrescan provides 6~7% (w/ -s)
@@ -93,7 +93,7 @@ $(BUILD_ROOT)/images/%.jpg: pages/%.jpg
 
 $(BUILD_ROOT)/images/%.svg: pages/%.svg
 	$(MKDIR_CP)
-	$(SVGCLEANER) $@ $@ || true
+	$(SCOUR) -i $^ --enable-comment-stripping --enable-id-stripping --create-groups --no-line-breaks --strip-xml-prolog -p 10 -o $@ || true
 
 ## Compress gifs (losslessly)
 $(BUILD_ROOT)/images/%.gif: pages/%.gif
