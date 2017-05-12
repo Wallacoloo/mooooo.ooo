@@ -172,8 +172,8 @@ in terms of the Chebyshev basis.
 </p>
 
 <p>
-I compute the first 9 terms of the series with the following Mathematica code.
-I omit solving for {{"A_1, A_3, A_5"|tex}} and {{"A_7"|tex}} because symmetry requires they be zero.
+I compute the first 11 terms of the series with the following Mathematica code.
+I omit solving for {{"A_1, A_3, A_5, A_7"|tex}} and {{"A_9"|tex}} because symmetry requires they be zero.
 In order to keep the function's domain as {{"(-1, 1)"|tex}}, I scale the parameter to {{"\\sin(x)"|tex}} by {{"\\pi"|tex}}.
 This way, we get coefficients to a function that computes one full cycle of {{"\\sin(\\pi x)"|tex}}.
 I'll undo the scaling of {{"x"|tex}} later.
@@ -201,8 +201,8 @@ Likewise, the plot for the relative error measurement: {{"(\\widehat{\\sin}(x) -
 {{ show_image(page.images["relative_error_plot.svg"], caption="Relative error of the sine approximation on " + "(-\\pi, \\pi)"|tex + ".") }}
 
 <p>
-The error is fairly uniform, and it reaches the target of {{"2^{-25}"|tex}}.
-For completeness, here's the polynomial approximation. Chebyshev functions are themselves polynomials,
+The error is fairly uniform, and it reaches the target of {{"2^{-24}"|tex}}.
+For completeness, the polynomial coefficients are shown below. Chebyshev functions are themselves polynomials,
 so expanding the function gives an ordinary polynomial.
 </p>
 
