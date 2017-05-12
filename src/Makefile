@@ -2,6 +2,7 @@
 OPTIPNG=optipng #Optional
 JPGCRUSH=jpgcrush #Optional
 #GIFSICLE=gifsicle #Optional
+SVGCLEANER=svgcleaner #Optional tool to compress svgs.
 
 # jpegoptim provides 3~4% improvement (w/ -s)
 # jpegrescan provides 6~7% (w/ -s)
@@ -90,8 +91,9 @@ $(BUILD_ROOT)/images/%.jpg: pages/%.jpg
 	$(MKDIR_CP)
 	$(JPGCRUSH) $@ || true
 
-$(BUILD_DIR)/%.svg: pages/%.svg
+$(BUILD_ROOT)/images/%.svg: pages/%.svg
 	$(MKDIR_CP)
+	$(SVGCLEANER) $@ $@ || true
 
 ## Compress gifs (losslessly)
 $(BUILD_ROOT)/images/%.gif: pages/%.gif
@@ -105,6 +107,9 @@ $(BUILD_DIR)/%.png: $(BUILD_ROOT)/images/%.png
 	$(MKDIR_CP)
 
 $(BUILD_DIR)/%.gif: $(BUILD_ROOT)/images/%.gif
+	$(MKDIR_CP)
+
+$(BUILD_DIR)/%.svg: $(BUILD_ROOT)/images/%.svg
 	$(MKDIR_CP)
 
 ## Copy webm videos

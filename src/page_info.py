@@ -104,10 +104,13 @@ def filter_tex_to_svg(tex):
     """
     # TODO: don't render if do_render == False
     # Note: we prepend a space to fix bug in tex2svg when input is a number or starts with '-'
-    p = subprocess.Popen(["/usr/bin/tex2svg", "--inline", " " + tex], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    res = "\n".join(line.decode() for line in p.communicate())
-    assert "<svg" in res.lower() #Is tex2svg installed? Install via 'npm install -g tex-equation-to-svg'
-    return res.strip()
+    res = subprocess.check_output(["tex2svg", "--inline", " " + tex])
+    res = res.decode().strip()
+    if not "<svg" in res.lower():
+        print("ERROR IN filter_tex_to_svg: %r", res)
+        print("Is tex2svg installed? Install via 'npm install -g tex-equation-to-svg'")
+    return res
+    
 
 
 def get_unparsed_commits(filename):
