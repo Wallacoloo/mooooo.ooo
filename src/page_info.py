@@ -402,6 +402,9 @@ class Page(object):
         rtdeps = set()
         anchors = set() # html anchors, e.g. mypage.html#heading1 - "heading1" is an anchor
         def to_rel_path(abs_path):
+            build_root = config["build"]["dir"] + "/"
+            if abs_path.startswith(build_root):
+                abs_path = abs_path[len(build_root):]
             # Separate the anchor, if it was provided
             if "#" in abs_path:
                 abs_path, anchor = abs_path.split("#")
