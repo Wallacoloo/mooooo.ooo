@@ -50,15 +50,13 @@ By {{ page.authors[0].name }}
 		<b>Comments?</b> See the footer for contact info{# no linebreak before period -#}
 		{% if page.comments.get("reddit") %}
 		or {{ offsite_link(page.comments["reddit"], "join the discussion on reddit") }}{# no linebreak before period -#}
+		{% endif %}
+		{% if page.comments.get("news.ycombinator") %}
+		or {{ offsite_link(page.comments["news.ycombinator"], "join the discussion on Hacker News") }}{# no linebreak before period -#}
 		{% endif %}.
 	</p>
 </div>
 
-{#
-<div>
-		{{ mailto_link(page.comment_email, "Submit a new comment", subject=page.comment_email_subject) }} via email.
-</div>
-#}
 
 {% endblock %}
 

@@ -81,6 +81,11 @@ publish-host: publish-ipfs ## Pin the new build to the remote host
 publish: publish-ipfs publish-cf publish-ipns publish-host ## Publish the site everywhere
 	true
 
+## Rasterize SVGs to PNG
+%.png: %.svg
+	convert $< $@
+	# convert -density 144
+
 ## Build compressed png images
 $(BUILD_ROOT)/images/%.png: pages/%.png
 	$(MKDIR_CP)

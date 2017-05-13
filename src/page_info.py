@@ -561,6 +561,15 @@ class Image(Page):
             else:
                 im = PIL.Image.open(self._path_on_disk)
                 return im.size
+    @property
+    def rasterized(self):
+        """Return an Image object for a rasterized version of this image.
+        For non-vector graphics, this is a noop.
+        """
+        if self.path_on_disk.endswith(".svg"):
+            return Image(path_on_disk=self.path_in_build_tree[:-4] + ".png", need_exist=False)
+        else:
+            return self
 
 class Audio(Page):
     do_render_with_jinja = False
