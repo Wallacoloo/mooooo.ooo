@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Dependency management from python.
 Exposes methods to build specific resources & publish to IPFS, etc"""
 
