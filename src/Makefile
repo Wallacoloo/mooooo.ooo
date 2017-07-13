@@ -129,6 +129,10 @@ $(BUILD_DIR)/%.ogg: pages/%.ogg
 $(BUILD_DIR)/%.icc: pages/%.icc
 	$(MKDIR_CP)
 
+## Copy PDFs
+$(BUILD_DIR)/%.pdf: pages/%.pdf
+	$(MKDIR_CP)
+
 # If the font already exists, just directly copy it
 $(BUILD_ROOT)/fonts/%: fonts/%
 	$(MKDIR_CP)

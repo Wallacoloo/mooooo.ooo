@@ -27,7 +27,7 @@ GFX_EXTENSIONS = IMG_EXTENSIONS + VID_EXTENSIONS
 FONT_EXTENSIONS = ".eot", ".ttf", ".woff", ".woff2"
 CSS_EXTENSIONS = ".css",
 # non-categorical; usually meant to be downloaded.
-OTHER_EXTENSIONS = ".icc",
+OTHER_EXTENSIONS = ".icc", ".pdf"
 
 # Config file read from .json on disk
 config = json.loads(open(CONFIG_PATH, "r").read())
