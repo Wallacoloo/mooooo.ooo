@@ -1,0 +1,13 @@
+{% from 'base.html' import heading, offsite_link, show_image %}
+{{ page.set_title("State machines in C++17") }}
+
+{% extends 'blog_entry.html' %}
+
+{% block entry_content %}
+
+Designing a library for Finite State Machines is an interesting idea, because
+it's such a <i>broad</i> concept. State machines represent a model of
+computation, so it seems that either (a) supporting arbitrary state machines
+requires a library with similar complexity to a complete programming language
+or (b) <i>no</i> library is necessary, because a state machine encompasses just
+a subset of everything the language is capable of already.
