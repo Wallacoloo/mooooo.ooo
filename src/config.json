@@ -29,8 +29,8 @@
 		},
 		"fonts":
 		{
-				"title": "Cardo",
-				"body": "Cardo"
+				"title": "Lora",
+				"body": "Quicksand"
 		},
 		"fontinfo":
 		{
@@ -51,7 +51,13 @@
 						"author": "Andrew Paglinawan",
 						"license": "SIL Open Font License",
 						"url": "http://www.fontsquirrel.com/fonts/Quicksand"
-				}
+				},
+                "lora":
+                {
+                        "author": "Olga Karpushina",
+                        "license": "SIL Open Font License",
+                        "url": "https://github.com/cyrealtype/Lora-Cyrillic"
+                }
 		},
 		"licenses":
 		{
