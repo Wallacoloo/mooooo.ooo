@@ -7,7 +7,7 @@ import re
 
 import dateutil.parser, jinja2, joblib, PIL.Image, pygments
 import xml.etree.ElementTree as ElementTree
-from jinja2 import Environment, PackageLoader
+from jinja2 import Environment, PackageLoader, StrictUndefined
 from urllib.parse import urlsplit
 from pygments.lexers import guess_lexer, get_lexer_by_name
 from pygments.formatters import HtmlFormatter
@@ -460,7 +460,7 @@ class Page(object):
         # Both (a), (c), (d) require rendering the page
         do_render = not query_type and not query_anchors and not query_deps
 
-        env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True)
+        env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True, undefined=StrictUndefined)
 
         # Populate template global variables & filters
         env.globals.update(config)
@@ -544,13 +544,13 @@ class Image(Page):
     def size(self):
         """Returns the size of the image in pixels (width, height)"""
         if self.is_video:
-            cmd = "avconv -i %s" % self._path_on_disk
+            cmd = "ffprobe -show_entries stream=height,width -v error -of flat=s=_ %s" %self._path_on_disk
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            di = p.communicate()
-            for line in di:
-                if str(line).rfind("Video") > 0:
-                    resolution = re.findall("(\d+x\d+)", str(line))[0]
-            return [int(dim) for dim in resolution.split("x")]
+            output = p.communicate()
+            video_vars = {}
+            for line in output:
+                exec(line, video_vars)
+            return video_vars["streams_stream_0_width"], video_vars["streams_stream_0_height"]
         else:
             if self._path_on_disk.endswith(".svg"):
                 # PIL doesn't support SVG.
