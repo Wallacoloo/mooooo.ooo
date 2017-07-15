@@ -26,6 +26,31 @@
     font-weight: 700;
     font-style: normal;
 }
+
+@font-face
+{
+    font-family: 'quicksand';
+	src: local("Quicksand Italic"), local("Quicksand-Italic");
+	{{ incl_font_sources("Quicksand-Italic") }}
+    font-weight: 400;
+    font-style: italic;
+}
+@font-face
+{
+    font-family: 'quicksand';
+	src: local("Quicksand BoldItalic"), local("Quicksand-BoldItalic");
+	{{ incl_font_sources("Quicksand-BoldItalic") }}
+    font-weight: 700;
+    font-style: italic;
+}
+/*@font-face
+{
+    font-family: 'quicksand';
+	src: local("Quicksand Medium"), local("Quicksand-Medium");
+	{{ incl_font_sources("Quicksand-Medium") }}
+    font-weight: 500;
+    font-style: normal;
+}*/
 {#
 /* Raleway font:
  * source: http://www.fontsquirrel.com/fonts/Raleway
