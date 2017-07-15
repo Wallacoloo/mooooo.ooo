@@ -25,7 +25,9 @@
 		"fonts":
 		{
 				"title": "Lora",
-				"body": "Quicksand"
+				"body": "Quicksand",
+				"header": "Lora",
+				"icons": "FontAwesome"
 		},
 		"fontinfo":
 		{

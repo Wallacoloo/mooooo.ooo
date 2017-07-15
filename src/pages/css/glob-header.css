@@ -11,7 +11,7 @@
 		/* stack each navigation link horizontally, not vertically */
 		display: table-cell;
 		width: 1%;
-		font-family: Quicksand,"Helvetica Neue",Helvetica,Arial,sans-serif;
+		font-family: "{{ config.fonts.header }}","Helvetica Neue",Helvetica,Arial,sans-serif;
 		font-size: 1.67em;
 		padding-top: 0.2em;
 }
@@ -25,7 +25,7 @@
 		display: block;
 		text-decoration: none;
 		color: #337AB7;
-		font-family: Quicksand,"Helvetica Neue",Helvetica,Arial,sans-serif;
+		font-family: "{{ config.fonts.header }}","Helvetica Neue",Helvetica,Arial,sans-serif;
 		font-weight: bold;
 		border-bottom: rgba(216,216,216,0) 2px solid;
 		transition: all 0.15s ease 0s;

@@ -117,6 +117,14 @@ def filter_tex_to_svg(tex):
         print("Is tex2svg installed? Install via 'npm install -g tex-equation-to-svg'")
     return res
     
+def filter_unique(it):
+    """Skip items if they've been seen before in the sequence.
+    """
+    seen = set()
+    for i in it:
+        if i not in seen:
+            seen.add(i)
+            yield i
 
 
 def get_unparsed_commits(filename):
@@ -481,6 +489,7 @@ class Page(object):
         env.filters["detailed_date"] = filter_detailed_date
         env.filters["drop_null_values"] = filter_drop_null_values
         env.filters["url_with_args"] = filter_url_with_args
+        env.filters["unique"] = filter_unique
         env.filters["tex"] = filter_tex_to_svg
         env.filters["to_rel_path"] = to_rel_path
         env.globals["page"] = self

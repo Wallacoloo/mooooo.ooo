@@ -63,7 +63,7 @@ The exceptions to this include:
 </p>
 
 <ul class="list-single-lines">
-		{% for font in config.fontinfo.keys()|sort %}
+		{% for font in config.fonts.values()|unique|sort %}
 		{% set fontinfo=config.fontinfo[font|lower|replace(" ", "")] %}
 			<li>
 					<a href="{{fontinfo.url}}">{{ fontinfo.name }}</a>
