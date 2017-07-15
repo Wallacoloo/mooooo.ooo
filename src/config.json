@@ -36,24 +36,28 @@
 		{
 				"cardo":
 				{
+						"name": "Cardo",
 						"author": "David Perry",
 						"license": "SIL Open Font License",
 						"url": "https://www.fontsquirrel.com/fonts/cardo"
 				},
 				"fontawesome":
 				{
+						"name": "Font Awesome",
 						"author": "Dave Gandy",
 						"license": "SIL Open Font License",
 						"url": "https://fortawesome.github.io/Font-Awesome/"
 				},
 				"quicksand":
 				{
+						"name": "Quicksand",
 						"author": "Andrew Paglinawan",
 						"license": "SIL Open Font License",
 						"url": "http://www.fontsquirrel.com/fonts/Quicksand"
 				},
                 "lora":
                 {
+						"name": "Lora",
                         "author": "Olga Karpushina",
                         "license": "SIL Open Font License",
                         "url": "https://github.com/cyrealtype/Lora-Cyrillic"

@@ -63,10 +63,10 @@ The exceptions to this include:
 </p>
 
 <ul class="list-single-lines">
-		{% for font in ("Font Awesome", "Quicksand", "Cardo") %}
+		{% for font in config.fontinfo.keys()|sort %}
 		{% set fontinfo=config.fontinfo[font|lower|replace(" ", "")] %}
 			<li>
-					<a href="{{fontinfo.url}}">{{ font }}</a>
+					<a href="{{fontinfo.url}}">{{ fontinfo.name }}</a>
 					by {{ fontinfo.author }} (license: <a href="{{ config.licenses[fontinfo.license].url }}">
 							{{ fontinfo.license }}</a>).
 			</li>
