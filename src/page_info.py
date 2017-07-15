@@ -588,16 +588,6 @@ class Other(Page):
 
 class BlogEntry(Page):
     do_render_with_jinja = True
-    @property
-    def comment_email(self):
-        """The email address that should be used to send comments to this blog entry"""
-        return config["social"]["comment_email"]
-
-    @property
-    def comment_email_subject(self):
-        """The subject tagline that should be used to identify a comment to this article"""
-        return "[%s]" %self.friendly_path
-    
 
 class HomePage(Page):
     do_render_with_jinja = True

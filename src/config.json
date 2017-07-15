@@ -3,13 +3,8 @@
 		"social":
 		{
 				"contact_email": "colin@mooooo.ooo",
-				"comment_email": "comments@mooooo.ooo",
 				"github_url": "https://github.com/wallacoloo",
 				"twitter_url": "https://twitter.com/wallacoloo"
-		},
-		"comments":
-		{
-				"check_interval": 120
 		},
 		"ipfs":
 		{
