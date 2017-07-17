@@ -4,12 +4,75 @@
 {% extends 'blog_entry.html' %}
 
 {% block entry_content %}
-
-Designing a library for Finite State Machines is an interesting idea, because
-it's such a <i>broad</i> concept. State machines represent a model of
+<p>
+Designing a library for Finite State Machines (FSM) is an interesting idea, because
+it's such a <i>broad</i> concept. State machines represent a complete model of
 computation, so it seems that either (a) supporting arbitrary state machines
 requires a library with similar complexity to a complete programming language
 or (b) <i>no</i> library is necessary, because a state machine encompasses just
 a subset of everything the language is capable of already.
+</p>
+
+<p>
+It turns out that this <i>can</i> be the case in many functional languages that
+support such features as algebraic datatypes and pattern matching natively, but
+certainly a small library can make implementing state machines easier and enforce
+some level of consistency in imperative languages like C++.
+</p>
+
+{{ heading("What does a state machine library provide?") }}
+<p>
+In practice, most explicit state machines are event-driven, in that they only change state
+or produce effects when some input changes (a timer expires, a button is pressed,
+etc). Such FSMs usually consist of three things:
+1. A finite list of possible states that machine can occupy.
+2. Variables, some of which are shared across states and some of which might be
+used by only one state.
+3. Actions to perform upon specific events, and criteria upon which to transition
+to a new state.
+</p>
+
+<p>
+Some people break the third thing into two, but I tend to consider
+the transitions themselves as actions as well because doing so usually gives a
+little more versatility (which will be shown later).
+</p>
+
+{{ heading("Which libraries are out there?") }}
+<p>
+Within the realm of C++, the majority of state machine libraries occupy one of
+two categories.
+</p>
+
+<p>
+In the first of these categories, the user creates an enum with as many values
+as there are states. The user then creates a class that holds an instance
+of this enum, plus whichever variables are needed by any of the possible states.
+The user also creates an enum that enumerates all the possible events the state
+machine can handle.
+Finally, they create a 2-dimensional "transition table", where upon receiving
+an event, the state machine indexes the table based on the value of its state
+enum and the event type to obtain a pointer to a function that performs some action
+or alters some variables on the state machine and may yield a new state.
+<p>
+
+<p>
+Among the downsides to this approach is the limitation that all states share all data.
+This is a bit unclean (it's like declaring all your variables public, everywhere),
+wastes memory and limits the extent to which the programmer can take advantage
+of paradigms like RAII for management of state-specific resources. Additionally,
+we might like for our events to have some associated data, but enums don't allow
+for that.
+</p>
+
+<p>
+The most promising library I could find is the Boost MSM. This does support
+state-specific variables, which aren't visible to other states, but it looks
+like they're still persisted across all states. So efficient usage of memory
+and RAII still aren't possible.
+</p>
+
+{{ heading("Sum types") }}
+
 
 {% endblock %}
