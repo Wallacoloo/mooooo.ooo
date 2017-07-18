@@ -178,5 +178,195 @@ IntStrSumType halve(IntStrSumType x) {
 
 {{ heading("State machines from sum types") }}
 
+<p>
+A finite state machine (FSM) can be viewed as a sum type: there is a fixed (at compile time) set
+of states that the machine may occupy, and at any given time it is in exactly one state.
+</p>
+
+<p>
+When an event occurs, we dispatch it to the appropriate handler based on the active state.
+This handler can perform some actions and then return a <em>new</em> state for the machine.
+Here's how we might perform event dispatch for a vending machine.
+</p>
+
+{{ multiline_code("""
+/// Data that a caller will supply us when the user presses a button on the vending machine.
+struct ButtonPressed {
+    int index;
+};
+
+/// List of errors we might encounter.
+enum class ErrorType {
+    OutOfStock,
+    InsufficientFunds
+};
+
+// Three different states our vending machine might be in.
+struct Idle {
+    /// Amount of cash (in pennies) deposited by the user so far.
+    int funds;
+};
+struct Errored {
+    ErrorType error;
+};
+struct FetchingItem {
+    int itemRow, itemCol;
+};
+
+using State = std::variant<Idle, Error, FetchingItem>;
+State state = Idle;
+void dispatchEvent(ButtonPressed event) {
+    state = std::visit(overloaded {
+            [&](Idle&& state) {
+                int cost = getPrice(event.index);
+                if (!hasStock(event.index)) {
+                    return Error{ErrorType::OutOfStock};
+                } else if (cost > state.funds) {
+                    return Error{ErrorType::ErrorInsufficientFunds};
+                } else {
+                    giveChange(state.funds - cost);
+                    // assume each row has 8 different items.
+                    return FetchingItem{event.index/8, event.index%8};
+                }
+            },
+            [&](FetchingItem&& state) {
+                return state;
+            },
+            [&](Errored&& state) {
+                return state;
+            }
+        },
+        std::move(state)
+    );
+}
+""", "c++") }}
+
+<p>
+Note the use of std::move when passing the state into the visitor.
+This will crop up again, and its purpose is to make sure that we avoid ever
+copying the state as we process it. That's not hugely relevant in the vending machine example,
+but other state machines may allocate data on the heap (if using a heap) or have destructors
+that cause side effects, and we would only want to trigger those when actually
+leaving the state.
+</p>
+
+<p>
+The image below shows how the State type will be
+arranged in memory. The first word will be the tag - an integer that indicates
+which variant is active: Idle, Error, or FetchingItem.
+The second word is occupied by funds if the state is Idle,
+otherwise it is error or itemRow, depending on if the
+state machine is in the Errored or FetchingItem state respectively.
+The third word will hold itemCol when in the FetchingItem
+state, and is unused in all other states.
+</p>
+
+<p>
+The state machine as a whole <em>always</em> occupies 3 words of memory, it's
+just that the meaning of these words varies based on which state is active. The
+nice thing about this approach - versus one that doesn't use variants - is that
+we saved 2 words by folding funds, error and
+itemRow together. This is possible because they're state-local variables that never
+need to exist simultaneously. The memory savings can be impressive when
+it comes to large state machines with many variables.
+</p>
+
+{{ show_image(page.images["statevariant.svg"], caption="Possible memory layout of the State type.") }}
+
+<p>
+Finally, we might add more events, like a CoinInserted event.
+At this point, we could make the dispatchEvent function take a variant
+over the possible events, and then the visitor would visit some function that
+matches both the state and the event type. While we're at it, we can remove
+the ugly overloaded lambda and name our event handlers by elevating the dispatchEvent
+function into a Fsm base class. Here's what the user code might look like:
+</p>
+
+{{ multiline_code("""
+struct CoinInserted {
+    /// Value of the coin, in pennies.
+    int value;
+};
+
+using Event = std::variant<ButtonPressed, CoinInserted>;
+using State = std::variant<Idle, Error, FetchingItem>;
+// Note that the Fsm takes the derived class as a template parameter. This is
+// because it needs to know where to find our `onEvent` handlers.
+struct VendingMachine : public Fsm<VendingMachine, Event, State> {
+    // Variables that should be shared across all states can be placed below.
+    int stock[NUM_ITEMS];
+    int prices[NUM_ITEMS];
+    // What to do when in the Idle state and a ButtonPressed event occurs.
+    State onEvent(Idle&& state, ButtonPressed event) {
+        int cost = prices[event.index];
+        if (stock[event.index] <= 0) {
+            return Error{ErrorType::OutOfStock};
+        } else if (cost > state.funds) {
+            return Error{ErrorType::InsufficientFunds};
+        } else {
+            giveChange(state.funds - cost);
+            --stock[event.index];
+            return FetchingItem{event.index/8, event.index%8};
+        }
+    }
+    // Ignore button presses in all other states.
+    State onEvent(FetchingItem&& state, ButtonPressed) {
+        return std::move(state);
+    }
+    State onEvent(Errored&& state, ButtonPressed) {
+        return std::move(state);
+    }
+    State onEvent(Idle&& state, CoinInserted event) {
+        state.funds += event.value;
+        return std::move(state);
+    }
+    // Spit the coins back out in non-idle states.
+    // Note: we can use a template here to avoid repeatitition.
+    // C++ function overloads work such that events associated with the Idle
+    // state will be processed by the explicitly defined function above instead
+    // of this template.
+    template <typename S> State onEvent(S&& state, CoinInserted event) {
+        giveChange(event.value);
+        return std::move(state);
+    }
+private:
+    void giveChange(int value);
+};
+""", "c++") }}
+
+And here's the library code that handles all the ugly bits.
+
+{{ multiline_code("""
+/// Calls the appropriate `onEvent(State, Event)` function of the derived class.
+template <typename Implementor, typename State> struct EventDispatcher {
+    EventDispatcher(Implementor& self_) : self(self_) {}
+    template <typename ActiveState, typename Event>
+    State operator()(ActiveState&& state, const Event& event) {
+        return std::move(self.onEvent(std::move(state), event));
+    }
+    Implementor& self;
+};
+
+/// Base type for all Finite State Machines.
+template <typename Implementor, typename Event, typename State> struct Fsm {
+    /// dispatch an event variant to the appropriate handler, based on the current state.
+    void dispatch(const Event& event) {
+        // dispatch the event and obtain the new state.
+        EventDispatcher<Implementor, State> dispatcher(*self);
+        this->fsmState = std::move(std::visit(
+            dispatcher, std::move(fsmState), event));
+    }
+private:
+    State fsmState;
+};
+""", "c++") }}
+
+<p>
+Surprisingly simple, though a bit dense.
+</p>
+
+{{ heading("Additional features") }}
+
+
 
 {% endblock %}
