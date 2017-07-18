@@ -365,7 +365,17 @@ private:
 Surprisingly simple, though a bit dense.
 </p>
 
-{{ heading("Additional features") }}
+{{ heading("RAII") }}
+<p>
+One of the nice things about a variant-based approach to state machines is that
+we can use the Resource Acquisition Is Initialization (RAII) design pattern because
+the a state's destructor is always called when we transition into a new state.
+For example, if the FetchingItem state requires various hardware power supplies
+to be active but other states don't, we can bring up the power supplies in the
+constructor of FetchingItem, and turn them off in its destructor. This could be
+more reliable than manually doing that for each possible transition to/from
+the FetchingItem state (especially within the context of exceptions, if applicable).
+</p>
 
 
 
