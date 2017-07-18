@@ -73,6 +73,110 @@ and RAII still aren't possible.
 </p>
 
 {{ heading("Sum types") }}
+<p>
+C++17 offers <i>variant</i> types (also known as tagged unions or sum types).
+A variant is much like the C union construct, but type safe.
+Like a union, it allows a variable to be assigned <i>different types</i> throughout its lifetime,
+but it only ever has one value at a time.
+</p>
+
+<p>
+For those with experience in dynamic programming languages, it's not too different
+from what languages like Python allow:
+</p>
+
+{{ multiline_code("""
+def halve(x):
+    if isinstance(x, int):
+        return x/2
+    elif isinstance(x, str):
+        return x[0:len(x)/2]
+    else:
+        raise TypeError(\"Expected an int or str\")
+
+>>> halve(24)
+12
+>>> halve('hello, world!')
+'hello,'
+""", "python") }}
+
+<p>
+In this case, x is similar to a sum type: it can be either an int or a string
+and we only know at runtime. Today, this can be implemented in C++ as follows:
+</p>
+
+{{ multiline_code("""
+typedef union {
+    int,
+    std::string,
+} IntStrUnion;
+
+struct IntStrSumType {
+    /// Holds '0' to indicate 'data' is an int.
+    /// Holds '1' to indicate 'data' is a string.
+    int tag;
+    IntStrUnion data;
+};
+
+IntStrSumType halve(const IntStrSumType& x) {
+    if (x.tag == 0) {
+        return IntStrSumType(0, *((int*)&x) / 2);
+    } else if (x.tag == 1) {
+         IntStrSumType(1,
+            ((std::string*)&x)->substr(0, ((std::string*)&x)->length()/2));
+    } else {
+        DIE(\"Illegal type tag: expected 0 or 1\");
+    }
+}
+""", "c++") }}
+
+<p>
+Note though that this method is incredibly error prone. Beyond the obvious,
+memory leaks are difficult to avoid with this approach.
+Because the compiler doesn't know
+the type of the value contained in a union, it can't call any constructors when the value
+is deleted. Thus, the caller will have to explicitly call the destructor of the appropriate type
+when done with the returned value.
+</p>
+
+<p>
+We could overcome some of these errors by wrapping this in a safer interface -
+make a class whose destructor checks the tag of the union and calls the destructor of the
+active type, then overload the assignment operator so that it sets the appropriate tag
+based on if you assign it an int or a string, and finally make the tag private
+and force all casts to be checked against the tag. This is essentially what
+std::variant does, but it also introduces the concept of visitors.
+</p>
+
+<p>
+Below is how the halve function could be implemented in C++17. Note the existence
+of the overloaded keyword: this lets us overload lambda functions in the same
+way that C++ lets one overload normal functions. The visit function does some
+magic behind the scenes so that the tag will be checked at runtime and then the
+appropriate overload of our lambda will be called. We'll make the syntax a bit
+friendlier later on, too.
+</p>
+
+{{ multiline_code("""
+#include <variant>
+
+using IntStrSumType = std::variant<int, std::string>;
+
+IntStrSumType halve(IntStrSumType x) {
+    std::visit(overloaded {
+            [](int&& x_int) {
+                return x_int/2;
+            },
+            [](string&& x_str) {
+                return x_str.substr(x_str.length()/2);
+            }
+        },
+        x
+    );
+}
+""", "c++") }}
+
+{{ heading("State machines from sum types") }}
 
 
 {% endblock %}
