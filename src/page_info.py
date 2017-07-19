@@ -26,8 +26,6 @@ SND_EXTENSIONS = ".ogg",
 GFX_EXTENSIONS = IMG_EXTENSIONS + VID_EXTENSIONS
 FONT_EXTENSIONS = ".eot", ".ttf", ".woff", ".woff2"
 CSS_EXTENSIONS = ".css",
-# non-categorical; usually meant to be downloaded.
-OTHER_EXTENSIONS = ".icc", ".pdf"
 
 # Config file read from .json on disk
 config = json.loads(open(CONFIG_PATH, "r").read())
@@ -185,7 +183,11 @@ class Page(object):
         else:
             self._path = path_on_disk
 
-        if get_ext(self._path) in GFX_EXTENSIONS:
+        if get_ext(self._path) == ".html":
+            self.do_render_with_jinja = True
+            # By rendering the page, we can determine our type
+            self.render(query_type=True)
+        elif get_ext(self._path) in GFX_EXTENSIONS:
             # If this resource is an image, cast it as such for the extra data
             self.set_type(Image)
         elif get_ext(self._path) in FONT_EXTENSIONS:
@@ -194,13 +196,8 @@ class Page(object):
             self.set_type(Css)
         elif get_ext(self._path) in SND_EXTENSIONS:
             self.set_type(Audio)
-        elif get_ext(self._path) in OTHER_EXTENSIONS:
-            self.set_type(Other)
         else:
-            assert get_ext(self._path) == ".html"
-            self.do_render_with_jinja = True
-            # By rendering the page, we can determine our type
-            self.render(query_type=True)
+            self.set_type(Other)
 
     def __repr__(self):
         return "<Page.%s %r>" %(self.__class__.__name__, self.path_on_disk)
@@ -373,8 +370,7 @@ class Page(object):
 
         etc = {}
         for page in names:
-            if get_ext(page) in OTHER_EXTENSIONS:
-                etc[page] = Other(path_on_disk=os.path.join(self.dir_on_disk, page), **kwargs)
+            etc[page] = Other(path_on_disk=os.path.join(self.dir_on_disk, page), **kwargs)
         return etc
 
 

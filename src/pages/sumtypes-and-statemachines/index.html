@@ -1,20 +1,20 @@
 {% from 'base.html' import heading, offsite_link, show_image %}
-{{ page.set_title("State machines in C++17") }}
+{{ page.set_title("Sum types and state machines in C++17") }}
 
 {% extends 'blog_entry.html' %}
 
 {% block entry_content %}
 <p>
 Designing a library for Finite State Machines (FSM) is an interesting idea, because
-it's such a <i>broad</i> concept. State machines represent a complete model of
+it's such a <em>broad</em> concept. State machines represent a complete model of
 computation, so it seems that either (a) supporting arbitrary state machines
 requires a library with similar complexity to a complete programming language
-or (b) <i>no</i> library is necessary, because a state machine encompasses just
+or (b) <em>no</em> library is necessary, because a state machine encompasses just
 a subset of everything the language is capable of already.
 </p>
 
 <p>
-It turns out that this <i>can</i> be the case in many functional languages that
+It turns out that this <em>can</em> be the case in many functional languages that
 support such features as algebraic datatypes and pattern matching natively, but
 certainly a small library can make implementing state machines easier and enforce
 some level of consistency in imperative languages like C++.
@@ -25,12 +25,14 @@ some level of consistency in imperative languages like C++.
 In practice, most explicit state machines are event-driven, in that they only change state
 or produce effects when some input changes (a timer expires, a button is pressed,
 etc). Such FSMs usually consist of three things:
-1. A finite list of possible states that machine can occupy.
-2. Variables, some of which are shared across states and some of which might be
-used by only one state.
-3. Actions to perform upon specific events, and criteria upon which to transition
-to a new state.
 </p>
+<ul class="list-single-lines">
+        <li>A finite list of possible states that machine can occupy.
+        <li>Variables, some of which are shared across states and some of which might be
+used by only one state.
+        <li>Actions to perform upon specific events, and criteria upon which to transition
+to a new state.
+</ul>
 
 <p>
 Some people break the third thing into two, but I tend to consider
@@ -66,7 +68,8 @@ for that.
 </p>
 
 <p>
-The most promising library I could find is the Boost MSM. This does support
+The most promising library I could find is the {{ offsite_link("http://www.boost.org/doc/libs/1_53_0/libs/msm/doc/HTML/index.html", "Boost MSM") }}.
+This does support
 state-specific variables, which aren't visible to other states, but it looks
 like they're still persisted across all states. So efficient usage of memory
 and RAII still aren't possible.
@@ -74,9 +77,9 @@ and RAII still aren't possible.
 
 {{ heading("Sum types") }}
 <p>
-C++17 offers <i>variant</i> types (also known as tagged unions or sum types).
+C++17 offers <em>variant</em> types (also known as tagged unions or sum types).
 A variant is much like the C union construct, but type safe.
-Like a union, it allows a variable to be assigned <i>different types</i> throughout its lifetime,
+Like a union, it allows a variable to be assigned <em>different types</em> throughout its lifetime,
 but it only ever has one value at a time.
 </p>
 
@@ -377,6 +380,23 @@ more reliable than manually doing that for each possible transition to/from
 the FetchingItem state (especially within the context of exceptions, if applicable).
 </p>
 
+{{ heading("In closing") }}
+<p>
+This loose framework should work for many scenarios. The library code, along with examples,
+is available {{ onsite_link(page.other["fsm.h"], "here") }}, and has also been extended to
+support callbacks whenever a state is entered or exited (for when RAII isn't
+applicable). If you want to make use of variants, but are stuck on a non-C++17
+codebase, take a look at the fantastic {{ offsite_link("https://github.com/mpark/variant/tree/single-header/", "mpark") }} library:
+a drop-in replacement for std::variant for C++11 and up.
+</p>
+
+<p>
+I wouldn't have considered using variants in C++ for this sort of purpose due to perceived ergonomic issues.
+Kalle Huttunen showed that it doesn't have to look that terrible in his post,
+{{ offsite_link("http://khuttun.github.io/2017/02/04/implementing-state-machines-with-std-variant.html", "Implementing State Machines with std::variant") }}.
+This work merely improves upon that by providing further ergonomic improvements
+and by avoiding copies when not transitioning states, thereby allowing RAII.
+</p>
 
 
 {% endblock %}

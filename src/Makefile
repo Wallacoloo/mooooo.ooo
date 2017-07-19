@@ -133,6 +133,10 @@ $(BUILD_DIR)/%.icc: pages/%.icc
 $(BUILD_DIR)/%.pdf: pages/%.pdf
 	$(MKDIR_CP)
 
+## Copy Headers
+$(BUILD_DIR)/%.h: pages/%.h
+	$(MKDIR_CP)
+
 # If the font already exists, just directly copy it
 $(BUILD_ROOT)/fonts/%: fonts/%
 	$(MKDIR_CP)
