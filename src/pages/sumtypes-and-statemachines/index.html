@@ -10,7 +10,7 @@ it's such a <em>broad</em> concept. State machines represent a complete model of
 computation, so it seems that either (a) supporting arbitrary state machines
 requires a library with similar complexity to a complete programming language
 or (b) <em>no</em> library is necessary, because a state machine encompasses just
-a subset of everything the language is capable of already.
+a subset of everything the language is already capable of.
 </p>
 
 <p>
@@ -27,10 +27,10 @@ or produce effects when some input changes (a timer expires, a button is pressed
 etc). Such FSMs usually consist of three things:
 </p>
 <ul class="list-single-lines">
-        <li>A finite list of possible states that machine can occupy.
-        <li>Variables, some of which are shared across states and some of which might be
+        <li> A finite list of possible states which the machine may occupy.
+        <li> Variables, some of which are shared across states and some of which might be
 used by only one state.
-        <li>Actions to perform upon specific events, and criteria upon which to transition
+        <li> Actions to perform upon specific events, and criteria upon which to transition
 to a new state.
 </ul>
 
@@ -42,7 +42,7 @@ little more versatility (which will be shown later).
 
 {{ heading("Which libraries are out there?") }}
 <p>
-Within the realm of C++, the majority of state machine libraries occupy one of
+Within the realm of C++, most state machine libraries occupy one of
 two categories.
 </p>
 
@@ -59,6 +59,25 @@ or alters some variables on the state machine and may yield a new state.
 <p>
 
 <p>
+With code instead of words, that's something like this:
+</p>
+
+{{ multiline_code("""
+struct StateMachine {
+    State activeState;
+    // declare variables that any states need below
+    // [...]
+    void onEvent(Event event) {
+        // Look up the handler for this state/event combo
+        auto handler = transitionTable[(int)activeState][(int)event];
+        // Let the handler perform actions & generate the new state.
+        activeState = handler(this);
+    }
+};
+""", "c++") }}
+
+
+<p>
 Among the downsides to this approach is the limitation that all states share all data.
 This is a bit unclean (it's like declaring all your variables public, everywhere),
 wastes memory and limits the extent to which the programmer can take advantage
@@ -68,10 +87,39 @@ for that.
 </p>
 
 <p>
+In the second category, each possible state is its own class, which derives
+from a common base class. The base class provides a virtual method for handling
+events, which returns a new state. There is no need for a transition table.
+</p>
+
+{{ multiline_code("""
+class State {
+    virtual unique_ptr<State> onEvent(Event event) = 0;
+};
+
+struct StateMachine {
+    unique_ptr<State> activeState;
+    void onEvent(Event event) {
+	activeState = activeState->onEvent(event);
+    }
+};
+""", "c++") }}
+
+<p>
+In this method, each state can implement its own local variables and RAII is possible.
+The downside is that it requires heap allocation and vtables + virtual dispatch,
+including the extra layer of indirection that comes from pointers.
+For many state machines, this leads to suboptimal performance and the heap requirement
+does limit things for some embedded applications (software that drives hardware
+peripherals tends to use a lot of state machines and perform operations
+from within interrupts, where memory allocations are risky or impossible).
+</p>
+
+<p>
 The most promising library I could find is the {{ offsite_link("http://www.boost.org/doc/libs/1_53_0/libs/msm/doc/HTML/index.html", "Boost MSM") }}.
-This does support
+This works without a heap and does support
 state-specific variables, which aren't visible to other states, but it looks
-like they're still persisted across all states. So efficient usage of memory
+like they're still <em>persisted</em> across all states. So efficient usage of memory
 and RAII still aren't possible.
 </p>
 
@@ -95,7 +143,7 @@ def halve(x):
     elif isinstance(x, str):
         return x[0:len(x)/2]
     else:
-        raise TypeError(\"Expected an int or str\")
+        raise TypeError('Expected an int or str')
 
 >>> halve(24)
 12
@@ -111,7 +159,7 @@ and we only know at runtime. Today, this can be implemented in C++ as follows:
 {{ multiline_code("""
 typedef union {
     int,
-    std::string,
+    std::string
 } IntStrUnion;
 
 struct IntStrSumType {
@@ -125,7 +173,7 @@ IntStrSumType halve(const IntStrSumType& x) {
     if (x.tag == 0) {
         return IntStrSumType(0, *((int*)&x) / 2);
     } else if (x.tag == 1) {
-         IntStrSumType(1,
+        return IntStrSumType(1,
             ((std::string*)&x)->substr(0, ((std::string*)&x)->length()/2));
     } else {
         DIE(\"Illegal type tag: expected 0 or 1\");
@@ -137,8 +185,8 @@ IntStrSumType halve(const IntStrSumType& x) {
 Note though that this method is incredibly error prone. Beyond the obvious,
 memory leaks are difficult to avoid with this approach.
 Because the compiler doesn't know
-the type of the value contained in a union, it can't call any constructors when the value
-is deleted. Thus, the caller will have to explicitly call the destructor of the appropriate type
+the type of the value contained in a union, it can't call any constructors when the union
+is destroyed. Thus, the caller will have to explicitly call the destructor of the appropriate type
 when done with the returned value.
 </p>
 
@@ -154,7 +202,7 @@ std::variant does, but it also introduces the concept of visitors.
 <p>
 Below is how the halve function could be implemented in C++17. Note the existence
 of the overloaded keyword: this lets us overload lambda functions in the same
-way that C++ lets one overload normal functions. The visit function does some
+way that C++ lets one overload named functions. The visit function does some
 magic behind the scenes so that the tag will be checked at runtime and then the
 appropriate overload of our lambda will be called. We'll make the syntax a bit
 friendlier later on, too.
@@ -187,8 +235,9 @@ of states that the machine may occupy, and at any given time it is in exactly on
 </p>
 
 <p>
-When an event occurs, we dispatch it to the appropriate handler based on the active state.
-This handler can perform some actions and then return a <em>new</em> state for the machine.
+<em>Logically</em>, event handling is identical to the previous examples:
+when an event occurs, we dispatch it to the appropriate handler based on the active state.
+This handler can perform some actions and return a new state for the machine.
 Here's how we might perform event dispatch for a vending machine.
 </p>
 
@@ -233,10 +282,10 @@ void dispatchEvent(ButtonPressed event) {
                 }
             },
             [&](FetchingItem&& state) {
-                return state;
+                return std::move(state);
             },
             [&](Errored&& state) {
-                return state;
+                return std::move(state);
             }
         },
         std::move(state)
@@ -266,12 +315,14 @@ state, and is unused in all other states.
 
 <p>
 The state machine as a whole <em>always</em> occupies 3 words of memory, it's
-just that the meaning of these words varies based on which state is active. The
-nice thing about this approach - versus one that doesn't use variants - is that
+just that the meaning of these words varies based on which state is active.
+When compared to an approach in which all state is always persisted and shared,
 we saved 2 words by folding funds, error and
 itemRow together. This is possible because they're state-local variables that never
 need to exist simultaneously. The memory savings can be impressive when
 it comes to large state machines with many variables.
+When compared to a virtual dispatch approach, we <em>still</em> saved one word
+by avoiding any vtable pointers.
 </p>
 
 {{ show_image(page.images["statevariant.svg"], caption="Possible memory layout of the State type.") }}
@@ -372,7 +423,7 @@ Surprisingly simple, though a bit dense.
 <p>
 One of the nice things about a variant-based approach to state machines is that
 we can use the Resource Acquisition Is Initialization (RAII) design pattern because
-the a state's destructor is always called when we transition into a new state.
+the state's destructor is always called when we transition into a new state.
 For example, if the FetchingItem state requires various hardware power supplies
 to be active but other states don't, we can bring up the power supplies in the
 constructor of FetchingItem, and turn them off in its destructor. This could be
