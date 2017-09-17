@@ -23,7 +23,7 @@
 <style>
 body
 {
-	background-color: #101010;
+	background-color: #ffffff;
 }
 html,body
 {
@@ -45,11 +45,19 @@ html,body
 	background-position: 50% 50%;
 	background-size: contain;
 }
+.info
+{
+	position: fixed;
+	bottom: 0px;
+	color: #BE1E79;
+	text-decoration: none;
+}
 </style>
 {% endblock %}
 
 {% block body %}
-{{ bg_image(page.images["index.gif"]) }}
-{{ bg_audio(page.audio["shadilay_loop.ogg"]) }}
+{{ bg_image(page.images["pinkie_box.gif"]) }}
+{{ bg_audio(page.audio["tarzan_and_jane_loop.ogg"]) }}
+<a class="info" href="https://youtu.be/eKOonpKfLZ8">Animation by Tridashie</a>
 {% endblock %}
 
