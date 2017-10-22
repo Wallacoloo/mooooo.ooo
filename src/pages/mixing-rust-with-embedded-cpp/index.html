@@ -1,0 +1,74 @@
+{# Recap the design week project myself and Matt Kline did. #}
+
+{% from 'base.html' import heading, offsite_link %}
+{{ page.set_title("Mixing Rust with embedded C++") }}
+
+{% extends 'blog_entry.html' %}
+<p>
+Every year, the company I work for sets aside one week for each of us to pursue
+self-directed research projects that we might not normally get the chance to do
+during usual product development. These often take the form of researching
+other ways we could have designed core components of our system, feasibility
+tests for extending a product into a related domain, or general workflow
+improvements. It's explicitly structured loosely so as to allow a lot of
+creativity (and it has real impacts in the mid-term; I highly recommend having
+this sort of thing be a normal part of your schedule).
+</p>
+
+<p>
+We're in the business of providing highly reliable handheld cable testers.
+The systems are generally composed of one microcontroller that coordinates
+all the hardware measurements in realtime and passes them off to a separate
+processor (this one running a full Linux environment) for post processing.
+</p>
+
+<p>
+Myself & a colleague spent our week studying the feasibility of using Rust
+on both of these processors, with my part focusing specifically on bare-metal
+Rust on that first MCU. I'll describe my process for integrating Rust into our
+existing embedded codebase, followed by a usability analysis.
+</p>
+
+{{ heading("Hello, world") }}
+<p>
+The first step is configuring cross compilation for the ARMv7 target. Historically,
+we've used crosstool-ng to compile a suitable gcc cross-compiler. It's not
+terribly difficult, but Rust makes cross compilation a <em>breeze</em>.
+In fact, Jorge Aparicio explains the steps {{ offsite_link("over here", "http://blog.japaric.io/quickstart/") }}, so I'm just going to list the commands without much more detail.
+</p>
+
+{# TODO: list the commands! #}
+
+{{ heading("Peripheral access") }}
+<p>
+Of course, the main role of this MCU is to interact with the other components on
+the board, and we do this via memory-mapped peripheral access. The 
+{{ inline_code("cortex-m4") }} crate only abstracts the processor <b>core</b>.
+To access the peripherals, we need a different set of abstractions. Usually
+these are provided by vendors as C libraries that ship thousands of macros for
+writing specific settings to specific registers. Initializing a serial port will
+look something like this:
+
+{{ multiline_code("""
+// Enable uart peripheral block
+RDC_SetPdapAccess(RDC, BOARD_DEBUG_UART_RDC_PDAP, 3 << (BOARD_DOMAIN_ID * 2), false, false);
+// Configure rx and tx pins
+IOMUXC_SW_MUX_CTL_PAD_UART2_RX_DATA = IOMUXC_SW_MUX_CTL_PAD_UART2_RX_DATA_MUX_MODE(0);
+IOMUXC_SW_MUX_CTL_PAD_UART2_TX_DATA = IOMUXC_SW_MUX_CTL_PAD_UART2_TX_DATA_MUX_MODE(0);
+// [...]
+// Enable the UART
+UART_UCR1_REG(BOARD_DEBUG_UART_BASEADDR) |= UART_UCR1_UARTEN_MASK;
+""", "c++") }}
+
+I omitted several tens of lines of setup for brevity, but the point is that all
+of this is just writing specific bits to specific registers. While this is easy
+to do, there's a <em>lot</em> of boilerplate in abstracting the register addresses,
+the bitfields they contain, and which bit combinations represent which setting.
+Because each processor maps its peripherals differently, these addresses and bit
+combinations vary for each one. Our microprocessor isn't mainstream enough to
+have its own rust crate that provides a similar API like the one above, but the
+good news is that the hardware vendors, along with the rust community, provide
+everything you need to derive your own API!
+
+{{ heading("SVD2Rust") }}
+{# TODO: explain the process of creating a rust library from the SVD #}
