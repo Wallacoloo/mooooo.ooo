@@ -107,12 +107,14 @@
 {% macro show_date(date) %}<span title="{{ date|detailed_date }}">{{ date|friendly_date }}</span>{% endmacro %}
 
 {% macro inline_code(code) %}
-<code class="inline-code">{{ code }}</code>
-{% endmacro %}
+<code class="inline-code">{{ code|e }}</code>{% endmacro %}
 
 {% macro multiline_code(code, filetype) %}
 <code class="multiline-code">{{ page.highlight_code(code, filetype, **kwargs) }}</code>
 {% endmacro %}
+
+{% macro path(p) %}
+{{ inline_code(p) }}{% endmacro %}
 
 {% if do_render or query_anchors or query_deps %}
 {% block document %}
