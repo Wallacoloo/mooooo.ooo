@@ -1,7 +1,8 @@
 #Build Requirements
 In order to build the website, the following tools/libraries are needed:
 ```
-# pacaur -S python python-jinja python-pillow python-dateutil python-requests python-joblib scour
+# pacman -S python python-jinja python-pillow python-dateutil python-requests python-pygments
+$ pacaur -S python-joblib scour
 ```
 
 If the `python-<x>` packages aren't available in your distribution, they may be
