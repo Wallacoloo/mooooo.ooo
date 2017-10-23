@@ -1,9 +1,323 @@
 {# Recap the design week project myself and Matt Kline did. #}
 
+{# OR: "Embedded Rust: where we're at".
+Just cover the weak points and what progress can be made.
+Cross compilation: check
+Trivial hello world: check
+Basic peripheral access: semi-check (svd2rust)
+Sane peripheral access: NO (but we have C bindings)
+  Mixing C with Rust: Check!
+No-std support: semi-check
+  The most heavily-used libraries support it, but most do not.
+  Serialization w/o std is a major pain-point.
+  But, serde-json (?) is working on it!
+#}
+
 {% from 'base.html' import heading, offsite_link %}
-{{ page.set_title("Mixing Rust with embedded C++") }}
+{{ page.set_title("Embedded Rust: where we are today") }}
 
 {% extends 'blog_entry.html' %}
+{% block entry_content %}
+
+<p>
+I recently had the opportunity to evaluate using bare metal Rust in future embedded
+products. I'm collecting my experiences here in the hope that (a) people
+seeking to pursue this path might understand the high-level process to follow
+easier and (b) to highlight the weakpoints and encourage discussions that
+might lead to improvement in these areas.
+</p>
+
+<p>
+Note: the first few sections of this article are distilled from Jorge Aparicio's
+Embedded Rust {{ offsite_link("http://blog.japaric.io/quickstart/", "tutorial") }}.
+Go read that if you want more detail.
+</p>
+
+{{ heading("Cross compilation") }}
+
+<p>
+Installing a cross compiler looks like this:
+</p>
+{{ multiline_code("""
+$ sudo pacman -S rustup arm-none-eabi-binutils
+$ rustup toolchain install nightly
+$ rustup default nightly
+$ rustup component add rust-src
+# Note: Xargo 0.3.9 can't build core; use 0.3.8 for now.
+$ cd / # See note below
+$ cargo install xargo --vers 0.3.8 -f
+$ echo 'PATH=\"$PATH:/home/<user>/.cargo/bin\"' >> ~/.bashrc
+""", "sh") }}
+
+<p>
+The {{ inline_code("cd /") }} line is important because if you're in a folder
+containing {{ path(".cargo/config") }}, cargo may use that configuration. When
+cross compiling our applications, we'll often modify this file in our toplevel
+binary crate so that {{ inline_code("cargo build") }} compiles for a specific
+target instead of the host. But that's <em>not</em> the behavior we want when
+installing xargo. I'm pretty sure that {{inline_code("cargo install")}} reading
+in the config from the current directory is a bug.
+</p>
+
+<p>
+Running the cross compiler looks like this (be sure to restart your shell so that
+xargo is on your PATH):
+</p>
+{{ multiline_code("""
+$ xargo build --target=thumbv7em-none-eabihf
+""", "sh") }}
+
+<p>
+If your crate is designed to be run only on that target, you can populate
+{{ path("&lt;directory_containing_Cargo.toml&gt;/.cargo/config") }} with the following:
+</p>
+{{ multiline_code("""
+[build]
+target = \"thumbv7em-none-eabihf\"
+""", "sh") }}
+
+<p>
+And now compiling the crate is as simple as {{ inline_code("xargo build") }}!
+</p>
+
+
+{{ heading("Hello, world") }}
+<p>
+Jorge shows us the bare minimum to create a new binary crate that can be run
+on the target:
+</p>
+
+{{ multiline_code("""
+$ cargo init --bin
+
+$ echo >> Cargo.toml <<EOF
+[dependencies.cortex-m-rt]
+version = \"0.3\"
+features = [\"abort-on-panic\"]
+EOF
+
+$ echo >> src/main.rs <<EOF
+#![no_std]
+// cortex_m_rt will insert a shim to get us into `main`.
+extern crate cortex_m_rt;
+fn main() {}
+EOF
+
+$ echo >> memory.x <<EOF
+MEMORY
+{
+  /* NOTE K = KiBi = 1024 bytes */
+  FLASH : ORIGIN = 0x08000000, LENGTH = 256K
+  RAM : ORIGIN = 0x20000000, LENGTH = 40K
+}
+
+/* NOTE Do NOT modify `_stack_start` unless you know what you are doing */
+_stack_start = ORIGIN(RAM) + LENGTH(RAM);
+EOF
+""", "sh") }}
+
+<p>
+Realistically, you'll want to also use the cortex-m crate and insert
+{{ inline_code("cortex_m::asm::bkpt()") }} inside main and use a debugger
+to know that you actually got there.
+</p>
+
+<p>
+This process can't be simplified much; if your microcontroller supports ELF
+loading (e.g. through uboot), then it might be possible to avoid defining the
+memory regions here and let uboot perform relocation. But if you're running
+directly out of flash, I don't see a way to avoid the custom linker script.
+Either way, you'll still want the cortex-m-rt crate in order to configure the
+interrupt vector table later.
+</p>
+
+{{ heading("Peripheral access") }}
+<p>
+The {{inline_code("cortex-m")}} crate provides access to memory-mapped
+components of the ARM core: the Memory Protection Unit, Nested Vector
+Interrupt Controller, etc. But vendor-provided peripherals like UARTs and
+GPIOs need to be defined separately and unless you're using a very common
+MCU, there's probably no crate for your specific configuration of peripherals.
+</p>
+
+<p>
+Fortunately, ARM chip vendors provide System View Desciption (SVD) files. These
+are machine-readable files (based on XML) that enumerate the memory-mapped
+registers corresponding to each peripheral, specifying where each register resides
+in memory, which bits comprise which fields, access policies (read-only, read-write,
+clear-on-read, etc) and even which bitfield assignments are valid.
+</p>
+
+<p>
+Usually, the vendor will also generate a set of C macro functions from the SVD
+to provide convenient usage. Then the programmer can write something like this,
+where each line corresponds to one register write:
+</p>
+
+{{ multiline_code("""
+// Enable uart peripheral block
+RDC_SetPdapAccess(RDC, BOARD_DEBUG_UART_RDC_PDAP, 3 << (BOARD_DOMAIN_ID * 2), false, false);
+// Configure rx and tx pins
+IOMUXC_SW_MUX_CTL_PAD_UART2_RX_DATA = IOMUXC_SW_MUX_CTL_PAD_UART2_RX_DATA_MUX_MODE(0);
+IOMUXC_SW_MUX_CTL_PAD_UART2_TX_DATA = IOMUXC_SW_MUX_CTL_PAD_UART2_TX_DATA_MUX_MODE(0);
+// [...]
+// Enable the UART
+UART_UCR1_REG(BOARD_DEBUG_UART_BASEADDR) |= UART_UCR1_UARTEN_MASK;
+""", "c++") }}
+
+<p>
+We can do the same, but in Rust! Enter {{ offsite_link("https://docs.rs/svd2rust", "SVD2Rust") }}.
+First, you'll want to locate the SVD file for your <em>specific</em> MCU. It might
+require some hunting; I was able to locate Keil's
+{{ offsite_link("http://www.keil.com/dd2/nxp/mcimx7d5/", "Device Family Pack") }}
+for the product family to which my
+device belongs. After downloading {{path("Keil.iMX7D_DFP.1.7.1.pack")}}, I renamed it to
+{{path("Keil.iMX7D_DFP.1.7.1.zip")}}, extracted it as a zip archive, and then located my MCU's
+.svd file inside of the {{path("SVD/")}} folder within.
+</p>
+
+<p>
+Then, just pipe this file through SVD2Rust:
+</p>
+
+{{ multiline_code("""
+$ cargo install rustfmt svd2rust
+$ svd2rust -i MCIMX7D5_M4.svd --target cortex-m | rustfmt > mcimx7d5_m4.rs
+""", "sh") }}
+
+<p>
+Now you can either wrap the output file in its own crate (like
+{{offsite_link("https://github.com/Wallacoloo/mcimx7d5_m4", "this")}},
+or just place it under {{path("src/")}} if you're feeling lazy.
+</p>
+
+<p>
+So, let's initialize a UART!
+</p>
+
+{{ multiline_code("""
+extern crate mcimx7d5_m4; // interface generated from the SVD
+use cortex_m::interrupt;
+use mcimx7d5_m4 as m4;
+// Perform initialization with IRQs disabled to avoid race conditions
+interrupt::free(|cs| {
+    let rdc = m4::RDC.borrow(cs);
+    
+    // Move M4 core to specific RDC domain:
+    // In C: RDC_SetDomainID(RDC, rdcMdaM4, BOARD_DOMAIN_ID, false);
+    rdc.mda1.write(|w| {
+        w.did().did_1()
+    });
+
+    // Set debug uart for M4 core domain access only
+    // In C: RDC_SetPdapAccess(RDC, BOARD_DEBUG_UART_RDC_PDAP, 3 << (BOARD_DOMAIN_ID * 2), false, false);
+    rdc.pdap105.write(|w| {
+        // Allow read/write access:
+        w.d1w().d1w_1()
+         .d1r().d1r_1()
+        // No semaphore
+         .sreq().sreq_0()
+        // No lock
+         .lck().lck_0()
+    });
+
+    let ccm = m4::CCM.borrow(cs);
+
+    // Select board debug clock derived from OSC clock(24M)
+    // In C: CCM_UpdateRoot(CCM, BOARD_DEBUG_UART_CCM_ROOT, ccmRootmuxUartOsc24m, 0, 0);
+    ccm.target_root96_tog.modify(|_r, w| {
+        // UART Clock from OSC 24M
+        unsafe { w.mux().bits(0) }
+        // No pre/post division (i.e. divide by 1)
+        .pre_podf().pre_podf_0()
+        .post_podf().post_podf_0()
+    });
+
+    // Enable debug uart clock
+    // In C: CCM_EnableRoot(CCM, BOARD_DEBUG_UART_CCM_ROOT);
+    ccm.target_root96_set.write(|w| {
+        w.enable().enable_1()
+    });
+
+    // M4 stop will cause A7 UART to lose functionality
+    // So we need UART clock all the time
+    // In C: CCM_ControlGate(CCM, BOARD_DEBUG_UART_CCM_CCGR, ccmClockNeededAll);
+    ccm.ccgr149.write(|w| {
+        // domain 0 clocks needed all the time
+        w.setting0().setting0_3()
+        // domain 1 clocks needed all the time
+         .setting1().setting1_3()
+        // Preserve the other clocks too
+         .setting2().setting2_3()
+         .setting3().setting3_3()
+    });
+
+    // [84 more lines omitted]
+});
+""", "rust") }}
+
+<p>
+Two things that are immediately apparent: (1) the C code is more concise and
+(2) the Rust code requires <em>more</em> hardcoded values. For example, the
+Clock Control Module (CCM) is used to control which peripherals should be clocked
+and when. It has one register for each peripheral, but the fields within each
+register are identical.
+In C, we have a function {{inline_code("CCM_ControlGate")}} that can access the
+clock registers for a given peripheral <em>generically</em> whereas in Rust we
+have to hardcode {{inline_code("ccm.ccgr149")}}. If we decide we want to
+use the secondary UART instead of the primary one, we have to update the code in
+a whole bunch of places, but furthermore this makes it more difficult to create
+abstractions above the individual register writes.
+</p>
+
+<p>
+To make the point, these 150 or so lines of C code are actually abstracted by a
+different layer shipped by NXP. With this secondary layer, configuration is as follows:
+</p>
+{{multiline_code("""
+// Setup UART init structure.
+uart_init_config_t initConfig = {
+    .baudRate   = 115200u,
+    .wordLength = uartWordLength8Bits,
+    .stopBitNum = uartStopBitNumOne,
+    .parity     = uartParityDisable,
+    .direction  = uartDirectionTxRx
+};
+
+// Get current module clock frequency.
+initConfig.clockRate  = get_uart_clock_freq(uart_base);
+
+/* Initialize UART baud rate, bit count, parity, stop bit and direction. */
+UART_Init(uart_base, &initConfig);
+
+/* Set UART build-in hardware FIFO Watermark. */
+UART_SetTxFifoWatermark(uart_base, 16);
+UART_SetRxFifoWatermark(uart_base, 1);
+
+/* Finally, enable the UART module */
+UART_Enable(uart_base);
+""", "c")}}
+
+<p>
+Rust largely lacks this abstraction, unless you're on a very mainstream MCU like
+the MSP430 or the STM32F03.
+</p>
+
+{{ heading("Mixing Rust with C") }}
+<p>
+Vendors already ship C abstractions above that extractable from SVDs. As a
+stop-gap, we can make use of those while we wait for the crate ecosystem to
+mature.
+</p>
+
+
+
+{# NOTE: for freertos-sys: install arm-none-eabi-gcc clang #}
+
+{% endblock %}
+
+
+
 <p>
 Every year, the company I work for sets aside one week for each of us to pursue
 self-directed research projects that we might not normally get the chance to do
@@ -23,7 +337,7 @@ processor (this one running a full Linux environment) for post processing.
 </p>
 
 <p>
-Myself & a colleague spent our week studying the feasibility of using Rust
+Myself and a colleague spent our week studying the feasibility of using Rust
 on both of these processors, with my part focusing specifically on bare-metal
 Rust on that first MCU. I'll describe my process for integrating Rust into our
 existing embedded codebase, followed by a usability analysis.
