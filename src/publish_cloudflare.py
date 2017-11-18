@@ -17,6 +17,9 @@
 ##### Then ipfs.yourdomain.com will serve the IPFS object indicated above
 ##### ipfs.yourdomain.com/XYZ will serve the IPFS object: QmRpCcmoMWVEa8mYn1bczeUDxS2QUcsysodPUBuMkxfzPN/XYZ
 
+# Note: Cloudflare API docs: https://api.cloudflare.com/
+
+
 import json, requests, sys
 
 # Cloudflare Name for the DNS TXT entries that we wish to link to IPFS, plus the root address relative to the ipfs folder we publish.
@@ -30,6 +33,12 @@ dnslink_subdomains = {
     },
     "shadilay.party": {
         "shadilay.party": "/shadilay-party"
+    },
+    "twi.dance": {
+        "twi.dance": "/twi-dance"
+    },
+    "colin.dance": {
+        "colin.dance": "/colin-dance"
     }
 }
 
@@ -56,7 +65,7 @@ def get_zone_id(api_key, site_name):
 def get_dns_txt_info(api_key, zone_id, dns_name):
     """Return the CloudFlare id of the DNS TXT entry with name=ipfs for the given zone_id"""
     r = api_call(api_key, "/zones/%s/dns_records" %zone_id, params={'type': 'TXT', 'name': dns_name})
-    return r["result"][0]
+    return r["result"][0] # TODO: a subdomain may have multiple TXT records!
 
 def update_txt_record(api_key, zone_id, record_data):
     """Update the TXT dns record to direct to the given ipfs object"""
