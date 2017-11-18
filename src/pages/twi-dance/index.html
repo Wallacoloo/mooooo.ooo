@@ -1,0 +1,23 @@
+{% from 'fullscreen_graphics.html' import bg_video, bg_audio %}
+{{ page.set_desc("Twilight likes to dance") }}
+{{ page.set_title("Twi-dance") }}
+
+{% extends 'fullscreen_graphics.html' %}
+
+{% block extra_style %}
+body
+{
+	background-color: #000000;
+}
+
+{% endblock %}
+
+{% block page_content %}
+{{ bg_video(page.images["jtanVLvpLZg.webm"]) }}
+{% endblock %}
+
+{% block footer %}
+<a href="https://youtu.be/jtanVLvpLZg">Video by KirbyStompFilms</a>;
+<a href="https://youtu.be/tb9OpAGGZ_w">Music by Archie</a>
+{% endblock %}
+
