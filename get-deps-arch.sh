@@ -5,4 +5,4 @@ pacaur -S jpgcrush python-joblib webify woff2-git
 
 # TODO: drop npm dependency by trying a different tex2svg script
 sudo pacman -S npm
-sudo npm install -g tex-equation-to-svg
+cd ../ && npm install tex-equation-to-svg
