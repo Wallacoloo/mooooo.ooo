@@ -1,63 +1,22 @@
+{% from 'fullscreen_graphics.html' import show_bg_image, bg_audio %}
 {{ page.set_desc("Pinkie Pie likes to party") }}
 {{ page.set_title("Pinkie.Party()") }}
 
-{% macro bg_image(image) %}
-{{ add_rtdep(image) }}
-<div class="bg-image" style="background-image: url({{ image.path|to_rel_path }});"></div>
-{% endmacro %}
+{% extends 'fullscreen_graphics.html' %}
 
-{% macro bg_audio(audio) %}
-{{ add_rtdep(audio) }}
-<audio src="{{ audio.path|to_rel_path }}" autoplay="autoplay" loop="loop">
-</audio>
-{% endmacro %}
-
-
-{% extends 'blank_html.html' %}
-{% block head %}
-<!-- SEE ALSO: http://shadilay.party -->
-<meta name="viewport" content="width=device-width initial-scale=1" />
-<meta name="description" content="{{ page.desc }}" />
-<meta name="author" content="Pinkie Pie">
-<title>{{ page.title }}</title>
-<style>
+{% block extra_style %}
 body
 {
 	background-color: #ffffff;
 }
-html,body
-{
-	width: 100%;
-	height: 100%;
-	max-width: 100%;
-	max-height: 100%;
-}
-*
-{
-	margin: 0px;
-	padding: 0px;
-	border: 0px;
-}
-.bg-image
-{
-	height: 100%;
-	background-repeat: no-repeat;
-	background-position: 50% 50%;
-	background-size: contain;
-}
-.info
-{
-	position: fixed;
-	bottom: 0px;
-	color: #BE1E79;
-	text-decoration: none;
-}
-</style>
 {% endblock %}
 
-{% block body %}
-{{ bg_image(page.images["pinkie_box.gif"]) }}
+{% block page_content %}
+{{ show_bg_image(page.images["pinkie_box.gif"]) }}
 {{ bg_audio(page.audio["tarzan_and_jane_loop.ogg"]) }}
+{% endblock %}
+
+{% block footer %}
 <a class="info" href="https://youtu.be/eKOonpKfLZ8">Animation by Tridashie</a>
 {% endblock %}
 
