@@ -38,7 +38,7 @@ all: $(BUILD_DIR)/index.html
 -include $(BUILD_ROOT)/all.depincludes
 
 $(BUILD_ROOT)/all.depincludes: $(BUILD_ROOT)/config.json
-	./make.py $@
+	PATH=${PATH}:${PWD}/../node_modules/mathjax-node/bin ./make.py $@
 
 
 clean: ## Removes the FINAL outputs of the build, but not cached versions stored elsewhere or dependency info
