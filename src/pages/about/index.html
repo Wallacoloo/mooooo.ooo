@@ -65,11 +65,13 @@ The exceptions to this include:
 <ul class="list-single-lines">
 		{% for font in config.fonts.values()|unique|sort %}
 		{% set fontinfo=config.fontinfo[font|lower|replace(" ", "")] %}
+		{% if fontinfo.license %}
 			<li>
 					<a href="{{fontinfo.url}}">{{ fontinfo.name }}</a>
 					by {{ fontinfo.author }} (license: <a href="{{ config.licenses[fontinfo.license].url }}">
 							{{ fontinfo.license }}</a>).
 			</li>
+		{% endif %}
 		{% endfor %}
 </ul>
 

@@ -119,6 +119,7 @@
 	{{ incl_font_sources("Lora-BoldItalic") }}
 }
 
+{#
 /* Cardo font:
  * source: http://www.fontsquirrel.com/fonts/Cardo
  *       : https://www.google.com/fonts/specimen/Cardo
@@ -130,7 +131,7 @@
     font-family: 'Cardo';
     font-style: normal;
     font-weight: 400;
-	src: local('Lora'), local('Cardo-Regular');
+	src: local('Cardo Regular'), local('Cardo-Regular');
 	{{ incl_font_sources("Cardo-Regular") }}
 }
 
@@ -150,6 +151,46 @@
     font-weight: 400;
 	src: local('Cardo Italic'), local('Cardo-Italic');
 	{{ incl_font_sources("Cardo-Italic") }}
+}
+#}
+
+/* Gentium Basic font:
+ * source: https://www.fontsquirrel.com/fonts/Gentium-Basic
+ *       : https://fonts.google.com/specimen/Gentium+Basic
+ * License: SIL Open Font License 1.1
+ * Author: SIL International
+ */
+@font-face
+{
+    font-family: 'Gentium Basic';
+    font-style: normal;
+    font-weight: 400;
+	src: local('Gentium Basic'), local('Gentium-Basic');
+	{{ incl_font_sources("GenBasR") }}
+}
+@font-face
+{
+    font-family: 'Gentium Basic';
+    font-style: normal;
+    font-weight: 700;
+	src: local('Gentium Basic Bold'), local('Gentium-Basic-Bold');
+	{{ incl_font_sources("GenBasB") }}
+}
+@font-face
+{
+    font-family: 'Gentium Basic';
+    font-style: italic;
+    font-weight: 400;
+	src: local('Gentium Basic Italic'), local('Gentium-Basic-Italic');
+	{{ incl_font_sources("GenBasI") }}
+}
+@font-face
+{
+    font-family: 'Gentium Basic';
+    font-style: italic;
+    font-weight: 700;
+	src: local('Gentium Basic Bold Italic'), local('Gentium-Basic-Bold-Italic');
+	{{ incl_font_sources("GenBasBI") }}
 }
 
 {{ include_inline(pages["css/font-awesome.css"]) }}

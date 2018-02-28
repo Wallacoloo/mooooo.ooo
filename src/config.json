@@ -4,7 +4,7 @@
 		{
 				"contact_email": "colin@mooooo.ooo",
 				"github_url": "https://github.com/wallacoloo",
-				"twitter_url": "https://twitter.com/wallacoloo"
+				"twitter_url": "https://twitter.com/Ponkadoodle"
 		},
 		"ipfs":
 		{
@@ -25,12 +25,23 @@
 		"fonts":
 		{
 				"title": "Lora",
-				"body": "Quicksand",
+				"body": "Gentium Basic",
 				"header": "Lora",
+				"subheading": "Gentium Basic",
+				"header_fallback": "Arial",
+				"body_fallback": "serif",
 				"icons": "FontAwesome"
 		},
 		"fontinfo":
 		{
+				"serif":
+				{
+						"license": null
+				},
+				"arial":
+				{
+						"license": null
+				},
 				"cardo":
 				{
 						"name": "Cardo",
@@ -58,6 +69,13 @@
                         "author": "Olga Karpushina",
                         "license": "SIL Open Font License",
                         "url": "https://github.com/cyrealtype/Lora-Cyrillic"
+                },
+                "gentiumbasic":
+                {
+						"name": "Gentium Basic",
+                        "author": "Victor Gaultney",
+                        "license": "SIL Open Font License",
+                        "url": "https://software.sil.org/gentium/"
                 }
 		},
 		"licenses":

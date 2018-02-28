@@ -20,6 +20,7 @@
 .page-content p, .page-content ul
 {
 		line-height: 1.5em;
+		font-size: 14pt;
 }
 
 /* A vertically-spaced list wherein each item is intended to fit on one line */

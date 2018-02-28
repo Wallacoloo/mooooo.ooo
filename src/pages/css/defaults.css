@@ -14,16 +14,18 @@ body, code, h1, h2, h3, h4, h5, h6, p, pre, ul
 html, body
 {
 		height: 100%;
+		background-color: #fff;
 }
 
 body
 {
-		font-family: "{{ config.fonts.body }}","Helvetica Neue",Helvetica,Arial,sans-serif;
+		font-family: "{{ config.fonts.body }}","{{ config.fonts.body_fallback }}";
+		color: #222;
 }
 
 h1, h2
 {
-	font-family: "{{ config.fonts.title }}","Helvetica Neue",Arial,sans-serif;
+	font-family: "{{ config.fonts.title }}","{{ config.fonts.header_fallback }}";
 	font-weight: bold;
 }
 

@@ -6,7 +6,10 @@
 
 .blog-pubdate
 {
-		opacity: 0.55;
+	font-family: "{{ config.fonts.subheading }}","{{ config.fonts.title }}","{{ config.fonts.header_fallback }}";
+	font-style: italic;
+	font-weight: bold;
+	opacity: 0.55;
 }
 
 /* Templated info displayed at the bottom of the blog, e.g. link to source */
