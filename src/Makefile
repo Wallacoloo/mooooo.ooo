@@ -34,14 +34,13 @@ endef
 
 export PATH:=${PATH}:${PWD}/../node_modules/mathjax-node/bin
 
-all: $(BUILD_INTERMEDIATE)/index.html.deps
-
--include $(BUILD_INTERMEDIATE)/index.html.deps
+all:
+include $(BUILD_INTERMEDIATE)/index.html.deps
 all: $(RT_DEPS$(BUILD_OUTPUT)/index.html)
 
 
 clean: ## Removes the FINAL outputs of the build, but not cached versions stored elsewhere or dependency info
-	rm -rf $(BUILD_OUTPUT)
+	rm -rf $(BUILD_OUTPUT) $(BUILD_INTERMEDIATE)
 
 clean-all: ## Remove ALL output files and temporaries, including dependency info
 	rm -rf $(BUILD_ROOT)
@@ -95,7 +94,7 @@ $(BUILD_INTERMEDIATE)/%.png.pageinfo: $(BUILD_INTERMEDIATE)/%.png ## Extract inf
 	@echo "Building $@ from $^"
 	./build_page.py $< $@
 
-$(BUILD_INTERMEDIATE)/%.pageinfo: pages/% $(CONFIG_JSON)
+$(BUILD_INTERMEDIATE)/%.jinja.html.pageinfo: pages/%.jinja.html $(CONFIG_JSON)
 	@mkdir -p $(dir $@)
 	./extract_git.py $< $@
 

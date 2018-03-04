@@ -3,13 +3,11 @@
 {% macro heading(text, link=True, link_to=None, show_icon=True, sublevel=0, class="") %}
 {# sublevel=0 for an ordinary header, 1 for a sub-heading, 2 for a sub-sub-heading, etc #}
 <h{{ sublevel+1 }} class="anchored-header {{ class }}" id="{{ text|into_tag }}">
-{{ add_anchor(text|into_tag) }}
+{% do page_info.anchors.add(text|into_tag) %}
 		{% if link %}
 			{% if link_to != None %}{# Link to other page #}
-				{{ add_rtdep(link_to) }}
-				{% if do_render %}
-					<a href="{{ link_to.path|to_rel_path }}">
-				{% endif %}
+				{% do page_info.rtdeps.add(link_to) %}
+				<a href="{{ link_to|to_rel_path }}">
 			{% else %}{# Link to self #}
 				<a href="{{ "#" + text|into_tag }}">
 			{% endif %}
@@ -29,16 +27,15 @@
 <span class="image-container">
 <span class="centered">
 {% for image_ in varargs %}
-{% set image_link=get_image(image_) %}
-{% set image_show=image_link.rasterized %}
-{{ add_srcdep(image_show) }}
-{{ add_rtdep(image_show) }}
-{{ add_rtdep(image_link) }}
-{% if do_render %}
-		<a href="{{ image_link.path|to_rel_path }}" class="image-link">
-				<img src="{{ image_show.path|to_rel_path }}" width="{{ image_show.size.0 }}px" height="{{ image_show.size.1 }}px" class="theater-image columns-{{ kwargs.get("columns", 1) }}"/>
-		</a>
-{% endif %}
+{% set image_link = image_.intermediate_path %}
+{% set image_show = image_.intermediate_path %}
+{% do page_info.rtdeps.add(image_show) %}
+{% do page_info.rtdeps.add(image_link) %}
+	<a href="{{ image_link|to_rel_path }}" class="image-link">
+			{# TODO
+			<img src="{{ image_show|to_rel_path }}" width="{{ image_.size.0 }}px" height="{{ image_.size.1 }}px" class="theater-image columns-{{ kwargs.get("columns", 1) }}"/>
+			#}
+	</a>
 {% endfor %}
 {% if kwargs.get("caption") %}
 	<span class="caption">
@@ -50,14 +47,12 @@
 {% endmacro %}
 
 {% macro show_video(video, caption="") %}
-{{ add_srcdep(video) }}
-{{ add_rtdep(video) }}
+{% do page_info.srcdeps.add(video) %}
+{% do page_info.rtdeps.add(video) %}
 <span class="image-container">
 <span class="centered">
-{% if do_render %}
-		<video src="{{ video.path|to_rel_path }}" width="{{ video.size.0 }}" height="{{ video.size.1 }}" controls class="theater-video">
-		</video>
-{% endif %}
+	<video src="{{ video.path|to_rel_path }}" width="{{ video.size.0 }}" height="{{ video.size.1 }}" controls class="theater-video">
+	</video>
 {% if caption %}
 	<span class="caption">
 		<i>{{ caption }}</i>
@@ -68,7 +63,7 @@
 {% endmacro %}
 
 {% macro audio(audio, autoplay=False, loop=False, controls=False) %}
-{{ add_rtdep(audio) }}
+{% do page_info.rtdeps.add(audio) %}
 <audio src="{{ audio.path|to_rel_path }}"
 	{% if loop %} loop="loop" {% endif %}
 	{% if autoplay %} autoplay="autoplay" {% endif %}
@@ -78,10 +73,8 @@
 {% endmacro %}
 
 {% macro include_css(css_page) %}
-{{ add_rtdep(css_page) }}
-{% if do_render %}
-	<link rel="stylesheet" href="{{ css_page.path|to_rel_path }}">
-{% endif %}
+{% do page_info.rtdeps.add(css_page) %}
+<link rel="stylesheet" href="{{ css_page.path|to_rel_path }}">
 {% endmacro %}
 
 {% macro offsite_link(path, label="", class="") %}
@@ -91,7 +84,7 @@
 
 {% macro onsite_link(destpage, label="", anchor="", class="") %}
 {# Use whenever a-href'ing to another page OR in-page heading #}
-{{ add_rtdep(destpage) }}
+{% do page_info.rtdeps.add(destpage) %}
 <a class="{{ class }}" href="{{ destpage.anchor_path(anchor, validate=validate_anchors)|to_rel_path }}">{{ label }}</a>{% endmacro %}
 
 {% macro mailto_link(address, label="", class="", subject="", body="") %}
@@ -110,7 +103,7 @@
 <code class="inline-code">{{ code|e }}</code>{% endmacro %}
 
 {% macro multiline_code(code, filetype) %}
-<code class="multiline-code">{{ page.highlight_code(code, filetype, **kwargs) }}</code>
+<code class="multiline-code">{{ page_info.highlight_code(code, filetype, **kwargs) }}</code>
 {% endmacro %}
 
 {% macro path(p) %}

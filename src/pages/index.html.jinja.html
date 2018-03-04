@@ -6,19 +6,21 @@
 {# Load all build-time dependencies #}
 {#
 {% set articles = [pages['fimfic-best-pony/index.html']] %}
-{% set articles = [get_page('fimfic-best-pony/index.html')] %}
-#}
 {% set articles = [] %}
+#}
+{% set articles = [get_page('fimfic-best-pony/index.html')] %}
 
 
 
 {% block page_content %}
 
 {% for entry in articles|sort(attribute="pub_date", reverse=True) %}
-{{ heading(entry.title, link_to=entry, show_icon=False, sublevel=1, class="title") }}
+{{ heading(entry.title, link_to=entry.build_path, show_icon=False, sublevel=1, class="title") }}
+{% if entry.pub_date %}
 <div class="blog-pubdate">
 {{ show_date(entry.pub_date) }}
 </div>
+{% endif %}
 {% endfor %}
 {% endblock %}
 

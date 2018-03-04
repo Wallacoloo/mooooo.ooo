@@ -1,11 +1,35 @@
-{% from 'base.html' import heading %}
-{{ page.set_title("Best pony, as told by Fimfiction") }}
-{{ page.offsite_comments("https://www.reddit.com/r/mylittlepony/comments/4tp1co/best_pony_as_told_by_fimfiction/") }}
-
+{% from 'base.html' import heading, offsite_link %}
+{% from 'blog_entry.html' import show_image %}
 {% extends 'blog_entry.html' %}
+
+{% set page_info.title = "Best pony, as told by Fimfiction" %}
+{{ page_info.comments.update(reddit="https://www.reddit.com/r/mylittlepony/comments/4tp1co/best_pony_as_told_by_fimfiction/") }}
+
+{% set rating_vs_char = get_image("rating_vs_char.png") %}
+{% set rating_vs_char_all = get_image("rating_vs_char_all.png") %}
+{% set character_mentions_in_a_story = get_image("character_mentions_in_a_story.png") %}
+{% set char_pairs = get_image("char_pairs.png") %}
+{% set character_mentions_in_a_sentence = get_image("character_mentions_in_a_sentence.png") %}
+{% set rating_vs_date_linear = get_image("rating_vs_date_linear.png") %}
+{% set rating_vs_length_linear = get_image("rating_vs_length_linear.png") %}
+{% set rating_vs_length = get_image("rating_vs_length.png") %}
+{% set story_lengths = get_image("story_lengths.png") %}
+{% set char_senti_by_month_smooth = get_image("char_senti_by_month_smooth.png") %}
+{% set text_senti_by_month_smooth = get_image("text_senti_by_month_smooth.png") %}
+{% set text_senti_by_storyarc = get_image("text_senti_by_storyarc.png") %}
+{% set text_senti_by_storyarc_binned = get_image("text_senti_by_storyarc_binned.png") %}
+{% set most_common_titles = get_image("most_common_titles.png") %}
+{% set story_status_distr = get_image("story_status_distr.png") %}
+{% set most_common_words_aj = get_image("most_common_words_aj.png") %}
+{% set most_common_words_fs = get_image("most_common_words_fs.png") %}
+{% set most_common_words_pp = get_image("most_common_words_pp.png") %}
+{% set most_common_words_ra = get_image("most_common_words_ra.png") %}
+{% set most_common_words_rd = get_image("most_common_words_rd.png") %}
+{% set most_common_words_ts = get_image("most_common_words_ts.png") %}
+
+
+
 {% block entry_content %}
-
-
 {{ heading("Background") }}
 
 <p>
@@ -33,7 +57,7 @@ So, why not start there? Who, <em>really</em>, is best pony?
 
 {{ heading("Best pony by story votes") }}
 
-{{ show_image(page.images["rating_vs_char.png"], caption="The average rating of all stories on Fimfiction, when filtered based on character appearance. Since Fimfiction doesn't expose a one-dimensional rating field, we
+{{ show_image(rating_vs_char, caption="The average rating of all stories on Fimfiction, when filtered based on character appearance. Since Fimfiction doesn't expose a one-dimensional rating field, we
 rank stories based on (likes-dislikes)/(likes+dislikes).") }}
 
 <p>
@@ -50,7 +74,7 @@ By the way, here's the same figure extended for more characters. If you
 want to read a good story, pick one about Nightmare Moon!
 </p>
 
-{{ show_image(page.images["rating_vs_char_all.png"], caption="Extended
+{{ show_image(rating_vs_char_all, caption="Extended
 character ratings. Each character has at least 4000 stories, except for
 Babs Seed (1436) and Flurry Heart (173).") }}
 
@@ -67,7 +91,7 @@ ill-defined, which is what makes it so much fun in the first place.
 So, here we go.
 </p>
 
-{{ show_image(page.images["character_mentions_in_a_story.png"],
+{{ show_image(character_mentions_in_a_story,
 caption="Hah! Take that, Applejack. Of the mane 6, AJ appears in the fewest stories.") }}
 
 <p>
@@ -84,7 +108,7 @@ Using the same method, we can also infer something about the fandom's
 favorite ship. Spoiler, it's Twilight Sparkle/Rainbow Dash.
 </p>
 
-{{ show_image(page.images["char_pairs.png"]) }}
+{{ show_image(char_pairs) }}
 
 <p>
 If we go back to the frequency of character appearances, there's something
@@ -98,14 +122,14 @@ fewer pronouns or non-name titles (e.g. "the librarian")
 than with other characters.
 </p>
 
-{{ show_image(page.images["character_mentions_in_a_sentence.png"]) }}
+{{ show_image(character_mentions_in_a_sentence) }}
 
 <p>
 Next up, how has the quality (or expectations) of fandom writing
 changed with time?
 </p>
 
-{{ show_image(page.images["rating_vs_date_linear.png"], caption="Because
+{{ show_image(rating_vs_date_linear, caption="Because
 Fimfiction allows publishing chapters individually and at different dates,
 and the ratings apply to entire stories (not chapters), I took publication
 date of a story to be the average publication date of all its chapters."
@@ -133,7 +157,7 @@ have higher ratings. Note: stories with 0 votes (likes and dislikes) were
 removed from the dataset for all these plots that mention rating.
 </p>
 
-{{ show_image(page.images["rating_vs_length_linear.png"],
+{{ show_image(rating_vs_length_linear,
 caption="Story length seems
 to be a better predictor of rating than publication date."
 )}}
@@ -148,9 +172,9 @@ strong horizontal lines in the plot below are due to quantization - the number
 of different possible ratings for stories with few votes is small.
 <p>
 
-{{ show_image(page.images["rating_vs_length.png"]) }}
+{{ show_image(rating_vs_length) }}
 
-{{ show_image(page.images["story_lengths.png"], caption="Number of stories
+{{ show_image(story_lengths, caption="Number of stories
 published, grouped by word count. The histogram bins are logarithmically
 sized.") }}
 
@@ -193,7 +217,7 @@ she likes to have. Rarity would probably be the lowest, as drama doesn't tend to
 and she is known to frequently exaggerate the "worst possible things". Surprisingly, this isn't quite the case:
 </p>
 
-{{ show_image(page.images["char_senti_by_month_smooth.png"], caption="Average character sentiment
+{{ show_image(char_senti_by_month_smooth, caption="Average character sentiment
 across all stories on Fimfiction plotted against the month in which each story was published.") }}
 
 <p>
@@ -213,19 +237,19 @@ sentence within a story (not just the ones in which a specific character is ment
 support the trollfic idea, since topics like murder would absolutely bring down the sentiment of a text.
 </p>
 
-{{ show_image(page.images["text_senti_by_month_smooth.png"]) }}
+{{ show_image(text_senti_by_month_smooth) }}
 
 <p>
 Next, take a look at the sentiment as a function of location within a given story.
 </p>
 
-{{ show_image(page.images["text_senti_by_storyarc.png"]) }}
+{{ show_image(text_senti_by_storyarc) }}
 
 <p>
 And with short, medium-length, and long stories plotted separately:
 </p>
 
-{{ show_image(page.images["text_senti_by_storyarc_binned.png"]) }}
+{{ show_image(text_senti_by_storyarc_binned) }}
 
 <p>
 The takeaway here is that Fimfiction authors love happy endings.
@@ -240,7 +264,7 @@ But while I was gathering those statistics, I found some
 others worthy of mention as well.
 </p>
 
-{{ show_image(page.images["most_common_titles.png"], caption="Yes. There really are nearly 30
+{{ show_image(most_common_titles, caption="Yes. There really are nearly 30
 stories all titled exactly 'The Trotting Dead'.") }}
 
 <p>
@@ -249,7 +273,7 @@ Additionally, Fimfiction has more incomplete stories than completed stories, tho
 this to be the case for fan fiction in general.
 </p>
 
-{{ show_image(page.images["story_status_distr.png"]) }}
+{{ show_image(story_status_distr) }}
 
 <p>
 Finally, I'll leave you with the most common words found in sentences mentioning each given character.
@@ -258,7 +282,7 @@ on Fimfiction) in order to weed out uninteresting words like "the" and "it". Hav
 stereotyping! (Click for larger versions).
 </p>
 
-{{ show_image("most_common_words_aj.png", "most_common_words_fs.png", "most_common_words_pp.png", "most_common_words_ra.png", "most_common_words_rd.png", "most_common_words_ts.png", 
+{{ show_image(most_common_words_aj, most_common_words_fs, most_common_words_pp, most_common_words_ra, most_common_words_rd, most_common_words_ts, 
 columns=2) }}
 
 <p>

@@ -2,6 +2,6 @@
 regardless of type (css, html, etc) #}
 
 {% macro include_inline(page) %}
-{{ add_srcdep(page) }}
+{% do page_info.srcdeps.add(page) %}
 {{ page.contents }}
 {% endmacro %}

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from page_info import config
 
 import jsonpickle, sys
 
@@ -9,10 +10,12 @@ if __name__ == "__main__":
     in_path, out_path = sys.argv[1:]
 
     page_info = jsonpickle.decode(open(in_path).read())
-    make_deps = "\n".join("$(shell make {}.deps)".format(d) for d in page_info['rtdeps'])
-    include_deps = "\n".join("-include {}.deps".format(d) for d in page_info['rtdeps'])
+    include_deps = "\n".join("include {}.deps".format(d.replace(".pageinfo","")) for d in page_info['rtdeps'])
     src_deps = "\\\n    ".join(page_info['srcdeps'])
-    rt_deps = "\\\n    ".join("$(RTDEPS{})".format(d) for d in page_info['rtdeps'])
+    builddir_deps = [d.replace(".pageinfo", "")
+        .replace(config['build']['intermediate'], config['build']['output'])
+        for d in page_info['rtdeps'] ]
+    rt_deps = "\\\n    ".join("$(RT_DEPS{})".format(d) for d in builddir_deps)
     output = """
 # _Buildtime_ dependencies for this file
 {intermediate_path}: {src_deps}
@@ -23,7 +26,6 @@ RT_DEPS{build_path} = {build_path} \
 # of our runtime dependencies).
 # Accomplish that by building and including any .deps files for our runtime
 # dependencies, below:
-{make_deps}
 {include_deps}
 """.format(**globals(), **page_info)
     out_file = open(out_path, 'w+')

@@ -7,6 +7,7 @@ import re
 
 import dateutil.parser, jinja2, joblib, PIL.Image, pygments
 import xml.etree.ElementTree as ElementTree
+import jinja2.ext
 from jinja2 import Environment, PackageLoader, ChoiceLoader, FileSystemLoader, StrictUndefined
 from jinja2.utils import Namespace
 from urllib.parse import urlsplit
@@ -81,7 +82,7 @@ def filter_friendly_date(date):
     return date.strftime("%b %d, %Y")
 
 def filter_detailed_date(date):
-    """Takes a datetime.datetime object, returns a detaile version of the date, e.g. 'Jan 22, 2015 at 8:09 PM PST'"""
+    """Takes a datetime.datetime object, returns a detailed version of the date, e.g. 'Jan 22, 2015 at 8:09 PM PST'"""
     return date.strftime("%b %d, %Y at %I:%M %p PST")
 
 def filter_drop_null_values(dict):
@@ -150,30 +151,38 @@ class Page(object):
         build_path = intermediate_path.replace(config["build"]["intermediate"], config["build"]["output"])
 
         # If there's info associated with the source, provide that to jinja, too.
-        src_pageinfo = jsonpickle.decode(open(self.src_pageinfo_file).read())
+        try:
+            src_pageinfo = jsonpickle.decode(open(self.src_pageinfo_file).read())
+        except FileNotFoundError:
+            src_pageinfo = {}
 
         page_info = Namespace(
             intermediate_path = intermediate_path,
             build_path = build_path,
+            title = "",
             desc = "",
-            builddeps = set(),
+            comments = dict(),
             rtdeps = set(),
             srcdeps = set(),
             anchors = set(),
             **src_pageinfo,
         )
 
+        #def to_build_path(abs_path):
+        #    return abs_path.replace(config['build']['intermediate'],
+        #            config['build']['output'])
+
         def to_rel_path(abs_path):
-            build_root = config["build"]["output"] + "/"
-            if abs_path.startswith(build_root):
-                abs_path = abs_path[len(build_root):]
+            #build_root = config["build"]["output"] + "/"
+            #if abs_path.startswith(build_root):
+            #    abs_path = abs_path[len(build_root):]
             # Separate the anchor, if it was provided
             if "#" in abs_path:
                 abs_path, anchor = abs_path.split("#")
             else:
                 anchor = ""
-            # Remove any stem that is common to (abs_path, out_path).
-            parts_out, parts_abs = out_path.split("/"), abs_path.split("/")
+            # Remove any stem that is common to (abs_path, build_path).
+            parts_out, parts_abs = build_path.split("/"), abs_path.split("/")
             while parts_out and parts_abs and parts_out[0] == parts_abs[0]:
                 del parts_out[0]
                 del parts_abs[0]
@@ -192,18 +201,20 @@ class Page(object):
                 retstr = "#"
             return retstr
 
-        def get_page(pg):
+        def get_resource(pg):
             nonlocal page_info
             basedir = os.path.dirname(self.src_filename)
             full_path = os.path.join(basedir, pg) + ".pageinfo"
             page_info.srcdeps.add(full_path)
+            page_info.rtdeps.add(full_path)
             if do_render:
                 # load the page info
-                page_info = jsonpickle.decode(open(full_path).read())
-                return page_info
+                info = jsonpickle.decode(open(full_path).read())
+                return info
 
 
         env = Environment(trim_blocks=True, lstrip_blocks=True, undefined=StrictUndefined,
+            extensions=[jinja2.ext.do],
             loader=ChoiceLoader([
                 PackageLoader("__main__", TEMPLATE_DIR),
                 FileSystemLoader("/")
@@ -213,7 +224,8 @@ class Page(object):
         env.globals.update(config)
         env.globals["do_render"] = do_render
         env.globals["config"] = config
-        env.globals["get_page"] = get_page
+        env.globals["get_page"] = get_resource
+        env.globals["get_image"] = get_resource
         #env.globals["resources"] = Pages("res/", [".css", ".scss"])
         env.filters["into_tag"] = filter_into_tag
         env.filters["friendly_date"] = filter_friendly_date
@@ -242,8 +254,9 @@ class Page(object):
     def get_page_info(self):
         # TODO: what to do if this is an image!
         env, page_info = self.get_jinja_env(do_render=False)
-        template = env.get_template(self.src_filename)
-        template.render()
+        if self.src_filename.endswith(".jinja.html"):
+            template = env.get_template(self.src_filename)
+            template.render()
         return page_info
 
 

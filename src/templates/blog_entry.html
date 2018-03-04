@@ -1,27 +1,27 @@
-{{ page.set_type(BlogEntry) }}
+{% set page_info.type = BlogEntry %}
 
 {% extends 'base.html' %}
 
 {% block page_content %}
 <article>
 <span class="blog-title-info">
-{{ heading(page.title, link=False, class="title") }}
+{{ heading(page_info.title, link=False, class="title") }}
 
-{% if page.authors %}
+{% if page_info.authors %}
 <div class="blog-author">
-By {{ page.authors[0].name }}
+By {{ page_info.authors[0].name }}
 </div>
 {% endif %}
 
 <div class="blog-pubdate">
-{% if page.is_published %}
+{% if page_info.pub_date %}
 	{# If the revision day would display as the same as the publish day, we simply show the day with the revision time as hovertext. #}
 	{# Otherwise, show both dates #}
-	{% if page.pub_date|friendly_date == page.last_edit_date|friendly_date %}
-		{{ show_date(page.last_edit_date) }}
+	{% if page_info.pub_date|friendly_date == page_info.last_edit_date|friendly_date %}
+		{{ show_date(page_info.last_edit_date) }}
 	{% else %}
-		{{ show_date(page.pub_date) }}
-		(last revised {{ show_date(page.last_edit_date) }})
+		{{ show_date(page_info.pub_date) }}
+		(last revised {{ show_date(page_info.last_edit_date) }})
 	{% endif %}
 {% else %}
 	<span><i>Draft</i></span>
@@ -35,12 +35,12 @@ By {{ page.authors[0].name }}
 
 <div class="blog-footer">
 	<p>
-	{% if page.is_published %}
+	{% if page_info.pub_date %}
 		{# Display the same data AND TIMESTAMP as in the header #}
-		{% if page.pub_date|friendly_date == page.last_edit_date|friendly_date %}
-			{{ show_date(page.last_edit_date) }}
+		{% if page_info.pub_date|friendly_date == page_info.last_edit_date|friendly_date %}
+			{{ show_date(page_info.last_edit_date) }}
 		{% else %}
-			{{ show_date(page.pub_date) }}
+			{{ show_date(page_info.pub_date) }}
 		{% endif %}
 	{% else %}
 		<i>Draft</i>
@@ -48,11 +48,11 @@ By {{ page.authors[0].name }}
 	</p>
 	<p>
 		<b>Comments?</b> See the footer for contact info{# no linebreak before period -#}
-		{% if page.comments.get("reddit") %}
-		or {{ offsite_link(page.comments["reddit"], "join the discussion on reddit") }}{# no linebreak before period -#}
+		{% if page_info.comments.get("reddit") %}
+		or {{ offsite_link(page_info.comments["reddit"], "join the discussion on reddit") }}{# no linebreak before period -#}
 		{% endif %}
-		{% if page.comments.get("news.ycombinator") %}
-		or {{ offsite_link(page.comments["news.ycombinator"], "join the discussion on Hacker News") }}{# no linebreak before period -#}
+		{% if page_info.comments.get("news.ycombinator") %}
+		or {{ offsite_link(page_info.comments["news.ycombinator"], "join the discussion on Hacker News") }}{# no linebreak before period -#}
 		{% endif %}.
 	</p>
 </div>
