@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% set page_info.page_type = HomePage %}
+{% set page_info.title = "MOOOOO.ooo - Miscellaneous Tech Writeups" %}
+
+{# Load all build-time dependencies #}
+{#
+{% set articles = [pages['fimfic-best-pony/index.html']] %}
+{% set articles = [get_page('fimfic-best-pony/index.html')] %}
+#}
+{% set articles = [] %}
+
+
+
+{% block page_content %}
+
+{% for entry in articles|sort(attribute="pub_date", reverse=True) %}
+{{ heading(entry.title, link_to=entry, show_icon=False, sublevel=1, class="title") }}
+<div class="blog-pubdate">
+{{ show_date(entry.pub_date) }}
+</div>
+{% endfor %}
+{% endblock %}
+

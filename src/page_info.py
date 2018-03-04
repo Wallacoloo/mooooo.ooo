@@ -2,12 +2,13 @@
 # Requires the following pip packages:
 # python-dateutil, jinja2
 
-import json, os, subprocess
+import json, os, subprocess, jsonpickle
 import re
 
 import dateutil.parser, jinja2, joblib, PIL.Image, pygments
 import xml.etree.ElementTree as ElementTree
-from jinja2 import Environment, PackageLoader, StrictUndefined
+from jinja2 import Environment, PackageLoader, ChoiceLoader, FileSystemLoader, StrictUndefined
+from jinja2.utils import Namespace
 from urllib.parse import urlsplit
 from pygments.lexers import guess_lexer, get_lexer_by_name
 from pygments.formatters import HtmlFormatter
@@ -47,6 +48,16 @@ def get_ext(path):
     ".pie"
     """
     return os.path.splitext(path)[1]
+
+def highlight_code(self, code, filetype=None):
+    if filetype:
+        lexer = get_lexer_by_name(filetype)
+    else:
+        lexer = guess_lexer(code)
+    return pygments.highlight(code, lexer, HtmlFormatter())
+def get_highlight_css(self):
+    """Return the CSS needed to perform syntax highlighting"""
+    return HtmlFormatter().get_style_defs('.highlight')
 
 def filter_into_tag(value):
     """Given some text, this returns a human-readable tag that closely
@@ -168,240 +179,37 @@ def get_pub_date_of_file(filename):
 
 
 class Page(object):
-    comments = {}
-    def __init__(self, path_on_disk=None, title=None, need_exist=True):
-        if need_exist: assert os.path.exists(path_on_disk)
-
-        self._path_on_disk = path_on_disk
-        self._title = title
-        self._desc = None
-        self._srcdeps = None # Haven't calculated the dependencies
-        self._rtdeps = None # Haven't calculated the dependencies
-        self._anchors = None # Haven't enumerated the page's anchors
-        if path_on_disk and path_on_disk.startswith("pages/"):
-            self._path = path_on_disk[len("pages/"):]
-        else:
-            self._path = path_on_disk
-
-        if get_ext(self._path) == ".html":
-            self.do_render_with_jinja = True
-            # By rendering the page, we can determine our type
-            self.render(query_type=True)
-        elif get_ext(self._path) in GFX_EXTENSIONS:
-            # If this resource is an image, cast it as such for the extra data
-            self.set_type(Image)
-        elif get_ext(self._path) in FONT_EXTENSIONS:
-            self.set_type(Font)
-        elif get_ext(self._path) == ".css":
-            self.set_type(Css)
-        elif get_ext(self._path) in SND_EXTENSIONS:
-            self.set_type(Audio)
-        else:
-            self.set_type(Other)
+    def __init__(self, src_filename):
+        assert os.path.exists(src_filename)
+        self.src_filename = src_filename
 
     def __repr__(self):
-        return "<Page.%s %r>" %(self.__class__.__name__, self.path_on_disk)
+        return "<Page %s>" %self.src_filename
 
-    @property
-    def path(self):
-        """Path relative to the build directory (i.e. the URL of the resource, minus the domain name"""
-        assert self._path is not None
-        return self._path
-    @property
-    def friendly_path(self):
-        """Returns the (unique) identifier/path for this page, but in the most friendly manner, i.e. no trailing 'index.html' or slash"""
-        p = self.path
-        if p.endswith("index.html"):
-            p = p[:-len("index.html")]
-        if p.endswith("/"):
-            p = p[:-1]
-        if p == "":
-            p = "/"
-        return p.lower()
-
-    def anchor_path(self, anchor, validate=True):
-        """Assert that the anchor is found on this page, and return the full page + anchor path.
-        e.g. mypage.html#myheading
-        """
-        if not anchor:
-            return self.path
-        else:
-            if anchor.startswith("#"):
-                anchor = anchor[1:0]
-            if not validate or anchor == "" or anchor in self.anchors:
-                return self.path + "#" + anchor
-            else:
-                raise KeyError("anchor not found on page: #%s" %anchor)
-
-    @property
-    def path_in_build_tree(self):
-        """Path that this page will occupy on the disk after being built.
-        This is always just the URL relative to base of the website, prefixed
-        with the build directory path on disk"""
-        return os.path.join(config["build"]["dir"], self.path)
-
-    @property
-    def build_dep_path(self):
-        """Path in which dependency information for this file should be stored"""
-        return os.path.join(config["build"]["root"], "deps", self.path + ".deps")
-
-    @property
-    def path_on_disk(self):
-        assert self._path_on_disk is not None
-        return self._path_on_disk
-
-    @property
-    def dir_on_disk(self):
-        """Returns the directory containing the source file for this resource"""
-        return os.path.split(self._path_on_disk)[0]
-
-    def set_type(self, type):
-        self.__class__ = type
-        return ""
-
-    def offsite_comments(self, url):
-        domain_name = urlsplit(url).netloc
-        nick = domain_name.lstrip("www.").rstrip(".com")
-        comments = self.comments or {}
-        comments[nick] = url
-        self.comments = comments
-        return ""
-
-
-    @property
-    def title(self):
-        assert self._title is not None
-        return self._title
-    def set_title(self, title):
-        # Only makes sense to set the title once
-        assert self._title == None or title == self._title
-        self._title = title
-        return ""
-
-    @property
-    def desc(self):
-        return self._desc
-    def set_desc(self, desc):
-        # Only makes sense to set the description once
-        assert self._desc == None or desc == self._desc
-        self._desc = desc
-        return ""
-
-    @property
-    def authors(self):
-        authors = get_authors_of_file(self._path_on_disk)
-        # For now, we only have one author
-        #assert len(authors) == 1 and all(a.name == "Colin Wallace" for a in authors)
-        return authors
-
-    @property
-    def _pub_date(self):
-        """Returns the date the article was made public, or None if it's still in draft form"""
-        return get_pub_date_of_file(self._path_on_disk)
-
-    @property
-    def pub_date(self):
-        pub_date = self._pub_date
-        assert pub_date is not None
-        return pub_date
-
-    @property
-    def is_published(self):
-        return self._pub_date is not None
-
-    @property
-    def last_edit_date(self):
-        return sorted(get_commits(self._path_on_disk), key=lambda c: c["date"])[-1]["date"]
-
-    @property
-    def anchors(self):
-        """Return a set of all html anchors on the page that can be linked to"""
-        if self._anchors is None:
-            self.render(query_anchors=True)
-        return self._anchors
-
-    def _get_images(self, names=None, **kwargs):
-        """Returns all the images in the same source directory as the object,
-        or the images in the files indicated by names, regardless of if they exist"""
-        if not names:
-            names = os.listdir(self.dir_on_disk)
-
-        images = {}
-        for page in names:
-            if get_ext(page) in IMG_EXTENSIONS:
-                images[page] = Image(path_on_disk=os.path.join(self.dir_on_disk, page), **kwargs)
-            if get_ext(page) in VID_EXTENSIONS:
-                images[page] = Image(path_on_disk=os.path.join(self.dir_on_disk, page), is_video=True, **kwargs)
-        return images
-
-
-    @property
-    def images(self):
-        """Retrives the images in the same directory as this page"""
-        return self._get_images()
-
-    def _get_audio(self, names=None, **kwargs):
-        """Returns all audio files in the same source directory as the object,
-        or the audio in the files indicated by names, regardless of if they exist"""
-        if not names:
-            names = os.listdir(self.dir_on_disk)
-
-        audio = {}
-        for page in names:
-            if get_ext(page) in SND_EXTENSIONS:
-                audio[page] = Audio(path_on_disk=os.path.join(self.dir_on_disk, page), **kwargs)
-        return audio
-
-
-    @property
-    def audio(self):
-        """Retrives the audio in the same directory as this page"""
-        return self._get_audio()
-
-    def _get_other(self, names=None, **kwargs):
-        """Returns all etc files in the same source directory as the object,
-        or the etc in the files indicated by names, regardless of if they exist"""
-        if not names:
-            names = os.listdir(self.dir_on_disk)
-
-        etc = {}
-        for page in names:
-            etc[page] = Other(path_on_disk=os.path.join(self.dir_on_disk, page), **kwargs)
-        return etc
-
-
-    @property
-    def other(self):
-        """Retrives the unclassified files in the same directory as this page"""
-        return self._get_other()
-
-
-    @property
-    def srcdeps(self):
-        """Query all the resources this file *immediately* depends on,
-        and return them as a list of Page objects"""
-        if self._srcdeps is None:
-            r = self.render(query_deps=True)
-        return self._srcdeps
-    @property
-    def rtdeps(self):
-        """All resources that this file depends on at runtime (e.g. links, etc)"""
-        # trigger building of deps    
-        self.srcdeps
-        return self._rtdeps
-
-    @property
-    def contents(self):
-        return self.render()
-
-    def get_jinja_env(self, query_type, query_deps, query_anchors, do_render):
+    def get_jinja_env(self, do_render=False):
         global config
-        out_path = self.path
-        srcdeps = set()
-        rtdeps = set()
-        anchors = set() # html anchors, e.g. mypage.html#heading1 - "heading1" is an anchor
+        authors = get_authors_of_file(self.src_filename)
+        pub_date = get_pub_date_of_file(self.src_filename)
+        commits = sorted(get_commits(self.src_filename), key=lambda c: c["date"])
+        last_edit_date = commits[-1]["date"] if commits else None
+        intermediate_path = self.src_filename.replace(".html.jinja.html", ".html")
+        build_path = intermediate_path.replace(config["build"]["intermediate"], config["build"]["output"])
+
+        page_info = Namespace(
+            authors = authors,
+            pub_date = pub_date,
+            last_edit_date = last_edit_date,
+            intermediate_path = intermediate_path,
+            build_path = build_path,
+            desc = "",
+            builddeps = set(),
+            rtdeps = set(),
+            srcdeps = set(),
+            anchors = set(),
+        )
+
         def to_rel_path(abs_path):
-            build_root = config["build"]["dir"] + "/"
+            build_root = config["build"]["output"] + "/"
             if abs_path.startswith(build_root):
                 abs_path = abs_path[len(build_root):]
             # Separate the anchor, if it was provided
@@ -428,45 +236,29 @@ class Page(object):
                 # old web browsers misinterpret empty href. See http://stackoverflow.com/questions/5637969/is-an-empty-href-valid
                 retstr = "#"
             return retstr
-        def add_srcdep(dep):
-            srcdeps.add(dep)
-            # Return empty string so this expression won't write to the output stream
-            return ""
-        def add_rtdep(dep):
-            rtdeps.add(dep)
-            return ""
-        def add_anchor(anch):
-            anchors.add(anch)
-            return ""
 
-        def get_image(name):
-            if isinstance(name, Image):
-                return name # we already found the image
+        def get_page(pg):
+            nonlocal page_info
+            basedir = os.path.dirname(self.src_filename)
+            full_path = os.path.join(basedir, pg) + ".pageinfo"
+            page_info.srcdeps.add(full_path)
+            if do_render:
+                # load the page info
+                page_info = jsonpickle.decode(open(full_path).read())
+                return page_info
 
-            try:
-                return self.images[name]
-            except KeyError:
-                if not query_deps:
-                    raise
-                else:
-                    # If we aren't rendering, we can pretend the image already exists (we assume it will be generated later)
-                    return self._get_images([name], need_exist=False)[name]
 
-        env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True, undefined=StrictUndefined)
+        env = Environment(trim_blocks=True, lstrip_blocks=True, undefined=StrictUndefined,
+            loader=ChoiceLoader([
+                PackageLoader("__main__", TEMPLATE_DIR),
+                FileSystemLoader("/")
+            ]))
 
         # Populate template global variables & filters
         env.globals.update(config)
-        env.globals["add_srcdep"] = add_srcdep
-        env.globals["add_rtdep"] = add_rtdep
-        env.globals["add_anchor"] = add_anchor
-        env.globals["get_image"] = get_image
-        env.globals["query_type"] = query_type
-        env.globals["query_anchors"] = query_anchors
-        env.globals["query_deps"] = query_deps
         env.globals["do_render"] = do_render
-        env.globals["validate_anchors"] = not query_anchors # Avoid circular dependencies.
         env.globals["config"] = config
-        env.globals["pages"] = get_pages()
+        env.globals["get_page"] = get_page
         #env.globals["resources"] = Pages("res/", [".css", ".scss"])
         env.filters["into_tag"] = filter_into_tag
         env.filters["friendly_date"] = filter_friendly_date
@@ -476,62 +268,29 @@ class Page(object):
         env.filters["unique"] = filter_unique
         env.filters["tex"] = filter_tex_to_svg
         env.filters["to_rel_path"] = to_rel_path
-        env.globals["page"] = self
         # Expose these types for passing to the `page.set_type` macro
         env.globals["BlogEntry"] = BlogEntry
         env.globals["HomePage"] = HomePage
         env.globals["AboutPage"] = AboutPage
         env.globals["Page"] = Page
+        env.globals['page_info'] = page_info
 
-        return env, srcdeps, rtdeps, anchors
+        return env, page_info._Namespace__attrs
 
-    def render(self, query_type=False, query_anchors=False, query_deps=False):
-        # We are either (a) rendering the page,
-        # (b) querying its type
-        # (c) querying its anchors
-        # (d) querying its dependencies
-        # Both (a), (c), (d) require rendering the page
-        do_render = not query_type and not query_anchors and not query_deps
+    def render(self):
+        """ Render a .jinja.html page to html. """
+        env, page_info = self.get_jinja_env(do_render=True)
 
-        rendered = None
-        srcdeps, rtdeps, anchors = set(), set(), set()
-        if self.do_render_with_jinja:
-            env, srcdeps, rtdeps, anchors = self.get_jinja_env(\
-                query_type=query_type,
-                query_anchors=query_anchors,
-                query_deps=query_deps,
-                do_render=do_render)
-            src = open(self._path_on_disk).read()
-            template = env.from_string(src)
-            rendered = template.render().strip()
-        elif do_render:
-            # This is a binary file
-            rendered = open(in_path, "rb").read()
+        template = env.get_template(self.src_filename)
+        return template.render().strip()
 
-        if query_deps:
-            if self._srcdeps:
-                srcdeps.update(self._srcdeps)
-            self._srcdeps = srcdeps
-            if self._rtdeps:
-                rtdeps.update(self._rtdeps)
-            self._rtdeps = rtdeps
+    def get_page_info(self):
+        # TODO: what to do if this is an image!
+        env, page_info = self.get_jinja_env(do_render=False)
+        template = env.get_template(self.src_filename)
+        template.render()
+        return page_info
 
-        if query_anchors:
-            if self._anchors:
-                anchors.update(self._anchors)
-            self._anchors = anchors
-
-        return rendered
-
-    def highlight_code(self, code, filetype=None):
-        if filetype:
-            lexer = get_lexer_by_name(filetype)
-        else:
-            lexer = guess_lexer(code)
-        return pygments.highlight(code, lexer, HtmlFormatter())
-    def get_highlight_css(self):
-        """Return the CSS needed to perform syntax highlighting"""
-        return HtmlFormatter().get_style_defs('.highlight')
 
 
 class Author(object):
@@ -654,10 +413,4 @@ class Pages(object):
             if isinstance(item, BlogEntry):
                 entries[key] = item
         return entries
-
-def get_pages():
-    ext = [".html", ".css"]
-    ext.extend(GFX_EXTENSIONS)
-    ext.extend(FONT_EXTENSIONS)
-    return Pages("pages/", ext)
 

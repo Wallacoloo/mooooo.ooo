@@ -116,17 +116,20 @@
 {% macro path(p) %}
 {{ inline_code(p) }}{% endmacro %}
 
-{% if do_render or query_anchors or query_deps %}
+
+{% if do_render %}
 {% block document %}
 <!DOCTYPE html>
 <html>
 		<head>
 			<meta charset="utf-8">
 			<meta name="viewport" content="width=device-width initial-scale=1" />
-			<meta name="description" content="{{ page.desc or "Weblog/homepage for a developer/engineer/artist. DIY projects, opinions and code." }}" />
+			<meta name="description" content="{{ page_info.desc or "Weblog/homepage for a developer/engineer/artist. DIY projects, opinions and code." }}" />
+			{# TODO
 			{{ include_css(pages["css/global.css"]) }}
-			<meta name="author" content="{{ page.authors|join(", ", "name") }}">
-			<title>{{ page.title }}</title>
+			#}
+			<meta name="author" content="{{ page_info.authors|join(", ", "name") }}">
+			<title>{{ page_info.title }}</title>
 			<style>
 {# Include absolutely essentially style in the header; things that prevent the page from looking outright horrible while loading #}
 
@@ -150,14 +153,16 @@ img
 					{# Derivative templates are expected to
 						{% set is_page_xxx = True %} for at least one page #}
 					<ul class="nav-ul">
-							<li class="nav-li-blog{{ " active" if page.__class__ == HomePage else ""}}">
+							{# TODO
+							<li class="nav-li-blog{{ " active" if page.type == HomePage else ""}}">
 									{{ onsite_link(pages["/"], "Blog") }}
 							</li>
 							<li class="filler">
 							</li>
-							<li class="nav-li-about{{ " active" if page.__class__ == AboutPage else "" }}">
+							<li class="nav-li-about{{ " active" if page.type == AboutPage else "" }}">
 									{{ onsite_link(pages["about"], "About") }}
 							</li>
+							#}
 					</ul>
 			</header>
 			<div class="page-content">
@@ -165,14 +170,22 @@ img
 			</div>
 			<footer class="glob-footer">
 					<div class="footer-social">
-							{{ mailto_link(social.contact_email, class="email fa fa-envelope") }}
-							{{ offsite_link(social.github_url, class="github fa fa-github") }}
-							{{ offsite_link(social.twitter_url, class="twitter fa fa-twitter") }}
+							{% if social.contact_email %}
+									{{ mailto_link(social.contact_email, class="email fa fa-envelope") }}
+							{% endif %}
+							{% if social.github_url %}
+									{{ offsite_link(social.github_url, class="github fa fa-github") }}
+							{% endif %}
+							{% if social.twitter_url %}
+									{{ offsite_link(social.twitter_url, class="twitter fa fa-twitter") }}
+							{% endif %}
 					</div>
+					{# TODO
 					<p class="footer-legal">
 							Unless otherwise stated, all code snippets, artwork or writings hosted on this website are released into the public domain.
 							{{ onsite_link(pages["about"], "More info", anchor="License / Attributions"|into_tag) }}.
 					</p>
+					#}
 			</footer>
 			{% endblock %}
 		</body>

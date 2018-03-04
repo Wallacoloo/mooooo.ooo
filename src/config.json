@@ -19,7 +19,8 @@
 		},
 		"build":
 		{
-				"dir": "<BUILD_DIR>",
+				"output": "<BUILD_OUTPUT>",
+				"intermediate": "<BUILD_INTERMEDIATE>",
 				"root": "<BUILD_ROOT>"
 		},
 		"fonts":

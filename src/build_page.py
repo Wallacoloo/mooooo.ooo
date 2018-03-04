@@ -2,24 +2,22 @@
 # Requires the following pip packages:
 # python-dateutil, jinja2
 
-import os.path, sys
+import sys, jsonpickle
 
 from page_info import Page
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: %s <input html template>" %sys.argv[0])
+    if len(sys.argv) != 3:
+        print("Usage: %s <input html template> <output>" %sys.argv[0])
         sys.exit(1)
 
-    in_path = sys.argv[1]
+    in_path, out_path = sys.argv[1:]
 
     page = Page(in_path)
-    rendered = page.render()
-    out_path = page.path_in_build_tree
-    if isinstance(rendered, str):
-        # Open the file in text mode
-        f = open(out_path, "w+")
+    if out_path.endswith(".pageinfo"):
+        output = jsonpickle.encode(page.get_page_info())
     else:
-        # Writing binary data (e.g. images)
-        f = open(out_path, "wb+")
-    f.write(rendered)
+        output = page.render()
+    out_file = open(out_path, "w+")
+    out_file.write(output)
+
