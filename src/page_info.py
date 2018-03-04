@@ -494,6 +494,7 @@ class Page(object):
         do_render = not query_type and not query_anchors and not query_deps
 
         rendered = None
+        srcdeps, rtdeps, anchors = set(), set(), set()
         if self.do_render_with_jinja:
             env, srcdeps, rtdeps, anchors = self.get_jinja_env(\
                 query_type=query_type,
@@ -616,7 +617,8 @@ class Pages(object):
             self._all = {}
             for fname in recursive_listdir(self._basedir):
                 if get_ext(fname) in self._extensions:
-                    self._all[fname] = Page(path_on_disk=os.path.join(self._basedir, fname))
+                    pg = Page(path_on_disk=os.path.join(self._basedir, fname))
+                    self._all[pg.path] = pg
         return self._all
 
     def __hasitem__(self, key):
