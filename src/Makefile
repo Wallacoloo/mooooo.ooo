@@ -11,6 +11,9 @@ SCOUR=scour #Optional tool to compress svgs.
 
 MAKE_DIR=$(shell pwd)
 BUILD_ROOT=$(shell cd ../ && pwd)/build
+BUILD_INTERMEDIATE=$(BUILD_ROOT)/intermediate
+BUILD_OUTPUT=$(BUILD_ROOT)/output
+CONFIG_JSON=$(BUILD_ROOT)/config.json
 
 IPFSID_FILE=$(BUILD_ROOT)/mooooo.ipfsid
 IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
@@ -31,14 +34,14 @@ endef
 
 export PATH:=${PATH}:${PWD}/../node_modules/mathjax-node/bin
 
-all: $(BUILD_ROOT)/intermediate/index.html.deps
+all: $(BUILD_INTERMEDIATE)/index.html.deps
 
--include $(BUILD_ROOT)/intermediate/index.html.deps
-all: $(RT_DEPS$(BUILD_ROOT)/output/index.html)
+-include $(BUILD_INTERMEDIATE)/index.html.deps
+all: $(RT_DEPS$(BUILD_OUTPUT)/index.html)
 
 
 clean: ## Removes the FINAL outputs of the build, but not cached versions stored elsewhere or dependency info
-	rm -rf $(BUILD_ROOT)/output
+	rm -rf $(BUILD_OUTPUT)
 
 clean-all: ## Remove ALL output files and temporaries, including dependency info
 	rm -rf $(BUILD_ROOT)
@@ -50,16 +53,16 @@ $(IPNSID_FILE):
 	ipfs id --format="<id>" > $@
 
 ## Build the site's config file, which holds secret keys, etc.
-$(BUILD_ROOT)/config.json: config.json $(IPNSID_FILE)
+$(CONFIG_JSON): config.json $(IPNSID_FILE)
 	@mkdir -p $(dir $@)
 	sed  "s:<IPNS_ID>:$(shell cat $(IPNSID_FILE)):" $< |\
-	sed  "s:<BUILD_OUTPUT>:$(BUILD_ROOT)/output:" |\
-	sed  "s:<BUILD_INTERMEDIATE>:$(BUILD_ROOT)/intermediate:" |\
+	sed  "s:<BUILD_OUTPUT>:$(BUILD_OUTPUT):" |\
+	sed  "s:<BUILD_INTERMEDIATE>:$(BUILD_INTERMEDIATE):" |\
 	sed  "s:<BUILD_ROOT>:$(BUILD_ROOT):" \
 	> $@
 
 publish-ipfs: $(PUB_TARGETS) ## Publish the site to IPFS
-	ipfs add -r -q $(BUILD_ROOT)/output | tail -1 > $(BUILD_ROOT)/mooooo.ipfsid
+	ipfs add -r -q $(BUILD_OUTPUT) | tail -1 > $(BUILD_ROOT)/mooooo.ipfsid
 
 publish-ipns: publish-ipfs ## Update the IPNS link to point to the newest version of the website
 	ipfs name publish /ipfs/$(shell cat $(IPFSID_FILE))
@@ -75,62 +78,66 @@ publish-host: publish-ipfs ## Pin the new build to the remote host
 publish: publish-ipfs publish-cf publish-ipns publish-host ## Publish the site everywhere
 	true
 
-%.deps: %.pageinfo ## Extract dependencies from a pageinfo object
+$(BUILD_INTERMEDIATE)/%.deps: $(BUILD_INTERMEDIATE)/%.pageinfo ## Extract dependencies from a pageinfo object
 	@echo "Building $@ from $^"
 	./extract_deps.py $< $@
 
-%.html.pageinfo: %.html.jinja.html $(BUILD_ROOT)/config.json ## Extract information about a html page
+$(BUILD_INTERMEDIATE)/%.pageinfo: $(BUILD_INTERMEDIATE)/%.jinja.html $(BUILD_INTERMEDIATE)/%.jinja.html.pageinfo $(CONFIG_JSON) ## Extract information about a html page
 	@echo "Building $@ from $^"
 	./build_page.py $< $@
 
-%.html: %.html.jinja.html $(BUILD_ROOT)/config.json ## Render html jinja templates
+$(BUILD_INTERMEDIATE)/%.html: $(BUILD_INTERMEDIATE)/%.html.jinja.html $(CONFIG_JSON) ## Render html jinja templates
 	@echo "Building $@ from $^"
 	./build_page.py $< $@
 
-%.png.pageinfo: %.png ## Extract information about an image
+$(BUILD_INTERMEDIATE)/%.png.pageinfo: $(BUILD_INTERMEDIATE)/%.png ## Extract information about an image
 	# TODO
 	@echo "Building $@ from $^"
 	./build_page.py $< $@
 
+$(BUILD_INTERMEDIATE)/%.pageinfo: pages/% $(CONFIG_JSON)
+	@mkdir -p $(dir $@)
+	./extract_git.py $< $@
+
 # HOW TO COPY SOURCES INTO INTERMEDIATE/
 
-$(BUILD_ROOT)/intermediate/%.html.jinja.html: pages/%.html.jinja.html
+$(BUILD_INTERMEDIATE)/%.html.jinja.html: pages/%.html.jinja.html
 	$(MKDIR_CP)
 
-$(BUILD_ROOT)/intermediate/%.jpg: $(BUILD_ROOT)/images/%.jpg
+$(BUILD_INTERMEDIATE)/%.jpg: $(BUILD_ROOT)/images/%.jpg
 	$(MKDIR_CP)
 
-$(BUILD_ROOT)/intermediate/%.png: $(BUILD_ROOT)/images/%.png
+$(BUILD_INTERMEDIATE)/%.png: $(BUILD_ROOT)/images/%.png
 	$(MKDIR_CP)
 
-$(BUILD_ROOT)/intermediate/%.gif: $(BUILD_ROOT)/images/%.gif
+$(BUILD_INTERMEDIATE)/%.gif: $(BUILD_ROOT)/images/%.gif
 	$(MKDIR_CP)
 
-$(BUILD_ROOT)/intermediate/%.svg: $(BUILD_ROOT)/images/%.svg
+$(BUILD_INTERMEDIATE)/%.svg: $(BUILD_ROOT)/images/%.svg
 	$(MKDIR_CP)
 
 ## Copy webm videos
-$(BUILD_ROOT)/intermediate/%.webm: pages/%.webm
+$(BUILD_INTERMEDIATE)/%.webm: pages/%.webm
 	$(MKDIR_CP)
 
 ## Copy ogg audio files
-$(BUILD_ROOT)/intermediate/%.ogg: pages/%.ogg
+$(BUILD_INTERMEDIATE)/%.ogg: pages/%.ogg
 	$(MKDIR_CP)
 
 ## Copy ICC color profiles
-$(BUILD_ROOT)/intermediate/%.icc: pages/%.icc
+$(BUILD_INTERMEDIATE)/%.icc: pages/%.icc
 	$(MKDIR_CP)
 
 ## Copy PDFs
-$(BUILD_ROOT)/intermediate/%.pdf: pages/%.pdf
+$(BUILD_INTERMEDIATE)/%.pdf: pages/%.pdf
 	$(MKDIR_CP)
 
 ## Copy Headers
-$(BUILD_ROOT)/intermediate/%.h: pages/%.h
+$(BUILD_INTERMEDIATE)/%.h: pages/%.h
 	$(MKDIR_CP)
 
 ## Copy generated fonts to the intermediate directory (as the font generators may create extra files)
-$(BUILD_ROOT)/intermediate/fonts/%: $(BUILD_ROOT)/fonts/%
+$(BUILD_INTERMEDIATE)/fonts/%: $(BUILD_ROOT)/fonts/%
 	$(MKDIR_CP)
 
 
@@ -182,7 +189,7 @@ $(BUILD_ROOT)/fonts/%.woff2: $(BUILD_ROOT)/fonts/%.ttf
 
 
 ## Files to be published can be copied from the intermediate folder
-$(BUILD_ROOT)/output/%: $(BUILD_ROOT)/intermediate/%
+$(BUILD_OUTPUT)/%: $(BUILD_INTERMEDIATE)/%
 	$(MKDIR_CP)
 
 # Self-documenting help function provided by http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html

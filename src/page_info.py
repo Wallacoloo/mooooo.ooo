@@ -15,8 +15,6 @@ from pygments.formatters import HtmlFormatter
 
 
 CONFIG_PATH = "../build/config.json"
-# Directory in which blog entries are stored
-BLOG_ENTRY_DIR="blog_entries"
 # Directory in which Jinja2 templates are stored
 TEMPLATE_DIR="templates"
 
@@ -136,69 +134,25 @@ def filter_unique(it):
             yield i
 
 
-def get_unparsed_commits(filename):
-    """Returns an array of commit dicts, where each entry looks like:
-    { 'author': '<name>', 'date': '<date>', 'message': '<message>' }
-    """
-    proc = subprocess.Popen(["git", "log", '--pretty=format:{%n  "author": "%aN",%n  "date": "%cD",%n  "message": "%s"%n},', "--", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    stdout, stderr = proc.communicate()
-    if stderr:
-        raise RuntimeError("git log error:", stderr)
-
-    raw = stdout.decode('utf-8')
-    return json.loads("[%s []]" %raw)[:-1]
-
-def get_commits(filename):
-    """Returns an array of commit dicts, where each entry looks like:
-    { 'author': <Author object>, 'date': <Datetime object>, 'message': '<message>' }
-    """
-    commits = get_unparsed_commits(filename)
-    for c in commits:
-        c["author"] = Author(c["author"])
-        c["date"] = dateutil.parser.parse(c["date"])
-
-    return commits
-
-def get_authors_of_file(filename):
-    """Return a set of Author objects that have commits associated with the
-    file"""
-    commits = get_commits(filename)
-
-    authors = set()
-    for commit in commits:
-        authors.add(commit['author'])
-    return list(authors)
-
-def get_pub_date_of_file(filename):
-    """Returns the date at which this file was committed with the message "PUBLISH", indicating it is ready to be made public"""
-    commits = get_commits(filename)
-
-    for c in commits:
-        if c["message"] == "PUBLISH":
-            return c["date"]
-
 
 class Page(object):
     def __init__(self, src_filename):
         assert os.path.exists(src_filename)
         self.src_filename = src_filename
+        self.src_pageinfo_file = src_filename + ".pageinfo"
 
     def __repr__(self):
         return "<Page %s>" %self.src_filename
 
     def get_jinja_env(self, do_render=False):
         global config
-        authors = get_authors_of_file(self.src_filename)
-        pub_date = get_pub_date_of_file(self.src_filename)
-        commits = sorted(get_commits(self.src_filename), key=lambda c: c["date"])
-        last_edit_date = commits[-1]["date"] if commits else None
         intermediate_path = self.src_filename.replace(".html.jinja.html", ".html")
         build_path = intermediate_path.replace(config["build"]["intermediate"], config["build"]["output"])
 
+        # If there's info associated with the source, provide that to jinja, too.
+        src_pageinfo = jsonpickle.decode(open(self.src_pageinfo_file).read())
+
         page_info = Namespace(
-            authors = authors,
-            pub_date = pub_date,
-            last_edit_date = last_edit_date,
             intermediate_path = intermediate_path,
             build_path = build_path,
             desc = "",
@@ -206,6 +160,7 @@ class Page(object):
             rtdeps = set(),
             srcdeps = set(),
             anchors = set(),
+            **src_pageinfo,
         )
 
         def to_rel_path(abs_path):
