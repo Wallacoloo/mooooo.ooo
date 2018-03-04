@@ -182,7 +182,7 @@ class Page(object):
             else:
                 anchor = ""
             # Remove any stem that is common to (abs_path, build_path).
-            parts_out, parts_abs = build_path.split("/"), abs_path.split("/")
+            parts_out, parts_abs = intermediate_path.split("/"), abs_path.split("/")
             while parts_out and parts_abs and parts_out[0] == parts_abs[0]:
                 del parts_out[0]
                 del parts_abs[0]
