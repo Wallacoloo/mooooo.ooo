@@ -221,6 +221,7 @@ class Page(object):
     @property
     def repo_page(self):
         """Path where the user can view the source/revision history of a file & submit pull requests."""
+        #TODO: should use config.json
         return "https://github.com/Wallacoloo/mooooo.ooo/tree/master/src/pages/%s" %self.path
 
     def anchor_path(self, anchor, validate=True):
@@ -398,9 +399,8 @@ class Page(object):
     def contents(self):
         return self.render()
 
-    def render(self, query_type=False, query_anchors=False, query_deps=False):
+    def get_jinja_env(self, query_type, query_deps, query_anchors, do_render):
         global config
-        in_path = self._path_on_disk
         out_path = self.path
         srcdeps = set()
         rtdeps = set()
@@ -457,13 +457,6 @@ class Page(object):
                     # If we aren't rendering, we can pretend the image already exists (we assume it will be generated later)
                     return self._get_images([name], need_exist=False)[name]
 
-        # We are either (a) rendering the page,
-        # (b) querying its type
-        # (c) querying its anchors
-        # (d) querying its dependencies
-        # Both (a), (c), (d) require rendering the page
-        do_render = not query_type and not query_anchors and not query_deps
-
         env = Environment(loader=PackageLoader("__main__", TEMPLATE_DIR), trim_blocks=True, lstrip_blocks=True, undefined=StrictUndefined)
 
         # Populate template global variables & filters
@@ -489,18 +482,35 @@ class Page(object):
         env.filters["tex"] = filter_tex_to_svg
         env.filters["to_rel_path"] = to_rel_path
         env.globals["page"] = self
-        # Expose these types for passing to the `set_page_type` macro
+        # Expose these types for passing to the `page.set_type` macro
         env.globals["BlogEntry"] = BlogEntry
         env.globals["HomePage"] = HomePage
         env.globals["AboutPage"] = AboutPage
         env.globals["Page"] = Page
 
+        return env, srcdeps, rtdeps, anchors
+
+    def render(self, query_type=False, query_anchors=False, query_deps=False):
+        # We are either (a) rendering the page,
+        # (b) querying its type
+        # (c) querying its anchors
+        # (d) querying its dependencies
+        # Both (a), (c), (d) require rendering the page
+        do_render = not query_type and not query_anchors and not query_deps
+
+        rendered = None
         if self.do_render_with_jinja:
-            template = env.from_string(open(in_path).read())
-            r = template.render().strip()
+            env, srcdeps, rtdeps, anchors = self.get_jinja_env(\
+                query_type=query_type,
+                query_anchors=query_anchors,
+                query_deps=query_deps,
+                do_render=do_render)
+            src = open(self._path_on_disk).read()
+            template = env.from_string(src)
+            rendered = template.render().strip()
         elif do_render:
             # This is a binary file
-            r = open(in_path, "rb").read()
+            rendered = open(in_path, "rb").read()
 
         if query_deps:
             if self._srcdeps:
@@ -515,8 +525,7 @@ class Page(object):
                 anchors.update(self._anchors)
             self._anchors = anchors
 
-        if do_render:
-            return r
+        return rendered
 
     def highlight_code(self, code, filetype=None):
         if filetype:

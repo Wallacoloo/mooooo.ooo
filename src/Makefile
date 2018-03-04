@@ -31,6 +31,7 @@ define MKDIR_CP
 	cp $< $@
 endef
 
+export PATH:=${PATH}:${PWD}/../node_modules/mathjax-node/bin
 
 all: $(BUILD_ROOT)/all.depincludes
 all: $(BUILD_DIR)/index.html
@@ -38,7 +39,7 @@ all: $(BUILD_DIR)/index.html
 -include $(BUILD_ROOT)/all.depincludes
 
 $(BUILD_ROOT)/all.depincludes: $(BUILD_ROOT)/config.json
-	PATH=${PATH}:${PWD}/../node_modules/mathjax-node/bin ./make.py $@
+	./make.py $@
 
 
 clean: ## Removes the FINAL outputs of the build, but not cached versions stored elsewhere or dependency info
