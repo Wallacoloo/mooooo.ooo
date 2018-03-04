@@ -218,11 +218,6 @@ class Page(object):
         if p == "":
             p = "/"
         return p.lower()
-    @property
-    def repo_page(self):
-        """Path where the user can view the source/revision history of a file & submit pull requests."""
-        #TODO: should use config.json
-        return "https://github.com/Wallacoloo/mooooo.ooo/tree/master/src/pages/%s" %self.path
 
     def anchor_path(self, anchor, validate=True):
         """Assert that the anchor is found on this page, and return the full page + anchor path.

@@ -162,7 +162,7 @@ $(BUILD_DIR)/fonts/%: $(BUILD_ROOT)/fonts/%
 
 define BUILD_PAGE
 	@mkdir -p $(dir $@)
-	./build_page.py pages/$(subst $(BUILD_DIR)/,,$@) $@
+	./build_page.py pages/$(subst $(BUILD_DIR)/,,$@)
 endef
 
 ## Build any resources (webpages, css, images, fonts, etc)
