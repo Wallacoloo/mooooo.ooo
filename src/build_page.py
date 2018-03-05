@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     in_path, out_path = sys.argv[1:]
 
-    page = Page(in_path)
+    page = Page.from_unknown_type(src_filename=in_path)
     if out_path.endswith(".pageinfo"):
         output = jsonpickle.encode(page.get_page_info())
     else:

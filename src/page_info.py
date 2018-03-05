@@ -137,6 +137,15 @@ def filter_unique(it):
 
 
 class Page(object):
+    @staticmethod
+    def from_unknown_type(src_filename, **kwargs):
+        """ Auto-deduce the type of a page, and return an instance of that. """
+        if src_filename.endswith(".html.jinja.html"):
+            Cls = JinjaPage
+        elif get_ext(src_filename) in GFX_EXTENSIONS:
+            Cls = Image
+        return Cls(src_filename=src_filename, **kwargs)
+
     def __init__(self, src_filename):
         assert os.path.exists(src_filename)
         self.src_filename = src_filename
@@ -144,28 +153,48 @@ class Page(object):
 
     def __repr__(self):
         return "<Page %s>" %self.src_filename
+    
+    @property
+    def intermediate_path(self):
+        # TODO: this should be passed via CLI
+        return self.src_filename \
+            .replace(".html.jinja.html", ".html")
+    @property
+    def build_path(self):
+        return self.intermediate_path \
+            .replace(config["build"]["intermediate"], config["build"]["output"])
 
-    def get_jinja_env(self, do_render=False):
-        global config
-        intermediate_path = self.src_filename.replace(".html.jinja.html", ".html")
-        build_path = intermediate_path.replace(config["build"]["intermediate"], config["build"]["output"])
-
-        # If there's info associated with the source, provide that to jinja, too.
+    @property
+    def base_page_info(self):
+        """ Return the page_info common to all pages,
+        sometimes unpopulated. """
+        # If there's info associated with the source, provide that, too.
         try:
             src_pageinfo = jsonpickle.decode(open(self.src_pageinfo_file).read())
         except FileNotFoundError:
             src_pageinfo = {}
 
-        page_info = Namespace(
-            intermediate_path = intermediate_path,
-            build_path = build_path,
-            title = "",
-            desc = "",
-            comments = dict(),
+        return dict(
+            intermediate_path = self.intermediate_path,
+            build_path = self.build_path,
             rtdeps = set(),
             srcdeps = set(),
             anchors = set(),
             **src_pageinfo,
+        )
+
+class JinjaPage(Page):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _get_jinja_env(self, do_render=False):
+        global config
+
+        page_info = Namespace(
+            title = "",
+            desc = "",
+            comments = dict(),
+            **self.base_page_info
         )
 
         #def to_build_path(abs_path):
@@ -182,7 +211,7 @@ class Page(object):
             else:
                 anchor = ""
             # Remove any stem that is common to (abs_path, build_path).
-            parts_out, parts_abs = intermediate_path.split("/"), abs_path.split("/")
+            parts_out, parts_abs = page_info.intermediate_path.split("/"), abs_path.split("/")
             while parts_out and parts_abs and parts_out[0] == parts_abs[0]:
                 del parts_out[0]
                 del parts_abs[0]
@@ -246,31 +275,20 @@ class Page(object):
 
     def render(self):
         """ Render a .jinja.html page to html. """
-        env, page_info = self.get_jinja_env(do_render=True)
+        env, page_info = self._get_jinja_env(do_render=True)
 
         template = env.get_template(self.src_filename)
         return template.render().strip()
 
     def get_page_info(self):
-        # TODO: what to do if this is an image!
-        env, page_info = self.get_jinja_env(do_render=False)
-        if self.src_filename.endswith(".jinja.html"):
-            template = env.get_template(self.src_filename)
-            template.render()
+        env, page_info = self._get_jinja_env(do_render=False)
+        template = env.get_template(self.src_filename)
+        template.render()
         return page_info
 
 
 
-class Author(object):
-    def __init__(self, name):
-        self.name = name
-    def __eq__(self, other):
-        return self.name == other.name
-    def __hash__(self):
-        return hash(self.name)
-
 class Image(Page):
-    do_render_with_jinja = False
     def __init__(self, **kwargs):
         self._is_video = kwargs.pop("is_video", False)
         super().__init__(**kwargs)
@@ -281,7 +299,7 @@ class Image(Page):
     def size(self):
         """Returns the size of the image in pixels (width, height)"""
         if self.is_video:
-            cmd = "ffprobe -show_entries stream=height,width -v error -of flat=s=_ %s" %self._path_on_disk
+            cmd = "ffprobe -show_entries stream=height,width -v error -of flat=s=_ %s" %self.src_filename
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             output = p.communicate()
             video_vars = {}
@@ -289,27 +307,42 @@ class Image(Page):
                 exec(line, video_vars)
             return video_vars["streams_stream_0_width"], video_vars["streams_stream_0_height"]
         else:
-            if self._path_on_disk.endswith(".svg"):
+            if self.src_filename.endswith(".svg"):
                 # PIL doesn't support SVG.
                 # Instead, parse as XML.
                 # Width and Height are stored as attributes on the root SVG element.
-                tree = ElementTree.parse(self._path_on_disk)
+                tree = ElementTree.parse(self.src_filename)
                 root = tree.getroot()
                 width = int(root.attrib["width"].replace("pt", ""))
                 height = int(root.attrib["height"].replace("pt", ""))
                 return (width, height)
             else:
-                im = PIL.Image.open(self._path_on_disk)
+                im = PIL.Image.open(self.src_filename)
                 return im.size
-    @property
-    def rasterized(self):
-        """Return an Image object for a rasterized version of this image.
-        For non-vector graphics, this is a noop.
-        """
-        if self.path_on_disk.endswith(".svg"):
-            return Image(path_on_disk=self.path_in_build_tree[:-4] + ".png", need_exist=False)
-        else:
-            return self
+
+    def get_page_info(self):
+        page_info = self.base_page_info
+        page_info['size'] = self.size
+        return page_info
+
+    #@property
+    #def rasterized(self):
+    #    """Return an Image object for a rasterized version of this image.
+    #    For non-vector graphics, this is a noop.
+    #    """
+    #    if self.path_on_disk.endswith(".svg"):
+    #        return Image(path_on_disk=self.path_in_build_tree[:-4] + ".png", need_exist=False)
+    #    else:
+    #        return self
+
+
+class Author(object):
+    def __init__(self, name):
+        self.name = name
+    def __eq__(self, other):
+        return self.name == other.name
+    def __hash__(self):
+        return hash(self.name)
 
 class Audio(Page):
     do_render_with_jinja = False

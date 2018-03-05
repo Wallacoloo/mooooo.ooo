@@ -32,9 +32,7 @@
 {% do page_info.rtdeps.add(image_show) %}
 {% do page_info.rtdeps.add(image_link) %}
 	<a href="{{ image_link|to_rel_path }}" class="image-link">
-			{# TODO
 			<img src="{{ image_show|to_rel_path }}" width="{{ image_.size.0 }}px" height="{{ image_.size.1 }}px" class="theater-image columns-{{ kwargs.get("columns", 1) }}"/>
-			#}
 	</a>
 {% endfor %}
 {% if kwargs.get("caption") %}
