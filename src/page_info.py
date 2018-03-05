@@ -158,7 +158,8 @@ class Page(object):
     def intermediate_path(self):
         # TODO: this should be passed via CLI
         return self.src_filename \
-            .replace(".html.jinja.html", ".html")
+            .replace(".html.jinja.html", ".html") \
+            .replace(".png.src.png", ".png")
     @property
     def build_path(self):
         return self.intermediate_path \
@@ -182,13 +183,22 @@ class Page(object):
             anchors = set(),
             **src_srcinfo,
         )
+    @property
+    def base_build_info(self):
+        """ Return the build common to all pages
+        """
+        return dict(
+            intermediate_path = self.intermediate_path,
+            build_path = self.build_path,
+        )
 
     def get_build(self):
         """ Default build rule for POD files """
-        return dict(
-            output=open(self.src_filename, 'rb').read(),
-            rtdeps=set()
-        )
+        build = self.base_build_info
+        build['rtdeps'] = set()
+        build['output'] = \
+            open(self.src_filename, 'rb').read()
+        return build
 
 class JinjaPage(Page):
     def __init__(self, **kwargs):
@@ -204,9 +214,9 @@ class JinjaPage(Page):
             **self.base_src_info
         )
 
-        #def to_build_path(abs_path):
-        #    return abs_path.replace(config['build']['intermediate'],
-        #            config['build']['output'])
+        def to_build_path(abs_path):
+            return abs_path.replace(config['build']['intermediate'],
+                    config['build']['output'])
         def path_from_root(path):
             """ Treat `path' as a path relative to the intermediate root.
             """
@@ -266,7 +276,6 @@ class JinjaPage(Page):
         env.globals["config"] = config
         env.globals["get_page"] = get_resource
         env.globals["get_image"] = get_resource
-        #env.globals["resources"] = Pages("res/", [".css", ".scss"])
         env.filters["into_tag"] = filter_into_tag
         env.filters["friendly_date"] = filter_friendly_date
         env.filters["detailed_date"] = filter_detailed_date
@@ -275,6 +284,7 @@ class JinjaPage(Page):
         env.filters["unique"] = filter_unique
         env.filters["tex"] = filter_tex_to_svg
         env.filters["to_rel_path"] = to_rel_path
+        env.filters["to_build_path"] = to_build_path
         env.filters["path_from_root"] = path_from_root
         # Expose these types for passing to the `page.set_type` macro
         env.globals["BlogEntry"] = BlogEntry
@@ -287,15 +297,16 @@ class JinjaPage(Page):
 
     def get_build(self):
         """ Render a .jinja.html page to html. """
-        env, build_info = self._get_jinja_env(do_render=True)
+        env, jinja_info = self._get_jinja_env(do_render=True)
 
         template = env.get_template(self.src_filename)
         rendered = template.render().strip()
-        build_info = dict(
-            output=rendered,
-            rtdeps=build_info['rtdeps'],
-        )
-        return build_info
+
+        build = self.base_build_info
+        build['output'] = rendered
+        build['rtdeps'] = jinja_info['rtdeps']
+
+        return build
 
     def get_src_info(self):
         env, src_info = self._get_jinja_env(do_render=False)

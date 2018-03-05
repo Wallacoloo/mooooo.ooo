@@ -35,7 +35,8 @@ endef
 export PATH:=${PATH}:${PWD}/../node_modules/mathjax-node/bin
 
 all:
-include $(BUILD_INTERMEDIATE)/index.html.deps
+include $(BUILD_INTERMEDIATE)/index.html.srcdeps
+include $(BUILD_INTERMEDIATE)/index.html.rtdeps
 all: $(RT_DEPS$(BUILD_OUTPUT)/index.html)
 
 
@@ -77,45 +78,47 @@ publish-host: publish-ipfs ## Pin the new build to the remote host
 publish: publish-ipfs publish-cf publish-ipns publish-host ## Publish the site everywhere
 	true
 
-$(BUILD_INTERMEDIATE)/%.deps: $(BUILD_INTERMEDIATE)/%.srcinfo ## Extract dependencies from a srcinfo object
-	@echo "Building $@ from $^"
-	./extract_deps.py $< $@
+$(BUILD_INTERMEDIATE)/%.srcdeps: $(BUILD_INTERMEDIATE)/%.srcinfo ## Extract dependencies from a srcinfo object
+	./extract_srcdeps.py $< $@
 
 $(BUILD_INTERMEDIATE)/%.srcinfo: $(BUILD_INTERMEDIATE)/%.jinja.html $(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo $(CONFIG_JSON) ## Extract information about a html page
-	@echo "Building $@ from $^"
 	./build_page.py $< $@
 
-$(BUILD_INTERMEDIATE)/%.html.build: $(BUILD_INTERMEDIATE)/%.html.jinja.html $(CONFIG_JSON) ## Render html jinja templates
-	@echo "Building $@ from $^"
+$(BUILD_INTERMEDIATE)/%.html.build: $(BUILD_INTERMEDIATE)/%.html.jinja.html $(BUILD_INTERMEDIATE)/%.html.srcdeps $(CONFIG_JSON) ## Render html jinja templates
 	./build_page.py $< $@
 
 $(BUILD_INTERMEDIATE)/%.png.srcinfo: $(BUILD_INTERMEDIATE)/%.png ## Extract information about an image
-	# TODO
-	@echo "Building $@ from $^"
+	./build_page.py $< $@
+
+$(BUILD_INTERMEDIATE)/%.png.build: $(BUILD_INTERMEDIATE)/%.png.src.png ## Extract information about an image
 	./build_page.py $< $@
 
 $(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo: pages/%.jinja.html $(CONFIG_JSON)
 	@mkdir -p $(dir $@)
 	./extract_git.py $< $@
 
+# Extract binary data from a .build object
 $(BUILD_INTERMEDIATE)/%: $(BUILD_INTERMEDIATE)/%.build
 	./extract_build.py $< $@
+# Extract dependency data from a .build objct
+$(BUILD_INTERMEDIATE)/%.rtdeps: $(BUILD_INTERMEDIATE)/%.build
+	./extract_rtdeps.py $< $@
 
 # HOW TO COPY SOURCES INTO INTERMEDIATE/
 
 $(BUILD_INTERMEDIATE)/%.html.jinja.html: pages/%.html.jinja.html
 	$(MKDIR_CP)
 
-$(BUILD_INTERMEDIATE)/%.jpg: $(BUILD_ROOT)/images/%.jpg
+$(BUILD_INTERMEDIATE)/%.jpg.src.jpg: $(BUILD_ROOT)/images/%.jpg
 	$(MKDIR_CP)
 
-$(BUILD_INTERMEDIATE)/%.png: $(BUILD_ROOT)/images/%.png
+$(BUILD_INTERMEDIATE)/%.png.src.png: $(BUILD_ROOT)/images/%.png
 	$(MKDIR_CP)
 
-$(BUILD_INTERMEDIATE)/%.gif: $(BUILD_ROOT)/images/%.gif
+$(BUILD_INTERMEDIATE)/%.png.src.gif: $(BUILD_ROOT)/images/%.gif
 	$(MKDIR_CP)
 
-$(BUILD_INTERMEDIATE)/%.svg: $(BUILD_ROOT)/images/%.svg
+$(BUILD_INTERMEDIATE)/%.png.src.svg: $(BUILD_ROOT)/images/%.svg
 	$(MKDIR_CP)
 
 ## Copy webm videos
@@ -198,6 +201,11 @@ $(BUILD_OUTPUT)/%: $(BUILD_INTERMEDIATE)/%
 help:
 	@grep -h -P '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
+## Print the value of a variable, e.g. print-BUILD_ROOT
+#print-%  : ; @echo $* = $($*)
+print-RT_DEPS/home/colin/src/mooooo/build/output/index.html: ; @echo $@ = $(RT_DEPS/home/colin/src/mooooo/build/output/index.html)
+print-RT_DEPS/home/colin/src/mooooo/build/output/fimfic-best-pony/index.html: ; @echo $@ = $(RT_DEPS/home/colin/src/mooooo/build/output/fimfic-best-pony/index.html)
+print-RT_DEPS/home/colin/src/mooooo/build/output/fimfic-best-pony/character_mentions_in_a_sentence.png: ; @echo $@ = $(RT_DEPS/home/colin/src/mooooo/build/output/fimfic-best-pony/character_mentions_in_a_sentence.png)
 
 .SECONDARY:
 .PHONY: clean clean-all clean-deps help publish-ipfs publish-ipns publish-cf publish

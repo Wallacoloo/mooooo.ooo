@@ -29,8 +29,8 @@
 {% for image_ in varargs %}
 {% set image_link = image_.intermediate_path %}
 {% set image_show = image_.intermediate_path %}
-{% do page_info.rtdeps.add(image_show) %}
-{% do page_info.rtdeps.add(image_link) %}
+{% do page_info.rtdeps.add(image_show|to_build_path) %}
+{% do page_info.rtdeps.add(image_link|to_build_path) %}
 	<a href="{{ image_link|to_rel_path }}" class="image-link">
 			<img src="{{ image_show|to_rel_path }}" width="{{ image_.size.0 }}px" height="{{ image_.size.1 }}px" class="theater-image columns-{{ kwargs.get("columns", 1) }}"/>
 	</a>
@@ -116,7 +116,9 @@
 			<meta charset="utf-8">
 			<meta name="viewport" content="width=device-width initial-scale=1" />
 			<meta name="description" content="{{ page_info.desc or "Weblog/homepage for a developer/engineer/artist. DIY projects, opinions and code." }}" />
+			{# TODO
 			{{ include_css("css/global.css"|path_from_root) }}
+			#}
 			<meta name="author" content="{{ page_info.authors|join(", ", "name") }}">
 			<title>{{ page_info.title }}</title>
 			<style>
