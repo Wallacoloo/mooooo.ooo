@@ -10,10 +10,12 @@ if __name__ == "__main__":
     in_path, out_path = sys.argv[1:]
 
     page_info = jsonpickle.decode(open(in_path).read())
-    src_deps = "\\\n    ".join(page_info['srcdeps'])
+    src_deps = "\n".join(
+            "{intermediate_path}.build: {d}".format(d=d, **page_info)
+            for d in page_info['srcdeps'])
     output = """
 # _Buildtime_ dependencies for this file
-{intermediate_path}.build: {src_deps}
+{src_deps}
 """.format(**globals(), **page_info)
     out_file = open(out_path, 'w+')
     out_file.write(output)

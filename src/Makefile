@@ -35,8 +35,7 @@ endef
 export PATH:=${PATH}:${PWD}/../node_modules/mathjax-node/bin
 
 all:
-include $(BUILD_INTERMEDIATE)/index.html.srcdeps
-include $(BUILD_INTERMEDIATE)/index.html.rtdeps
+include $(BUILD_INTERMEDIATE)/index.html.alldeps
 all: $(RT_DEPS$(BUILD_OUTPUT)/index.html)
 
 
@@ -103,6 +102,15 @@ $(BUILD_INTERMEDIATE)/%: $(BUILD_INTERMEDIATE)/%.build
 # Extract dependency data from a .build objct
 $(BUILD_INTERMEDIATE)/%.rtdeps: $(BUILD_INTERMEDIATE)/%.build
 	./extract_rtdeps.py $< $@
+
+# Make will autogenerate .srcdeps and .rtdeps. However, the .srcdeps file
+# contains dep info about the .rtdeps file, so it must be built _and included_
+# prior to building the .rtdeps file.
+# The solution is to create a .alldeps file that includes them both, but for which
+# its build depends on the .srcdeps file to be build. Then, include this .alldeps
+# file instead of both .srcdeps and .rtdeps
+$(BUILD_INTERMEDIATE)/%.alldeps: $(BUILD_INTERMEDIATE)/%.srcdeps
+	echo "include $^ $(^:.srcdeps=.rtdeps)" > $@
 
 # HOW TO COPY SOURCES INTO INTERMEDIATE/
 
