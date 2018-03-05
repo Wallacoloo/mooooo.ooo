@@ -5,14 +5,14 @@ import jsonpickle, sys
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: %s <input .pageinfo> <.deps>" %sys.argv[0])
+        print("Usage: %s <input .srcinfo> <.deps>" %sys.argv[0])
         sys.exit(1)
     in_path, out_path = sys.argv[1:]
 
     page_info = jsonpickle.decode(open(in_path).read())
-    include_deps = "\n".join("include {}.deps".format(d.replace(".pageinfo","")) for d in page_info['rtdeps'])
+    include_deps = "\n".join("include {}.deps".format(d.replace(".srcinfo","")) for d in page_info['rtdeps'])
     src_deps = "\\\n    ".join(page_info['srcdeps'])
-    builddir_deps = [d.replace(".pageinfo", "")
+    builddir_deps = [d.replace(".srcinfo", "")
         .replace(config['build']['intermediate'], config['build']['output'])
         for d in page_info['rtdeps'] ]
     rt_deps = "\\\n    ".join("$(RT_DEPS{})".format(d) for d in builddir_deps)

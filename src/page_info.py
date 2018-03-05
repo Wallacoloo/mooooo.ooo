@@ -149,7 +149,7 @@ class Page(object):
     def __init__(self, src_filename):
         assert os.path.exists(src_filename)
         self.src_filename = src_filename
-        self.src_pageinfo_file = src_filename + ".pageinfo"
+        self.src_srcinfo_file = src_filename + ".srcinfo"
 
     def __repr__(self):
         return "<Page %s>" %self.src_filename
@@ -165,14 +165,14 @@ class Page(object):
             .replace(config["build"]["intermediate"], config["build"]["output"])
 
     @property
-    def base_page_info(self):
-        """ Return the page_info common to all pages,
+    def base_src_info(self):
+        """ Return the src_info common to all pages,
         sometimes unpopulated. """
         # If there's info associated with the source, provide that, too.
         try:
-            src_pageinfo = jsonpickle.decode(open(self.src_pageinfo_file).read())
+            src_srcinfo = jsonpickle.decode(open(self.src_srcinfo_file).read())
         except FileNotFoundError:
-            src_pageinfo = {}
+            src_srcinfo = {}
 
         return dict(
             intermediate_path = self.intermediate_path,
@@ -180,7 +180,14 @@ class Page(object):
             rtdeps = set(),
             srcdeps = set(),
             anchors = set(),
-            **src_pageinfo,
+            **src_srcinfo,
+        )
+
+    def get_build(self):
+        """ Default build rule for POD files """
+        return dict(
+            output=open(self.src_filename, 'rb').read(),
+            rtdeps=set()
         )
 
 class JinjaPage(Page):
@@ -190,16 +197,20 @@ class JinjaPage(Page):
     def _get_jinja_env(self, do_render=False):
         global config
 
-        page_info = Namespace(
+        src_info = Namespace(
             title = "",
             desc = "",
             comments = dict(),
-            **self.base_page_info
+            **self.base_src_info
         )
 
         #def to_build_path(abs_path):
         #    return abs_path.replace(config['build']['intermediate'],
         #            config['build']['output'])
+        def path_from_root(path):
+            """ Treat `path' as a path relative to the intermediate root.
+            """
+            return os.path.join(config['build']['intermediate'], path)
 
         def to_rel_path(abs_path):
             #build_root = config["build"]["output"] + "/"
@@ -211,7 +222,7 @@ class JinjaPage(Page):
             else:
                 anchor = ""
             # Remove any stem that is common to (abs_path, build_path).
-            parts_out, parts_abs = page_info.intermediate_path.split("/"), abs_path.split("/")
+            parts_out, parts_abs = src_info.intermediate_path.split("/"), abs_path.split("/")
             while parts_out and parts_abs and parts_out[0] == parts_abs[0]:
                 del parts_out[0]
                 del parts_abs[0]
@@ -231,11 +242,11 @@ class JinjaPage(Page):
             return retstr
 
         def get_resource(pg):
-            nonlocal page_info
+            nonlocal src_info
             basedir = os.path.dirname(self.src_filename)
-            full_path = os.path.join(basedir, pg) + ".pageinfo"
-            page_info.srcdeps.add(full_path)
-            page_info.rtdeps.add(full_path)
+            full_path = os.path.join(basedir, pg) + ".srcinfo"
+            src_info.srcdeps.add(full_path)
+            src_info.rtdeps.add(full_path)
             if do_render:
                 # load the page info
                 info = jsonpickle.decode(open(full_path).read())
@@ -264,27 +275,33 @@ class JinjaPage(Page):
         env.filters["unique"] = filter_unique
         env.filters["tex"] = filter_tex_to_svg
         env.filters["to_rel_path"] = to_rel_path
+        env.filters["path_from_root"] = path_from_root
         # Expose these types for passing to the `page.set_type` macro
         env.globals["BlogEntry"] = BlogEntry
         env.globals["HomePage"] = HomePage
         env.globals["AboutPage"] = AboutPage
         env.globals["Page"] = Page
-        env.globals['page_info'] = page_info
+        env.globals['page_info'] = src_info
 
-        return env, page_info._Namespace__attrs
+        return env, src_info._Namespace__attrs
 
-    def render(self):
+    def get_build(self):
         """ Render a .jinja.html page to html. """
-        env, page_info = self._get_jinja_env(do_render=True)
+        env, build_info = self._get_jinja_env(do_render=True)
 
         template = env.get_template(self.src_filename)
-        return template.render().strip()
+        rendered = template.render().strip()
+        build_info = dict(
+            output=rendered,
+            rtdeps=build_info['rtdeps'],
+        )
+        return build_info
 
-    def get_page_info(self):
-        env, page_info = self._get_jinja_env(do_render=False)
+    def get_src_info(self):
+        env, src_info = self._get_jinja_env(do_render=False)
         template = env.get_template(self.src_filename)
         template.render()
-        return page_info
+        return src_info
 
 
 
@@ -320,10 +337,11 @@ class Image(Page):
                 im = PIL.Image.open(self.src_filename)
                 return im.size
 
-    def get_page_info(self):
-        page_info = self.base_page_info
-        page_info['size'] = self.size
-        return page_info
+    def get_src_info(self):
+        src_info = self.base_src_info
+        src_info['size'] = self.size
+        return src_info
+
 
     #@property
     #def rasterized(self):

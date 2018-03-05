@@ -14,10 +14,11 @@ if __name__ == "__main__":
     in_path, out_path = sys.argv[1:]
 
     page = Page.from_unknown_type(src_filename=in_path)
-    if out_path.endswith(".pageinfo"):
-        output = jsonpickle.encode(page.get_page_info())
-    else:
-        output = page.render()
+    if out_path.endswith(".srcinfo"):
+        output = page.get_src_info()
+    elif out_path.endswith(".build"):
+        output = page.get_build()
+    serialized = jsonpickle.encode(output)
     out_file = open(out_path, "w+")
-    out_file.write(output)
+    out_file.write(serialized)
 

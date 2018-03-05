@@ -77,26 +77,29 @@ publish-host: publish-ipfs ## Pin the new build to the remote host
 publish: publish-ipfs publish-cf publish-ipns publish-host ## Publish the site everywhere
 	true
 
-$(BUILD_INTERMEDIATE)/%.deps: $(BUILD_INTERMEDIATE)/%.pageinfo ## Extract dependencies from a pageinfo object
+$(BUILD_INTERMEDIATE)/%.deps: $(BUILD_INTERMEDIATE)/%.srcinfo ## Extract dependencies from a srcinfo object
 	@echo "Building $@ from $^"
 	./extract_deps.py $< $@
 
-$(BUILD_INTERMEDIATE)/%.pageinfo: $(BUILD_INTERMEDIATE)/%.jinja.html $(BUILD_INTERMEDIATE)/%.jinja.html.pageinfo $(CONFIG_JSON) ## Extract information about a html page
+$(BUILD_INTERMEDIATE)/%.srcinfo: $(BUILD_INTERMEDIATE)/%.jinja.html $(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo $(CONFIG_JSON) ## Extract information about a html page
 	@echo "Building $@ from $^"
 	./build_page.py $< $@
 
-$(BUILD_INTERMEDIATE)/%.html: $(BUILD_INTERMEDIATE)/%.html.jinja.html $(CONFIG_JSON) ## Render html jinja templates
+$(BUILD_INTERMEDIATE)/%.html.build: $(BUILD_INTERMEDIATE)/%.html.jinja.html $(CONFIG_JSON) ## Render html jinja templates
 	@echo "Building $@ from $^"
 	./build_page.py $< $@
 
-$(BUILD_INTERMEDIATE)/%.png.pageinfo: $(BUILD_INTERMEDIATE)/%.png ## Extract information about an image
+$(BUILD_INTERMEDIATE)/%.png.srcinfo: $(BUILD_INTERMEDIATE)/%.png ## Extract information about an image
 	# TODO
 	@echo "Building $@ from $^"
 	./build_page.py $< $@
 
-$(BUILD_INTERMEDIATE)/%.jinja.html.pageinfo: pages/%.jinja.html $(CONFIG_JSON)
+$(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo: pages/%.jinja.html $(CONFIG_JSON)
 	@mkdir -p $(dir $@)
 	./extract_git.py $< $@
+
+$(BUILD_INTERMEDIATE)/%: $(BUILD_INTERMEDIATE)/%.build
+	./extract_build.py $< $@
 
 # HOW TO COPY SOURCES INTO INTERMEDIATE/
 

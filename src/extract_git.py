@@ -48,7 +48,7 @@ def get_pub_date_of_file(filename):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: %s <input filename> <output .pageinfo>" %sys.argv[0])
+        print("Usage: %s <input filename> <output .srcinfo>" %sys.argv[0])
         sys.exit(1)
     git_filename, out_path = sys.argv[1:]
 
