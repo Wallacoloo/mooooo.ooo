@@ -1,14 +1,12 @@
 {% macro incl_font_sources(fname) %}
 	/* Embedded Open Type, for IE */
-{# TODO
 	{% set eotpath="fonts/%s.eot"|format(fname)|path_from_root %}
-	{% do page_info.add_rtdep(eotpath|to_build_path) %}
+	{% do page_info.rtdeps.add(eotpath|to_build_path) %}
 	src: url({{ eotpath|to_rel_path }});
 	src: url({{ eotpath|to_rel_path }}?#iefix) format('embedded-opentype');
 	{% for ext in ("ttf", "woff", "woff2") %}
 		{% set fpath="fonts/%s.%s"|format(fname, ext)|path_from_root %}
-		{% do page_info.add_rtdep(fpath|to_build_path) %}
+		{% do page_info.rtdeps.add(fpath|to_build_path) %}
 		src: url({{ fpath|to_rel_path }}) format('{{ext}}');
 	{% endfor %}
-#}
 {% endmacro %}
