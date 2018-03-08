@@ -19,9 +19,14 @@ if __name__ == "__main__":
                 .replace(".build", "")
             ) for d in page_info['srcdeps'])
     output = """
+ifndef INCL_{out_path}
+# include guard
+INCL_{out_path}=y
+
 # _Buildtime_ dependencies for this file
 {incl_src_deps}
 {src_deps}
+endif
 """.format(**globals())
     out_file = open(out_path, 'w+')
     out_file.write(output)

@@ -80,10 +80,10 @@
    This was we can indicate it's off-site (with an icon, etc), etc #}
 <a class="{{ class }}" href="{{ path }}">{{ label }}</a>{% endmacro %}
 
-{% macro onsite_link(destpage, label="", anchor="", class="") %}
+{% macro onsite_link(path, label="", anchor="", class="") %}
 {# Use whenever a-href'ing to another page OR in-page heading #}
-{% do page_info.rtdeps.add(destpage) %}
-<a class="{{ class }}" href="{{ destpage.anchor_path(anchor, validate=validate_anchors)|to_rel_path }}">{{ label }}</a>{% endmacro %}
+{% do page_info.rtdeps.add(path|to_build_path) %}
+<a class="{{ class }}" href="{{ path|to_rel_path }}">{{ label }}</a>{% endmacro %}
 
 {% macro mailto_link(address, label="", class="", subject="", body="") %}
 {{ offsite_link(path=("mailto:" + address)|url_with_args(**dict(subject=subject, body=body)|drop_null_values), label=label, class=class) }}{% endmacro %}
@@ -142,14 +142,14 @@ img
 					{# Derivative templates are expected to
 						{% set is_page_xxx = True %} for at least one page #}
 					<ul class="nav-ul">
-							{# TODO
-							<li class="nav-li-blog{{ " active" if page.type == HomePage else ""}}">
-									{{ onsite_link(pages["/"], "Blog") }}
+							{# TODO this causes recursive make vars
+							<li class="nav-li-blog{{ " active" if page_info.type == HomePage else ""}}">
+									{{ onsite_link("index.html"|path_from_root, "Blog") }}
 							</li>
 							<li class="filler">
 							</li>
-							<li class="nav-li-about{{ " active" if page.type == AboutPage else "" }}">
-									{{ onsite_link(pages["about"], "About") }}
+							<li class="nav-li-about{{ " active" if page_info.type == AboutPage else "" }}">
+									{{ onsite_link("about/index.html"|path_from_root, "About") }}
 							</li>
 							#}
 					</ul>

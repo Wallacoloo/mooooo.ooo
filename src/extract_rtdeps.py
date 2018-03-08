@@ -25,11 +25,15 @@ if __name__ == "__main__":
         for d in rtdeps]
     rt_deps_vars = "\\\n    ".join("$(RT_DEPS{})".format(d) for d in builddir_deps)
     output = """
+ifndef INCL_{out_path}
+#include guard
+INCL_{out_path}=y
 # Trigger calculation of the runtime dependencies for each of our dependencies
 {include_alldeps}
 # _Runtime_ dependencies for this file
 RT_DEPS{build_path} = {build_path} \
     {rt_deps_vars}
+endif
 """.format(build_path=build['build_path'], **globals())
     out_file = open(out_path, 'w+')
     out_file.write(output)

@@ -212,6 +212,7 @@ class JinjaPage(Page):
             title = "",
             desc = "",
             comments = dict(),
+            type = JinjaPage,
             **self.base_src_info
         )
 
@@ -308,12 +309,22 @@ class JinjaPage(Page):
 
         return env, src_info._Namespace__attrs
 
-    def get_build(self):
-        """ Render a .jinja.html page to html. """
-        env, jinja_info = self._get_jinja_env(do_render=True)
+    def get_rendered_jinja(self, do_render):
+        env, jinja_info = self._get_jinja_env(do_render=do_render)
 
         template = env.get_template(self.src_filename)
         rendered = template.render().strip()
+        # Don't rely on self!
+        jinja_info['srcdeps'].discard(self.intermediate_path)
+        jinja_info['rtdeps'].discard(self.intermediate_path)
+        jinja_info['rtdeps'].discard(self.build_path)
+        
+        return jinja_info, rendered
+
+
+    def get_build(self):
+        """ Render a .jinja.html page to html. """
+        jinja_info, rendered = self.get_rendered_jinja(do_render=True)
 
         build = self.base_build_info
         build['content'] = rendered
@@ -322,9 +333,7 @@ class JinjaPage(Page):
         return build
 
     def get_src_info(self):
-        env, src_info = self._get_jinja_env(do_render=False)
-        template = env.get_template(self.src_filename)
-        template.render()
+        src_info, _rendered = self.get_rendered_jinja(do_render=False)
         return src_info
 
 
