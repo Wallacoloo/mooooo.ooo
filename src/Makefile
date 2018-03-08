@@ -80,21 +80,37 @@ publish: publish-ipfs publish-cf publish-ipns publish-host ## Publish the site e
 $(BUILD_INTERMEDIATE)/%.srcdeps: $(BUILD_INTERMEDIATE)/%.srcinfo ## Extract dependencies from a srcinfo object
 	./extract_srcdeps.py $< $@
 
+# JINJA -> HTML
+
 $(BUILD_INTERMEDIATE)/%.srcinfo: $(BUILD_INTERMEDIATE)/%.jinja.html $(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo $(CONFIG_JSON) ## Extract information about a html page
 	./build_page.py $< $@
 
 $(BUILD_INTERMEDIATE)/%.html.build: $(BUILD_INTERMEDIATE)/%.html.jinja.html $(BUILD_INTERMEDIATE)/%.html.srcdeps $(CONFIG_JSON) ## Render html jinja templates
 	./build_page.py $< $@
 
+$(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo: pages/%.jinja.html $(CONFIG_JSON)
+	@mkdir -p $(dir $@)
+	./extract_git.py $< $@
+
+# JINJA -> CSS
+
+$(BUILD_INTERMEDIATE)/%.srcinfo: $(BUILD_INTERMEDIATE)/%.jinja.css $(BUILD_INTERMEDIATE)/%.jinja.css.srcinfo $(CONFIG_JSON) ## Extract information about a css page
+	./build_page.py $< $@
+
+$(BUILD_INTERMEDIATE)/%.css.build: $(BUILD_INTERMEDIATE)/%.css.jinja.css $(BUILD_INTERMEDIATE)/%.css.srcdeps $(CONFIG_JSON) ## Render css jinja templates
+	./build_page.py $< $@
+
+$(BUILD_INTERMEDIATE)/%.jinja.css.srcinfo: pages/%.jinja.css $(CONFIG_JSON)
+	@mkdir -p $(dir $@)
+	./extract_git.py $< $@
+
+# SRC.PNG -> PNG
+
 $(BUILD_INTERMEDIATE)/%.png.srcinfo: $(BUILD_INTERMEDIATE)/%.png ## Extract information about an image
 	./build_page.py $< $@
 
 $(BUILD_INTERMEDIATE)/%.png.build: $(BUILD_INTERMEDIATE)/%.png.src.png ## Extract information about an image
 	./build_page.py $< $@
-
-$(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo: pages/%.jinja.html $(CONFIG_JSON)
-	@mkdir -p $(dir $@)
-	./extract_git.py $< $@
 
 # Extract binary data from a .build object
 $(BUILD_INTERMEDIATE)/%: $(BUILD_INTERMEDIATE)/%.build
@@ -115,6 +131,8 @@ $(BUILD_INTERMEDIATE)/%.alldeps: $(BUILD_INTERMEDIATE)/%.srcdeps
 # HOW TO COPY SOURCES INTO INTERMEDIATE/
 
 $(BUILD_INTERMEDIATE)/%.html.jinja.html: pages/%.html.jinja.html
+	$(MKDIR_CP)
+$(BUILD_INTERMEDIATE)/%.css.jinja.css: pages/%.css.jinja.css
 	$(MKDIR_CP)
 
 $(BUILD_INTERMEDIATE)/%.jpg.src.jpg: $(BUILD_ROOT)/images/%.jpg

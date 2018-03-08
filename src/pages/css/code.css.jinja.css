@@ -1,6 +1,6 @@
 /* Code formatting styles */
 
-{{ page.get_highlight_css() }}
+{{ get_highlight_css() }}
 
 .multiline-code
 {

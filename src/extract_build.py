@@ -10,7 +10,7 @@ if __name__ == "__main__":
     in_path, out_path = sys.argv[1:]
 
     build = jsonpickle.decode(open(in_path).read())
-    output = build['output']
+    output = build['content']
     if isinstance(output, str):
         out_file = open(out_path, 'w+')
     else:

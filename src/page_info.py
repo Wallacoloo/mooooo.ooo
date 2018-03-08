@@ -54,7 +54,7 @@ def highlight_code(self, code, filetype=None):
     else:
         lexer = guess_lexer(code)
     return pygments.highlight(code, lexer, HtmlFormatter())
-def get_highlight_css(self):
+def get_highlight_css():
     """Return the CSS needed to perform syntax highlighting"""
     return HtmlFormatter().get_style_defs('.highlight')
 
@@ -140,7 +140,7 @@ class Page(object):
     @staticmethod
     def from_unknown_type(src_filename, **kwargs):
         """ Auto-deduce the type of a page, and return an instance of that. """
-        if src_filename.endswith(".html.jinja.html"):
+        if src_filename.endswith(".html.jinja.html") or src_filename.endswith(".css.jinja.css"):
             Cls = JinjaPage
         elif get_ext(src_filename) in GFX_EXTENSIONS:
             Cls = Image
@@ -159,6 +159,7 @@ class Page(object):
         # TODO: this should be passed via CLI
         return self.src_filename \
             .replace(".html.jinja.html", ".html") \
+            .replace(".css.jinja.css", ".css") \
             .replace(".png.src.png", ".png")
     @property
     def build_path(self):
@@ -196,7 +197,7 @@ class Page(object):
         """ Default build rule for POD files """
         build = self.base_build_info
         build['rtdeps'] = set()
-        build['output'] = \
+        build['content'] = \
             open(self.src_filename, 'rb').read()
         return build
 
@@ -251,12 +252,21 @@ class JinjaPage(Page):
                 retstr = "#"
             return retstr
 
-        def get_resource(pg):
+        def get_srcinfo(pg):
             nonlocal src_info
             basedir = os.path.dirname(self.src_filename)
             full_path = os.path.join(basedir, pg) + ".srcinfo"
             src_info.srcdeps.add(full_path)
-            src_info.rtdeps.add(full_path)
+            if do_render:
+                # load the page info
+                info = jsonpickle.decode(open(full_path).read())
+                return info
+
+        def get_resource(pg):
+            nonlocal src_info
+            basedir = os.path.dirname(self.src_filename)
+            full_path = os.path.join(basedir, pg) + ".build"
+            src_info.srcdeps.add(full_path)
             if do_render:
                 # load the page info
                 info = jsonpickle.decode(open(full_path).read())
@@ -274,8 +284,10 @@ class JinjaPage(Page):
         env.globals.update(config)
         env.globals["do_render"] = do_render
         env.globals["config"] = config
+        env.globals["get_srcinfo"] = get_srcinfo
+        # TODO: replace with get_resource
         env.globals["get_page"] = get_resource
-        env.globals["get_image"] = get_resource
+        env.globals["get_image"] = get_srcinfo
         env.filters["into_tag"] = filter_into_tag
         env.filters["friendly_date"] = filter_friendly_date
         env.filters["detailed_date"] = filter_detailed_date
@@ -286,6 +298,7 @@ class JinjaPage(Page):
         env.filters["to_rel_path"] = to_rel_path
         env.filters["to_build_path"] = to_build_path
         env.filters["path_from_root"] = path_from_root
+        env.globals["get_highlight_css"] = get_highlight_css
         # Expose these types for passing to the `page.set_type` macro
         env.globals["BlogEntry"] = BlogEntry
         env.globals["HomePage"] = HomePage
@@ -303,7 +316,7 @@ class JinjaPage(Page):
         rendered = template.render().strip()
 
         build = self.base_build_info
-        build['output'] = rendered
+        build['content'] = rendered
         build['rtdeps'] = jinja_info['rtdeps']
 
         return build

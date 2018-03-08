@@ -13,10 +13,16 @@ if __name__ == "__main__":
     src_deps = "\n".join(
             "{intermediate_path}.build: {d}".format(d=d, **page_info)
             for d in page_info['srcdeps'])
+    incl_src_deps = "\n".join(
+            "include {d}.srcdeps".format(d= \
+                d.replace(".srcinfo", "")
+                .replace(".build", "")
+            ) for d in page_info['srcdeps'])
     output = """
 # _Buildtime_ dependencies for this file
+{incl_src_deps}
 {src_deps}
-""".format(**globals(), **page_info)
+""".format(**globals())
     out_file = open(out_path, 'w+')
     out_file.write(output)
 

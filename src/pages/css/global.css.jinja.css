@@ -1,0 +1,9 @@
+{% from 'macros.jinja' import include_inline %}
+{{ include_inline(get_page("blog.css")) }}
+{{ include_inline(get_page("defaults.css")) }}
+{{ include_inline(get_page("glob-header.css")) }}
+{{ include_inline(get_page("glob-content.css")) }}
+{{ include_inline(get_page("glob-footer.css")) }}
+{{ include_inline(get_page("code.css")) }}
+{{ include_inline(get_page("fonts.css")) }}
+

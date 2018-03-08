@@ -193,5 +193,5 @@
 	{{ incl_font_sources("GenBasBI") }}
 }
 
-{{ include_inline(pages["css/font-awesome.css"]) }}
+{{ include_inline(get_page("font-awesome.css")) }}
 
