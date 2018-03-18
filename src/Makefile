@@ -84,6 +84,8 @@ publish: publish-ipfs publish-cf publish-ipns publish-host ## Publish the site e
 
 $(BUILD_INTERMEDIATE)/%.srcdeps: $(BUILD_INTERMEDIATE)/%.srcinfo ## Extract dependencies from a srcinfo object
 	./extract_srcdeps.py $< $@
+	@# Force all the files that the .srcdeps depends on to also be built now
+	cat $@ | grep '^include ' | sed 's|include ||' | xargs --no-run-if-empty $(MAKE)
 
 # %.HTML.JINJA.HTML -> %.HTML
 
@@ -129,11 +131,8 @@ $(BUILD_INTERMEDIATE)/%.rtdeps: $(BUILD_INTERMEDIATE)/%.build
 # The solution is to create a .alldeps file that includes them both, but for which
 # its build depends on the .srcdeps file to be build. Then, include this .alldeps
 # file instead of both .srcdeps and .rtdeps
-#	cat $^ | grep '^include ' | sed 's|include ||' | xargs --no-run-if-empty $(MAKE)
-#	cat $^ | grep '^include ' | sed 's|include |$(^:.srcdeps=.rtdeps): |' >> $@
 $(BUILD_INTERMEDIATE)/%.alldeps: $(BUILD_INTERMEDIATE)/%.srcdeps
 	echo "include $^" > $@
-	cat $^ | grep '^include ' | sed 's|include ||' | sed 's|srcdeps|alldeps|' | xargs --no-run-if-empty $(MAKE)
 	echo "include $(^:.srcdeps=.rtdeps)" >> $@
 
 # HOW TO COPY SOURCES INTO INTERMEDIATE/
