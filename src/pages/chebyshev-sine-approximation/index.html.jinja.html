@@ -1,13 +1,26 @@
 {% from 'base.html' import heading, offsite_link, show_image %}
-{{ page.set_title("Approximating sin(x) to 5 ULP with Chebyshev polynomials") }}
-{{ page.offsite_comments("https://news.ycombinator.com/item?id=14328650") }}
+{% extends 'blog_entry.html' %}
+{% set page_info.title = "Approximating sin(x) to 5 ULP with Chebyshev polynomials" %}
+{% do page_info.comments.update(hackernews="https://news.ycombinator.com/item?id=14328650") %}
 
+{% set chebyshev_basis = get_image("chebyshev_basis.svg") %}
+{% set scaled_sine = get_image("scaled_sine.svg") %}
+{% set cheby_proj1 = get_image("cheby_proj1.png") %}
+{% set solve_cheb_coeffs = get_image("solve_cheb_coeffs.png") %}
+{% set sine_from_coeffs = get_image("sine_from_coeffs.png") %}
+{% set reconstructed_sine_plot = get_image("reconstructed_sine_plot.svg") %}
+{% set relative_error_plot = get_image("relative_error_plot.svg") %}
+{% set sine_as_poly = get_image("sine_as_poly.png") %}
+{% set horner_ulp = get_image("horner_ulp.svg") %}
+{% set fact_sine_as_poly = get_image("fact_sine_as_poly.png") %}
+{% set factored_ulp = get_image("factored_ulp.svg") %}
+{% set factored_ulp_bounds = get_image("factored_ulp_bounds.svg") %}
+{% set bruteforce_ulp_bounds = get_image("bruteforce_ulp_bounds.svg") %}
 {# Note:
 def tof32(f):
 ...     return struct.unpack('>f', struct.pack('>f', f))[0]
 #}
 
-{% extends 'blog_entry.html' %}
 
 {% block entry_content %}
 
@@ -80,7 +93,7 @@ we can use {{"\\{T_0(x), T_1(x), T_2(x), \\dots\\}"|tex}}, where {{"T_n(x)"|tex}
 {{ offsite_link("https://en.wikipedia.org/wiki/Chebyshev_polynomials#First_kind", "Chebyshev polynomial of the first kind") }}.
 </p>
 
-{{ show_image(page.images["chebyshev_basis.svg"], caption="The first five Chebyshev polynomials. From Wikipedia (public domain).") }}
+{{ show_image(chebyshev_basis, caption="The first five Chebyshev polynomials. From Wikipedia (public domain).") }}
 
 <p>
 Chebyshev polynomials have the property that all their local extrema lie within {{"-1 < x < 1"|tex}}, and each such extrema
@@ -139,7 +152,7 @@ in order to make the result have less dynamic range. For example, if we scale {{
 we get something that looks like the below plot.
 </p>
 
-{{ show_image(page.images["scaled_sine.svg"], caption="Scaled sine function with a dynamic range of ~2, plotted on " + "(-\\pi, \\pi)"|tex + ".") }}
+{{ show_image(scaled_sine, caption="Scaled sine function with a dynamic range of ~2, plotted on " + "(-\\pi, \\pi)"|tex + ".") }}
 
 <p>
 The advantage of this is that if we optimize the <em>absolute</em> error of the above function to {{"2^{-24}/d"|tex}}, where {{"d"|tex}} is the dynamic range,
@@ -156,7 +169,7 @@ Specifically, it shows the following property for Chebyshev functions, which ari
 orthogonality.
 </p>
 
-{{ show_image(page.images["cheby_proj1.png"], caption="Chebyshev inner-product equality") }}
+{{ show_image(cheby_proj1, caption="Chebyshev inner-product equality") }}
 
 <p>
 If the scaled sine function is representable in terms of the Chebyshev basis functions,
@@ -180,26 +193,26 @@ This way, we get coefficients to a function that computes one full cycle of {{"\
 I'll undo the scaling of {{"x"|tex}} later.
 </p>
 
-{{ show_image(page.images["solve_cheb_coeffs.png"], caption="Solve for the Chebyshev coefficients to the scaled sine function. WorkingPrecision needs to be raised for NIntegrate to converge (or use Integrate, if you're patient).") }}
+{{ show_image(solve_cheb_coeffs, caption="Solve for the Chebyshev coefficients to the scaled sine function. WorkingPrecision needs to be raised for NIntegrate to converge (or use Integrate, if you're patient).") }}
 
 <p>
 Now that we have the Chebyshev coefficients, we can reconstruct an approximation to {{"\\sin(x)"|tex}} and also undo the scaling of the {{"x"|tex}} parameter:
 </p>
 
-{{ show_image(page.images["sine_from_coeffs.png"], caption="Reconstructing " + "\\widehat{\\sin}(x) = A_0 T_0(x) + A_1 T_1(x) + \\dots"|tex) }}
+{{ show_image(sine_from_coeffs, caption="Reconstructing " + "\\widehat{\\sin}(x) = A_0 T_0(x) + A_1 T_1(x) + \\dots"|tex) }}
 
 
 <p>
 A quick plot of the reconstructed sine function looks promising:
 </p>
 
-{{ show_image(page.images["reconstructed_sine_plot.svg"], caption="Plot of reconstructed sine approximation on " + "(-\\pi, \\pi)"|tex + ".") }}
+{{ show_image(reconstructed_sine_plot, caption="Plot of reconstructed sine approximation on " + "(-\\pi, \\pi)"|tex + ".") }}
 
 <p>
 Likewise, the plot for the relative error measurement: {{"(\\widehat{\\sin}(x) - \\sin(x))/\\sin(x)"|tex}}.
 </p>
 
-{{ show_image(page.images["relative_error_plot.svg"], caption="Relative error of the sine approximation on " + "(-\\pi, \\pi)"|tex + ".") }}
+{{ show_image(relative_error_plot, caption="Relative error of the sine approximation on " + "(-\\pi, \\pi)"|tex + ".") }}
 
 <p>
 The error is fairly uniform, and it reaches the target of {{"2^{-24}"|tex}}.
@@ -213,7 +226,7 @@ Note that the error could be reduced a bit further by using an iterative process
 which forces all the peaks to be equal.
 #}
 
-{{ show_image(page.images["sine_as_poly.png"], caption="Polynomial approximation to " + "\\sin(x)"|tex + ".") }}
+{{ show_image(sine_as_poly, caption="Polynomial approximation to " + "\\sin(x)"|tex + ".") }}
 
 
 
@@ -251,7 +264,7 @@ fn sine(x: f32) -> f32 {
 So how does this perform?
 </p>
 
-{{ show_image(page.images["horner_ulp.svg"], caption="Average error (in ULP) v.s. x.") }}
+{{ show_image(horner_ulp, caption="Average error (in ULP) v.s. x.") }}
 
 <p>
 Not very well, but why?
@@ -279,7 +292,7 @@ My instincts are to pull out a factor of {{"(x-\\pi)"|tex}} and {{"(x+\\pi)"|tex
 </p>
 
 
-{{ show_image(page.images["fact_sine_as_poly.png"], caption="\\sin(x)"|tex + " approximation divided by " + "(x-\\pi)(x+\\pi)"|tex + ".") }}
+{{ show_image(fact_sine_as_poly, caption="\\sin(x)"|tex + " approximation divided by " + "(x-\\pi)(x+\\pi)"|tex + ".") }}
 
 <p>
 Now if I multiplied by {{"(x+\\pi)(x-\\pi)"|tex}} <em>in 32-bit float</em> to undo the division, that wouldn't be quite right, because the float
@@ -314,13 +327,13 @@ let p1  = p3*x2  + coeffs[0];
 (x + 3.1415927410125732f32 - 0.00000008742277657347586f32) * p1 * x
 """, "rust") }}
 
-{{ show_image(page.images["factored_ulp.svg"], caption="Average error (in ULP) v.s. x.") }}
+{{ show_image(factored_ulp, caption="Average error (in ULP) v.s. x.") }}
 
 <p>
 At this point, it helps to look at the error bounds, rather than just their average magnitude:
 </p>
 
-{{ show_image(page.images["factored_ulp_bounds.svg"], caption="Max & min error (signed) v.s. x. The global maximum error is 4.90 ULP, at x=2.6183214.") }}
+{{ show_image(factored_ulp_bounds, caption="Max & min error (signed) v.s. x. The global maximum error is 4.90 ULP, at x=2.6183214.") }}
 
 <p>
 The plot above shows that the error oscillates over a large range, and rapidly.
@@ -346,7 +359,7 @@ The resulting coefficients are the ones shown in the code at the top of this art
 The maximum error over {{"(-\\pi, \\pi)"|tex}} is now 4.58 ULP and occurs at x=3.020473.
 </p>
 
-{{ show_image(page.images["bruteforce_ulp_bounds.svg"], caption="Max & min error v.s. x for the brute-forced coefficients.") }}
+{{ show_image(bruteforce_ulp_bounds, caption="Max & min error v.s. x for the brute-forced coefficients.") }}
 
 
 {# Brute-force search reveals:

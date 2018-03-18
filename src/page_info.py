@@ -48,7 +48,7 @@ def get_ext(path):
     """
     return os.path.splitext(path)[1]
 
-def highlight_code(self, code, filetype=None):
+def highlight_code(code, filetype=None):
     if filetype:
         lexer = get_lexer_by_name(filetype)
     else:
@@ -303,6 +303,7 @@ class JinjaPage(Page):
         env.globals["get_image"] = get_srcinfo
         env.filters["into_tag"] = filter_into_tag
         env.filters["friendly_date"] = filter_friendly_date
+        env.filters["highlight_code"] = highlight_code
         env.filters["detailed_date"] = filter_detailed_date
         env.filters["drop_null_values"] = filter_drop_null_values
         env.filters["url_with_args"] = filter_url_with_args
@@ -370,7 +371,7 @@ class Image(Page):
                 exec(line, video_vars)
             return video_vars["streams_stream_0_width"], video_vars["streams_stream_0_height"]
         else:
-            if self.src_filename.endswith(".svg"):
+            if self.intermediate_path.endswith(".svg"):
                 # PIL doesn't support SVG.
                 # Instead, parse as XML.
                 # Width and Height are stored as attributes on the root SVG element.

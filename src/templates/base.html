@@ -101,7 +101,7 @@
 <code class="inline-code">{{ code|e }}</code>{% endmacro %}
 
 {% macro multiline_code(code, filetype) %}
-<code class="multiline-code">{{ page_info.highlight_code(code, filetype, **kwargs) }}</code>
+<code class="multiline-code">{{ code|highlight_code(filetype, **kwargs) }}</code>
 {% endmacro %}
 
 {% macro path(p) %}

@@ -4,13 +4,17 @@
 {% set page_info.title = "MOOOOO.ooo - Miscellaneous Tech Writeups" %}
 
 {# Load all build-time dependencies #}
-{% set articles = [get_srcinfo('fimfic-best-pony/index.html')] %}
+{% set articles = [
+	get_srcinfo('fimfic-best-pony/index.html'),
+	get_srcinfo('chebyshev-sine-approximation/index.html'),
+] %}
 
 
 
 {% block page_content %}
 
-{% for entry in articles|sort(attribute="pub_date", reverse=True) %}
+{# {% for entry in articles|sort(attribute="pub_date", reverse=True) %} #}
+{% for entry in articles %}
 {{ heading(entry.title, link_to=entry.build_path, show_icon=False, sublevel=1, class="title") }}
 {% if entry.pub_date %}
 <div class="blog-pubdate">

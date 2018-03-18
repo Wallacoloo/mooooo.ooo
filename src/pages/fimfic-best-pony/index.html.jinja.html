@@ -3,7 +3,7 @@
 {% extends 'blog_entry.html' %}
 
 {% set page_info.title = "Best pony, as told by Fimfiction" %}
-{{ page_info.comments.update(reddit="https://www.reddit.com/r/mylittlepony/comments/4tp1co/best_pony_as_told_by_fimfiction/") }}
+{% do page_info.comments.update(reddit="https://www.reddit.com/r/mylittlepony/comments/4tp1co/best_pony_as_told_by_fimfiction/") %}
 
 {% set rating_vs_char = get_image("rating_vs_char.png") %}
 {% set rating_vs_char_all = get_image("rating_vs_char_all.png") %}

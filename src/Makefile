@@ -185,7 +185,7 @@ $(BUILD_CACHE)/%.woff2: $(BUILD_CACHE)/%.ttf
 
 
 ## Rasterize SVGs to PNG
-%.png: %.svg
+$(BUILD_CACHE)/%.png: $(BUILD_CACHE)/%.svg
 	convert $< $@
 	# convert -density 144
 
