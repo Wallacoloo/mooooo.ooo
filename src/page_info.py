@@ -354,35 +354,30 @@ class JinjaPage(Page):
 
 class Image(Page):
     def __init__(self, **kwargs):
-        self._is_video = kwargs.pop("is_video", False)
         super().__init__(**kwargs)
-    @property
-    def is_video(self):
-        return self._is_video
     @property
     def size(self):
         """Returns the size of the image in pixels (width, height)"""
-        if self.is_video:
+        if get_ext(self.intermediate_path) == ".svg":
+            # PIL doesn't support SVG.
+            # Instead, parse as XML.
+            # Width and Height are stored as attributes on the root SVG element.
+            tree = ElementTree.parse(self.src_filename)
+            root = tree.getroot()
+            width = int(root.attrib["width"].replace("pt", ""))
+            height = int(root.attrib["height"].replace("pt", ""))
+            return (width, height)
+        elif get_ext(self.intermediate_path) in VID_EXTENSIONS:
             cmd = "ffprobe -show_entries stream=height,width -v error -of flat=s=_ %s" %self.src_filename
             p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             output = p.communicate()
             video_vars = {}
             for line in output:
                 exec(line, video_vars)
-            return video_vars["streams_stream_0_width"], video_vars["streams_stream_0_height"]
+            return int(video_vars["streams_stream_0_width"]), int(video_vars["streams_stream_0_height"])
         else:
-            if self.intermediate_path.endswith(".svg"):
-                # PIL doesn't support SVG.
-                # Instead, parse as XML.
-                # Width and Height are stored as attributes on the root SVG element.
-                tree = ElementTree.parse(self.src_filename)
-                root = tree.getroot()
-                width = int(root.attrib["width"].replace("pt", ""))
-                height = int(root.attrib["height"].replace("pt", ""))
-                return (width, height)
-            else:
-                im = PIL.Image.open(self.src_filename)
-                return im.size
+            im = PIL.Image.open(self.src_filename)
+            return im.size
 
     def get_src_info(self):
         src_info = self.base_src_info

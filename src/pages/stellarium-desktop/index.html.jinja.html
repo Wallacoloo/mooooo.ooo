@@ -1,11 +1,12 @@
 {% from 'base.html' import heading, offsite_link, show_image %}
-{{ page.set_title("An interactive stargazing desktop background") }}
-
 {% extends 'blog_entry.html' %}
+{% set page_info.title = "An interactive stargazing desktop background" %}
+
+{% set stellarium_demo = get_image("stellarium-demo.webm") %}
 
 {% block entry_content %}
 
-{{ show_video(page.images["stellarium-demo.webm"], caption="The end result (video).") }}
+{{ show_video(stellarium_demo, caption="The end result (video).") }}
 <p>
 As described on the project's homepage, {{ offsite_link("http://stellarium.org", "Stellarium") }}
 "is a free open source planetarium for your computer. It shows a realistic sky in 3D, just like what you see with the naked eye, binoculars or a telescope."

@@ -45,11 +45,10 @@
 {% endmacro %}
 
 {% macro show_video(video, caption="") %}
-{% do page_info.srcdeps.add(video) %}
-{% do page_info.rtdeps.add(video) %}
+{% do page_info.rtdeps.add(video.build_path) %}
 <span class="image-container">
 <span class="centered">
-	<video src="{{ video.path|to_rel_path }}" width="{{ video.size.0 }}" height="{{ video.size.1 }}" controls class="theater-video">
+	<video src="{{ video.intermediate_path|to_rel_path }}" width="{{ video.size.0 }}" height="{{ video.size.1 }}" controls class="theater-video">
 	</video>
 {% if caption %}
 	<span class="caption">
