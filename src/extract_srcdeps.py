@@ -26,8 +26,14 @@ INCL_{out_path}=y
 # _Buildtime_ dependencies for this file
 {incl_src_deps}
 {src_deps}
+
+# How to build this file
+{intermediate_path}.build: {intermediate_src_path}
+	./build_page.py $< $@
 endif
-""".format(**globals())
+""".format(intermediate_path=page_info['intermediate_path'],
+        intermediate_src_path=page_info['intermediate_src_path'],
+        **globals())
     out_file = open(out_path, 'w+')
     out_file.write(output)
 

@@ -41,7 +41,6 @@ DEFAULT_TARGET=index.html
 include $(BUILD_INTERMEDIATE)/$(DEFAULT_TARGET).alldeps
 PUB_TARGETS=$(call GET_RT_DEPS_$(BUILD_OUTPUT)/$(DEFAULT_TARGET),)
 all: $(PUB_TARGETS)
-	@echo $(PUB_TARGETS)
 endif
 
 
@@ -91,8 +90,8 @@ $(BUILD_INTERMEDIATE)/%.srcdeps: $(BUILD_INTERMEDIATE)/%.srcinfo ## Extract depe
 $(BUILD_INTERMEDIATE)/%.srcinfo: $(BUILD_INTERMEDIATE)/%.jinja.html $(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo $(CONFIG_JSON) ## Extract information about a html page
 	./build_page.py $< $@
 
-$(BUILD_INTERMEDIATE)/%.html.build: $(BUILD_INTERMEDIATE)/%.html.jinja.html $(BUILD_INTERMEDIATE)/%.html.srcdeps $(CONFIG_JSON) ## Render html jinja templates
-	./build_page.py $< $@
+#$(BUILD_INTERMEDIATE)/%.html.build: $(BUILD_INTERMEDIATE)/%.html.jinja.html $(BUILD_INTERMEDIATE)/%.html.srcdeps $(CONFIG_JSON) ## Render html jinja templates
+#	./build_page.py $< $@
 
 $(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo: pages/%.jinja.html $(CONFIG_JSON)
 	@mkdir -p $(dir $@)
@@ -103,8 +102,8 @@ $(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo: pages/%.jinja.html $(CONFIG_JSON)
 $(BUILD_INTERMEDIATE)/%.srcinfo: $(BUILD_INTERMEDIATE)/%.jinja.css $(BUILD_INTERMEDIATE)/%.jinja.css.srcinfo $(CONFIG_JSON) ## Extract information about a css page
 	./build_page.py $< $@
 
-$(BUILD_INTERMEDIATE)/%.css.build: $(BUILD_INTERMEDIATE)/%.css.jinja.css $(BUILD_INTERMEDIATE)/%.css.srcdeps $(CONFIG_JSON) ## Render css jinja templates
-	./build_page.py $< $@
+#$(BUILD_INTERMEDIATE)/%.css.build: $(BUILD_INTERMEDIATE)/%.css.jinja.css $(BUILD_INTERMEDIATE)/%.css.srcdeps $(CONFIG_JSON) ## Render css jinja templates
+#	./build_page.py $< $@
 
 $(BUILD_INTERMEDIATE)/%.jinja.css.srcinfo: pages/%.jinja.css $(CONFIG_JSON)
 	@mkdir -p $(dir $@)
@@ -114,8 +113,8 @@ $(BUILD_INTERMEDIATE)/%.jinja.css.srcinfo: pages/%.jinja.css $(CONFIG_JSON)
 
 $(BUILD_INTERMEDIATE)/%.srcinfo: $(BUILD_INTERMEDIATE)/%.src.bin ## Extract info about a binary blob
 	./build_page.py $< $@
-$(BUILD_INTERMEDIATE)/%.build: $(BUILD_INTERMEDIATE)/%.src.bin ## Build a binary blob
-	./build_page.py $< $@
+#$(BUILD_INTERMEDIATE)/%.build: $(BUILD_INTERMEDIATE)/%.src.bin ## Build a binary blob
+#	./build_page.py $< $@
 
 # Extract binary data from a .build object
 $(BUILD_INTERMEDIATE)/%: $(BUILD_INTERMEDIATE)/%.build
@@ -130,8 +129,12 @@ $(BUILD_INTERMEDIATE)/%.rtdeps: $(BUILD_INTERMEDIATE)/%.build
 # The solution is to create a .alldeps file that includes them both, but for which
 # its build depends on the .srcdeps file to be build. Then, include this .alldeps
 # file instead of both .srcdeps and .rtdeps
+#	cat $^ | grep '^include ' | sed 's|include ||' | xargs --no-run-if-empty $(MAKE)
+#	cat $^ | grep '^include ' | sed 's|include |$(^:.srcdeps=.rtdeps): |' >> $@
 $(BUILD_INTERMEDIATE)/%.alldeps: $(BUILD_INTERMEDIATE)/%.srcdeps
-	echo "include $^ $(^:.srcdeps=.rtdeps)" > $@
+	echo "include $^" > $@
+	cat $^ | grep '^include ' | sed 's|include ||' | sed 's|srcdeps|alldeps|' | xargs --no-run-if-empty $(MAKE)
+	echo "include $(^:.srcdeps=.rtdeps)" >> $@
 
 # HOW TO COPY SOURCES INTO INTERMEDIATE/
 

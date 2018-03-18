@@ -184,6 +184,7 @@ class Page(object):
             src_srcinfo = {}
 
         return dict(
+            intermediate_src_path = self.src_filename,
             intermediate_path = self.intermediate_path,
             build_path = self.build_path,
             rtdeps = set(),
