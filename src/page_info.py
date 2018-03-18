@@ -142,7 +142,7 @@ class Page(object):
         """ Auto-deduce the type of a page, and return an instance of that. """
         if src_filename.endswith(".html.jinja.html") or src_filename.endswith(".css.jinja.css"):
             Cls = JinjaPage
-        elif get_ext(src_filename) in GFX_EXTENSIONS:
+        elif get_ext(src_filename.replace(".src.bin", "")) in GFX_EXTENSIONS:
             Cls = Image
         else:
             Cls = BinaryBlob
@@ -162,7 +162,7 @@ class Page(object):
         return self.src_filename \
             .replace(".html.jinja.html", ".html") \
             .replace(".css.jinja.css", ".css") \
-            .replace(".png.src.png", ".png")
+            .replace(".src.bin", "")
 
     @property
     def intermediate_dir(self):

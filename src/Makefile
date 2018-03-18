@@ -3,6 +3,7 @@ OPTIPNG=optipng #Optional
 JPGCRUSH=jpgcrush #Optional
 #GIFSICLE=gifsicle #Optional
 SCOUR=scour #Optional tool to compress svgs.
+COMPRESS_MEDIA=y
 
 # jpegoptim provides 3~4% improvement (w/ -s)
 # jpegrescan provides 6~7% (w/ -s)
@@ -84,7 +85,7 @@ publish: publish-ipfs publish-cf publish-ipns publish-host ## Publish the site e
 $(BUILD_INTERMEDIATE)/%.srcdeps: $(BUILD_INTERMEDIATE)/%.srcinfo ## Extract dependencies from a srcinfo object
 	./extract_srcdeps.py $< $@
 
-# JINJA -> HTML
+# %.HTML.JINJA.HTML -> %.HTML
 
 $(BUILD_INTERMEDIATE)/%.srcinfo: $(BUILD_INTERMEDIATE)/%.jinja.html $(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo $(CONFIG_JSON) ## Extract information about a html page
 	./build_page.py $< $@
@@ -96,7 +97,7 @@ $(BUILD_INTERMEDIATE)/%.jinja.html.srcinfo: pages/%.jinja.html $(CONFIG_JSON)
 	@mkdir -p $(dir $@)
 	./extract_git.py $< $@
 
-# JINJA -> CSS
+# %.CSS.JINJA.CSS -> %.CSS
 
 $(BUILD_INTERMEDIATE)/%.srcinfo: $(BUILD_INTERMEDIATE)/%.jinja.css $(BUILD_INTERMEDIATE)/%.jinja.css.srcinfo $(CONFIG_JSON) ## Extract information about a css page
 	./build_page.py $< $@
@@ -107,13 +108,6 @@ $(BUILD_INTERMEDIATE)/%.css.build: $(BUILD_INTERMEDIATE)/%.css.jinja.css $(BUILD
 $(BUILD_INTERMEDIATE)/%.jinja.css.srcinfo: pages/%.jinja.css $(CONFIG_JSON)
 	@mkdir -p $(dir $@)
 	./extract_git.py $< $@
-
-# SRC.PNG -> PNG
-
-$(BUILD_INTERMEDIATE)/%.png.srcinfo: $(BUILD_INTERMEDIATE)/%.png ## Extract information about an image
-	./build_page.py $< $@
-$(BUILD_INTERMEDIATE)/%.png.build: $(BUILD_INTERMEDIATE)/%.png.src.png ## Extract information about an image
-	./build_page.py $< $@
 
 # %.SRC.BIN -> %
 
@@ -145,36 +139,33 @@ $(BUILD_INTERMEDIATE)/%.html.jinja.html: pages/%.html.jinja.html
 $(BUILD_INTERMEDIATE)/%.css.jinja.css: pages/%.css.jinja.css
 	$(MKDIR_CP)
 
-$(BUILD_INTERMEDIATE)/%.jpg.src.jpg: $(BUILD_ROOT)/images/%.jpg
+ifeq ($(COMPRESS_MEDIA),y)
+## Build compressed png images
+$(BUILD_INTERMEDIATE)/%.png.src.bin: pages/%.png
+	$(MKDIR_CP)
+	$(OPTIPNG) --quiet $@ || true
+
+## Compress jpegs (losslessly), plus remove a lot of metadata
+$(BUILD_INTERMEDIATE)/%.jpg.src.bin: pages/%.jpg
+	$(MKDIR_CP)
+	$(JPGCRUSH) $@ || true
+
+## Strip SVGs
+$(BUILD_INTERMEDIATE)/%.svg.src.bin: pages/%.svg
+	$(MKDIR_CP)
+	$(SCOUR) -i $^ --enable-comment-stripping --enable-id-stripping --create-groups --no-line-breaks --strip-xml-prolog -p 10 -o $@ || true
+
+## Compress gifs (losslessly)
+$(BUILD_INTERMEDIATE)/%.gif.src.bin: pages/%.gif
+	$(MKDIR_CP)
+	$(GIFSICLE) -O3 -b $@ || true
+endif
+
+
+# Fallback for binary files
+$(BUILD_INTERMEDIATE)/%.src.bin: pages/%
 	$(MKDIR_CP)
 
-$(BUILD_INTERMEDIATE)/%.png.src.png: $(BUILD_ROOT)/images/%.png
-	$(MKDIR_CP)
-
-$(BUILD_INTERMEDIATE)/%.png.src.gif: $(BUILD_ROOT)/images/%.gif
-	$(MKDIR_CP)
-
-$(BUILD_INTERMEDIATE)/%.png.src.svg: $(BUILD_ROOT)/images/%.svg
-	$(MKDIR_CP)
-
-$(BUILD_INTERMEDIATE)/%.pdf.src.bin: pages/%.pdf
-	$(MKDIR_CP)
-
-## Copy webm videos
-$(BUILD_INTERMEDIATE)/%.webm: pages/%.webm
-	$(MKDIR_CP)
-
-## Copy ogg audio files
-$(BUILD_INTERMEDIATE)/%.ogg: pages/%.ogg
-	$(MKDIR_CP)
-
-## Copy ICC color profiles
-$(BUILD_INTERMEDIATE)/%.icc: pages/%.icc
-	$(MKDIR_CP)
-
-## Copy Headers
-$(BUILD_INTERMEDIATE)/%.h: pages/%.h
-	$(MKDIR_CP)
 
 ## Copy generated fonts to the intermediate directory (as the font generators may create extra files)
 $(BUILD_INTERMEDIATE)/fonts/%: $(BUILD_ROOT)/fonts/%
@@ -188,24 +179,6 @@ $(BUILD_INTERMEDIATE)/fonts/%: $(BUILD_ROOT)/fonts/%
 	convert $< $@
 	# convert -density 144
 
-## Build compressed png images
-$(BUILD_ROOT)/images/%.png: pages/%.png
-	$(MKDIR_CP)
-	$(OPTIPNG) --quiet $@ || true
-
-## Compress jpegs (losslessly), plus remove a lot of metadata
-$(BUILD_ROOT)/images/%.jpg: pages/%.jpg
-	$(MKDIR_CP)
-	$(JPGCRUSH) $@ || true
-
-$(BUILD_ROOT)/images/%.svg: pages/%.svg
-	$(MKDIR_CP)
-	$(SCOUR) -i $^ --enable-comment-stripping --enable-id-stripping --create-groups --no-line-breaks --strip-xml-prolog -p 10 -o $@ || true
-
-## Compress gifs (losslessly)
-$(BUILD_ROOT)/images/%.gif: pages/%.gif
-	$(MKDIR_CP)
-#	$(GIFSICLE) -O3 -b $@
 
 
 # If the font already exists, just directly copy it
