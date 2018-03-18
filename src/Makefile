@@ -3,7 +3,6 @@ OPTIPNG=optipng #Optional
 JPGCRUSH=jpgcrush #Optional
 #GIFSICLE=gifsicle #Optional
 SCOUR=scour #Optional tool to compress svgs.
-COMPRESS_MEDIA=y
 
 # jpegoptim provides 3~4% improvement (w/ -s)
 # jpegrescan provides 6~7% (w/ -s)
@@ -12,6 +11,7 @@ COMPRESS_MEDIA=y
 
 MAKE_DIR=$(shell pwd)
 BUILD_ROOT=$(shell cd ../ && pwd)/build
+BUILD_CACHE=$(BUILD_ROOT)/cache
 BUILD_INTERMEDIATE=$(BUILD_ROOT)/intermediate
 BUILD_OUTPUT=$(BUILD_ROOT)/output
 CONFIG_JSON=$(BUILD_ROOT)/config.json
@@ -35,9 +35,13 @@ export PATH:=${PATH}:${PWD}/../node_modules/mathjax-node/bin
 all:
 
 ifeq ($(filter-out all,$(MAKECMDGOALS)),)
-include $(BUILD_INTERMEDIATE)/index.html.alldeps
-PUB_TARGETS=$(call GET_RT_DEPS_$(BUILD_OUTPUT)/index.html,)
+DEFAULT_TARGET=index.html
+#DEFAULT_TARGET=css/global.css
+#DEFAULT_TARGET=css/fonts.css
+include $(BUILD_INTERMEDIATE)/$(DEFAULT_TARGET).alldeps
+PUB_TARGETS=$(call GET_RT_DEPS_$(BUILD_OUTPUT)/$(DEFAULT_TARGET),)
 all: $(PUB_TARGETS)
+	@echo $(PUB_TARGETS)
 endif
 
 
@@ -136,64 +140,52 @@ $(BUILD_INTERMEDIATE)/%.html.jinja.html: pages/%.html.jinja.html
 $(BUILD_INTERMEDIATE)/%.css.jinja.css: pages/%.css.jinja.css
 	$(MKDIR_CP)
 
-ifeq ($(COMPRESS_MEDIA),y)
 ## Build compressed png images
-$(BUILD_INTERMEDIATE)/%.png.src.bin: pages/%.png
+$(BUILD_CACHE)/%.png: pages/%.png
 	$(MKDIR_CP)
 	$(OPTIPNG) --quiet $@ || true
 
 ## Compress jpegs (losslessly), plus remove a lot of metadata
-$(BUILD_INTERMEDIATE)/%.jpg.src.bin: pages/%.jpg
+$(BUILD_CACHE)/%.jpg: pages/%.jpg
 	$(MKDIR_CP)
 	$(JPGCRUSH) $@ || true
 
 ## Strip SVGs
-$(BUILD_INTERMEDIATE)/%.svg.src.bin: pages/%.svg
+$(BUILD_CACHE)/%.svg: pages/%.svg
 	$(MKDIR_CP)
 	$(SCOUR) -i $^ --enable-comment-stripping --enable-id-stripping --create-groups --no-line-breaks --strip-xml-prolog -p 10 -o $@ || true
 
 ## Compress gifs (losslessly)
-$(BUILD_INTERMEDIATE)/%.gif.src.bin: pages/%.gif
+$(BUILD_CACHE)/%.gif: pages/%.gif
 	$(MKDIR_CP)
 	$(GIFSICLE) -O3 -b $@ || true
-endif
 
 
 # Fallback for binary files
-$(BUILD_INTERMEDIATE)/%.src.bin: pages/%
+$(BUILD_CACHE)/%: pages/%
 	$(MKDIR_CP)
 
-
-## Copy generated fonts to the intermediate directory (as the font generators may create extra files)
-$(BUILD_INTERMEDIATE)/fonts/%: $(BUILD_ROOT)/fonts/%
+$(BUILD_INTERMEDIATE)/%.src.bin: $(BUILD_CACHE)/%
 	$(MKDIR_CP)
+
+## Build TTF fonts from OTF
+$(BUILD_CACHE)/%.ttf: $(BUILD_CACHE)/%.otf
+	mkdir -p $(dir $@)
+	fontforge -c 'import fontforge; font = fontforge.open("$<"); font.generate("$@")'
+
+## Build WOFF, SVG, EOT fonts from TTF
+$(BUILD_CACHE)/%.woff $(BUILD_CACHE)/%.eot $(BUILD_CACHE)/%.svg: $(BUILD_CACHE)/%.ttf
+	webify $<
+
+## Build WOFF2 fonts from WOFF
+$(BUILD_CACHE)/%.woff2: $(BUILD_CACHE)/%.ttf
+	woff2_compress $<
 
 
 ## Rasterize SVGs to PNG
 %.png: %.svg
 	convert $< $@
 	# convert -density 144
-
-
-
-# If the font already exists, just directly copy it
-$(BUILD_ROOT)/fonts/%: fonts/%
-	$(MKDIR_CP)
-
-## Build TTF fonts from OTF
-$(BUILD_ROOT)/fonts/%.ttf: fonts/%.otf
-	mkdir -p $(dir $@)
-	fontforge -c 'import fontforge; font = fontforge.open("$(MAKE_DIR)/$<"); font.generate("$@")'
-
-## Build WOFF, SVG, EOT fonts from TTF
-$(BUILD_ROOT)/fonts/%.woff $(BUILD_ROOT)/fonts/%.eot $(BUILD_ROOT)/fonts/%.svg: $(BUILD_ROOT)/fonts/%.ttf
-	mkdir -p $(dir $@)
-	webify $<
-
-## Build WOFF2 fonts from WOFF
-$(BUILD_ROOT)/fonts/%.woff2: $(BUILD_ROOT)/fonts/%.ttf
-	woff2_compress $<
-
 
 
 ## Files to be published can be copied from the intermediate folder

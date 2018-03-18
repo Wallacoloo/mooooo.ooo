@@ -193,7 +193,5 @@
 	{{ incl_font_sources("GenBasBI") }}
 }
 
-{# TODO: why does this error?
 {{ include_inline(get_page("font-awesome.css")) }}
-#}
 
