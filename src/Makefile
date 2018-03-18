@@ -35,8 +35,12 @@ endef
 export PATH:=${PATH}:${PWD}/../node_modules/mathjax-node/bin
 
 all:
+
+ifeq ($(filter-out all,$(MAKECMDGOALS)),)
 include $(BUILD_INTERMEDIATE)/index.html.alldeps
-all: $(RT_DEPS$(BUILD_OUTPUT)/index.html)
+PUB_TARGETS=$(call GET_RT_DEPS_$(BUILD_OUTPUT)/index.html,)
+all: $(PUB_TARGETS)
+endif
 
 
 clean: ## Removes the FINAL outputs of the build, but not cached versions stored elsewhere or dependency info
@@ -108,8 +112,14 @@ $(BUILD_INTERMEDIATE)/%.jinja.css.srcinfo: pages/%.jinja.css $(CONFIG_JSON)
 
 $(BUILD_INTERMEDIATE)/%.png.srcinfo: $(BUILD_INTERMEDIATE)/%.png ## Extract information about an image
 	./build_page.py $< $@
-
 $(BUILD_INTERMEDIATE)/%.png.build: $(BUILD_INTERMEDIATE)/%.png.src.png ## Extract information about an image
+	./build_page.py $< $@
+
+# %.SRC.BIN -> %
+
+$(BUILD_INTERMEDIATE)/%.srcinfo: $(BUILD_INTERMEDIATE)/%.src.bin ## Extract info about a binary blob
+	./build_page.py $< $@
+$(BUILD_INTERMEDIATE)/%.build: $(BUILD_INTERMEDIATE)/%.src.bin ## Build a binary blob
 	./build_page.py $< $@
 
 # Extract binary data from a .build object
@@ -147,6 +157,9 @@ $(BUILD_INTERMEDIATE)/%.png.src.gif: $(BUILD_ROOT)/images/%.gif
 $(BUILD_INTERMEDIATE)/%.png.src.svg: $(BUILD_ROOT)/images/%.svg
 	$(MKDIR_CP)
 
+$(BUILD_INTERMEDIATE)/%.pdf.src.bin: pages/%.pdf
+	$(MKDIR_CP)
+
 ## Copy webm videos
 $(BUILD_INTERMEDIATE)/%.webm: pages/%.webm
 	$(MKDIR_CP)
@@ -157,10 +170,6 @@ $(BUILD_INTERMEDIATE)/%.ogg: pages/%.ogg
 
 ## Copy ICC color profiles
 $(BUILD_INTERMEDIATE)/%.icc: pages/%.icc
-	$(MKDIR_CP)
-
-## Copy PDFs
-$(BUILD_INTERMEDIATE)/%.pdf: pages/%.pdf
 	$(MKDIR_CP)
 
 ## Copy Headers
@@ -227,11 +236,6 @@ $(BUILD_OUTPUT)/%: $(BUILD_INTERMEDIATE)/%
 help:
 	@grep -h -P '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-## Print the value of a variable, e.g. print-BUILD_ROOT
-#print-%  : ; @echo $* = $($*)
-print-RT_DEPS/home/colin/src/mooooo/build/output/index.html: ; @echo $@ = $(RT_DEPS/home/colin/src/mooooo/build/output/index.html)
-print-RT_DEPS/home/colin/src/mooooo/build/output/fimfic-best-pony/index.html: ; @echo $@ = $(RT_DEPS/home/colin/src/mooooo/build/output/fimfic-best-pony/index.html)
-print-RT_DEPS/home/colin/src/mooooo/build/output/fimfic-best-pony/character_mentions_in_a_sentence.png: ; @echo $@ = $(RT_DEPS/home/colin/src/mooooo/build/output/fimfic-best-pony/character_mentions_in_a_sentence.png)
 
 .SECONDARY:
 .PHONY: clean clean-all clean-deps help publish-ipfs publish-ipns publish-cf publish

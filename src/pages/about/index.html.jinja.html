@@ -1,5 +1,5 @@
-{{ page.set_type(AboutPage) }}
-{{ page.set_title("About MOOOOOooo") }}
+{% set page_info.page_type = AboutPage %}
+{% set page_info.title = "About MOOOOOooo" %}
 
 {% from 'base.html' import heading %}
 
@@ -49,7 +49,7 @@ Some notable projects to which I have contributed include:
 
 <p>
 More details can be found on my <a href="https://github.com/Wallacoloo">Github page</a> or through
-my {{ onsite_link(page.other["resume.pdf"], "resume") }}.
+my {{ onsite_link("resume.pdf"|path_from_here, "resume") }}.
 Feel free to reach out to me for any reason (except to advertise your product) - my email can be found at the bottom of this page.
 </p>
 

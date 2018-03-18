@@ -11,6 +11,7 @@ if __name__ == "__main__":
 
     build = jsonpickle.decode(open(in_path).read())
     srcdep = out_path.replace(".rtdeps", ".srcdeps")
+    build_path=build['build_path']
     # all runtime intermediates we need
     rtdeps = [
             d.replace(".srcinfo","")
@@ -23,7 +24,8 @@ if __name__ == "__main__":
     builddir_deps = [d
         .replace(config['build']['intermediate'], config['build']['output'])
         for d in rtdeps]
-    rt_deps_vars = "\\\n    ".join("$(RT_DEPS{})".format(d) for d in builddir_deps)
+    call_rt_deps = " ".join("$(call GET_RT_DEPS_{dep},{build_path} $(1))"
+            .format(dep=d, build_path=build_path) for d in builddir_deps)
     output = """
 ifndef INCL_{out_path}
 #include guard
@@ -31,10 +33,14 @@ INCL_{out_path}=y
 # Trigger calculation of the runtime dependencies for each of our dependencies
 {include_alldeps}
 # _Runtime_ dependencies for this file
-RT_DEPS{build_path} = {build_path} \
-    {rt_deps_vars}
-endif
-""".format(build_path=build['build_path'], **globals())
+define GET_RT_DEPS_{build_path}
+$(if $(filter {build_path},$(1)), \\
+    $(1), \\
+    {build_path} {call_rt_deps} \\
+)
+endef
+endif # include guard
+""".format(**globals())
     out_file = open(out_path, 'w+')
     out_file.write(output)
 

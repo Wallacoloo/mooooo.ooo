@@ -144,6 +144,8 @@ class Page(object):
             Cls = JinjaPage
         elif get_ext(src_filename) in GFX_EXTENSIONS:
             Cls = Image
+        else:
+            Cls = BinaryBlob
         return Cls(src_filename=src_filename, **kwargs)
 
     def __init__(self, src_filename):
@@ -161,6 +163,11 @@ class Page(object):
             .replace(".html.jinja.html", ".html") \
             .replace(".css.jinja.css", ".css") \
             .replace(".png.src.png", ".png")
+
+    @property
+    def intermediate_dir(self):
+        return os.path.dirname(self.intermediate_path)
+
     @property
     def build_path(self):
         return self.intermediate_path \
@@ -223,6 +230,10 @@ class JinjaPage(Page):
             """ Treat `path' as a path relative to the intermediate root.
             """
             return os.path.join(config['build']['intermediate'], path)
+        def path_from_here(path):
+            """ Treat `path' as a path relative to the current folder
+            """
+            return os.path.join(self.intermediate_dir, path)
 
         def to_rel_path(abs_path):
             #build_root = config["build"]["output"] + "/"
@@ -299,6 +310,7 @@ class JinjaPage(Page):
         env.filters["to_rel_path"] = to_rel_path
         env.filters["to_build_path"] = to_build_path
         env.filters["path_from_root"] = path_from_root
+        env.filters["path_from_here"] = path_from_here
         env.globals["get_highlight_css"] = get_highlight_css
         # Expose these types for passing to the `page.set_type` macro
         env.globals["BlogEntry"] = BlogEntry
@@ -386,6 +398,9 @@ class Image(Page):
     #    else:
     #        return self
 
+class BinaryBlob(Page):
+    def get_src_info(self):
+        return self.base_src_info
 
 class Author(object):
     def __init__(self, name):

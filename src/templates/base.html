@@ -142,7 +142,6 @@ img
 					{# Derivative templates are expected to
 						{% set is_page_xxx = True %} for at least one page #}
 					<ul class="nav-ul">
-							{# TODO this causes recursive make vars
 							<li class="nav-li-blog{{ " active" if page_info.type == HomePage else ""}}">
 									{{ onsite_link("index.html"|path_from_root, "Blog") }}
 							</li>
@@ -151,7 +150,6 @@ img
 							<li class="nav-li-about{{ " active" if page_info.type == AboutPage else "" }}">
 									{{ onsite_link("about/index.html"|path_from_root, "About") }}
 							</li>
-							#}
 					</ul>
 			</header>
 			<div class="page-content">
