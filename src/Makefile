@@ -19,9 +19,6 @@ CONFIG_JSON=$(BUILD_ROOT)/config.json
 IPFSID_FILE=$(BUILD_ROOT)/mooooo.ipfsid
 IPNSID_FILE=$(BUILD_ROOT)/mooooo.ipnsid
 
-# For publishing to Amazon EC2
-#HOST_ID_FILE=-i ../MOOOOOoooWebServer.pem
-#HOST_USER_DOMAIN=root@ec2.mooooo.ooo
 # For publish to Raspberry Pi:
 HOST_ID_FILE=
 #HOST_USER_DOMAIN=alarm@ssh.mooooo.ooo
@@ -171,8 +168,6 @@ $(BUILD_INTERMEDIATE)/%.src.bin: pages/%
 $(BUILD_INTERMEDIATE)/fonts/%: $(BUILD_ROOT)/fonts/%
 	$(MKDIR_CP)
 
-
-# COMPRESSION / GENERATION OF MEDIA FILES
 
 ## Rasterize SVGs to PNG
 %.png: %.svg
