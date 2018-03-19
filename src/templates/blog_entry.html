@@ -36,7 +36,7 @@ By {{ page_info.authors[0].name }}
 <div class="blog-footer">
 	<p>
 	{% if page_info.pub_date %}
-		{# Display the same data AND TIMESTAMP as in the header #}
+		{# Display the same date AND TIMESTAMP as in the header #}
 		{% if page_info.pub_date|friendly_date == page_info.last_edit_date|friendly_date %}
 			{{ show_date(page_info.last_edit_date) }}
 		{% else %}
@@ -51,8 +51,8 @@ By {{ page_info.authors[0].name }}
 		{% if page_info.comments.get("reddit") %}
 		or {{ offsite_link(page_info.comments["reddit"], "join the discussion on reddit") }}{# no linebreak before period -#}
 		{% endif %}
-		{% if page_info.comments.get("news.ycombinator") %}
-		or {{ offsite_link(page_info.comments["news.ycombinator"], "join the discussion on Hacker News") }}{# no linebreak before period -#}
+		{% if page_info.comments.get("news_ycombinator") %}
+		or {{ offsite_link(page_info.comments["news_ycombinator"], "join the discussion on Hacker News") }}{# no linebreak before period -#}
 		{% endif %}.
 	</p>
 </div>

@@ -32,14 +32,6 @@ config = json.loads(open(CONFIG_PATH, "r").read())
 
 persistent = joblib.Memory(cachedir="../build/joblib", verbose=0)
 
-def recursive_listdir(path):
-    """Same as os.listdir, but recurses into subdirectories.
-    Original code by John La Rooy. Source: http://stackoverflow.com/a/19309964
-    Slight modification from original to remove the base dir from the returned paths
-        (thus mimicking os.listdir)
-    """
-    return [os.path.join(dp, f)[len(path):] for dp, dn, fn in os.walk(path) for f in fn]
-
 def get_ext(path):
     """Return the extension of a filename.
     Example:
@@ -110,7 +102,6 @@ def filter_tex_to_svg(tex):
     """Convert LaTeX into an inline svg.
     e.g. "e=mc^2"|tex
     """
-    # TODO: don't render if do_render == False
     # Note: we prepend a space to fix bug in tex2svg when input is a number or starts with '-'
     tex = subprocess.Popen(["tex2svg", "--inline", " " + tex], stdout=subprocess.PIPE)
     res = subprocess.check_output(["scour", "-q", "-p" "10",
@@ -220,7 +211,7 @@ class JinjaPage(Page):
             title = "",
             desc = "",
             comments = dict(),
-            type = Page,
+            page_type = Page,
             **self.base_src_info
         )
 
@@ -407,18 +398,6 @@ class Author(object):
     def __hash__(self):
         return hash(self.name)
 
-class Audio(Page):
-    do_render_with_jinja = False
-
-class Font(Page):
-    do_render_with_jinja = False
-
-class Css(Page):
-    do_render_with_jinja = True
-
-class Other(Page):
-    do_render_with_jinja = False
-
 class BlogEntry(Page):
     do_render_with_jinja = True
 
@@ -427,54 +406,4 @@ class HomePage(Page):
 
 class AboutPage(Page):
     do_render_with_jinja = True
-
-class Pages(object):
-    def __init__(self, basedir, extensions):
-        self._basedir = basedir
-        self._extensions = extensions
-        self._all = None
-
-    @property
-    def all(self):
-        if self._all is None:
-            self._all = {}
-            for fname in recursive_listdir(self._basedir):
-                if get_ext(fname) in self._extensions:
-                    pg = Page(path_on_disk=os.path.join(self._basedir, fname))
-                    self._all[pg.path] = pg
-        return self._all
-
-    def __hasitem__(self, key):
-        try:
-            self[key]
-        except KeyError:
-            return False
-        else:
-            return True
-
-    def __getitem__(self, key):
-        """Returns a page by its path.
-        Note: index.html is implicit (if the path doesn't exist)
-        """
-        if not isinstance(key, str):
-            raise KeyError(key)
-
-        if key.startswith("/"):
-            # Leading slash is optional, but useful for requesting the index page
-            key = key[1:]
-        if key in self.all:
-            return self.all[key]
-        elif os.path.join(key, "index.html") in self.all:
-            return self.all[os.path.join(key, "index.html")]
-        else:
-            raise KeyError(key)
-
-    @property
-    def blog_entries(self):
-        """Return all pages which are blog entries"""
-        entries = {}
-        for key, item in self.all.items():
-            if isinstance(item, BlogEntry):
-                entries[key] = item
-        return entries
 
