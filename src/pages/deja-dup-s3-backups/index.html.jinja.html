@@ -1,7 +1,28 @@
 {% from 'base.html' import heading, offsite_link, show_image %}
-{{ page.set_title("Secure, Automated Backups with Amazon S3 and Deja-Dup") }}
-
 {% extends 'blog_entry.html' %}
+{% set page_info.title = "Secure, Automated Backups with Amazon S3 and Deja-Dup" %}
+
+
+{% set im0_amazon_s3_landing = get_image("0-amazon-s3-landing.png") %}
+{% set im1_amazon_aws_homepage = get_image("1-amazon-aws-homepage.png") %}
+{% set im2_amazon_iam_homepage = get_image("2-amazon-IAM-homepage.png") %}
+{% set im3_amazon_iam_users_page = get_image("3-amazon-IAM-users-page.png") %}
+{% set im4_amazon_iam_new_users = get_image("4-amazon-IAM-new-users.png") %}
+{% set im5_amazon_iam_user_created = get_image("5-amazon-IAM-user-created.png") %}
+{% set im6_amazon_iam_users_page_2 = get_image("6-amazon-IAM-users-page-2.png") %}
+{% set im7_amazon_iam_users_colin = get_image("7-amazon-IAM-users-colin.png") %}
+{% set im8_amazon_iam_attach_policy = get_image("8-amazon-IAM-attach-policy.png") %}
+{% set im16_deja_dup_overview = get_image("16-deja-dup-overview.png") %}
+{% set im17_deja_dup_storage_location = get_image("17-deja-dup-storage-location.png") %}
+{% set im18_deja_dup_first_run_1 = get_image("18-deja-dup-first-run-1.png") %}
+{% set im19_deja_dup_first_run_2 = get_image("19-deja-dup-first-run-2.png") %}
+{% set im20_backup_complete = get_image("20-backup-complete.png") %}
+{% set im9_amazon_aws_s3_link = get_image("9-amazon-AWS-S3-link.png") %}
+{% set im11_amazon_s3_bucket_properties = get_image("11-amazon-S3-bucket-properties-2.png") %}
+{% set im12_amazon_s3_lifecycle_rule1_2 = get_image("12-amazon-S3-lifecycle-rule1-2.png") %}
+{% set im13_amazon_s3_lifecycle_rule2 = get_image("13-amazon-S3-lifecycle-rule2.png") %}
+{% set im14_amazon_s3_lifecycle_rule3 = get_image("14-amazon-S3-lifecycle-rule3.png") %}
+{% set im15_amazon_s3_lifecycle_save = get_image("15-amazon-S3-lifecycle-save.png") %}
 
 {% block entry_content %}
 
@@ -28,48 +49,48 @@ In configuring Deja Dup to backup my home directory to AWS, I was dissappointed 
 <p>
 First, {{ offsite_link("https://aws.amazon.com/", "sign up") }} for an amazon AWS account if you don't have one:
 </p>
-{{ show_image(page.images["0-amazon-s3-landing.png"]) }}
+{{ show_image(im0_amazon_s3_landing) }}
 
 <p>
 Follow the prompts, and you'll be deposited at the AWS landing page
 (which you can always reach by clicking the AWS box icon in the top left).
 </p>
-{{ show_image(page.images["1-amazon-aws-homepage.png"]) }}
+{{ show_image(im1_amazon_aws_homepage) }}
 
 <p>
 The first thing to do is to set up permissions / access keys. Click on the "Identity &amp; Access Management" (A.K.A "IAM") link under the "Security &amp; Identity" header. This takes you here:
 </p>
-{{ show_image(page.images["2-amazon-IAM-homepage.png"]) }}
+{{ show_image(im2_amazon_iam_homepage) }}
 
 <p>
 From here, click "Users":
 </p>
-{{ show_image(page.images["3-amazon-IAM-users-page.png"]) }}
+{{ show_image(im3_amazon_iam_users_page) }}
 
 <p>
 Then click "Create New Users", enter the name for your user and click "create".
 </p>
-{{ show_image(page.images["4-amazon-IAM-new-users.png"]) }}
+{{ show_image(im4_amazon_iam_new_users) }}
 
 <p>
 Expand the "Show User Security Credentials" dropdown and note both the Access Key ID &amp; the Secret Access Key - these will be needed later.
 </p>
-{{ show_image(page.images["5-amazon-IAM-user-created.png"]) }}
+{{ show_image(im5_amazon_iam_user_created) }}
 
 <p>
 Now return to the IAM homepage and again click on "Users". You should see your new user:
 </p>
-{{ show_image(page.images["6-amazon-IAM-users-page-2.png"]) }}
+{{ show_image(im6_amazon_iam_users_page_2) }}
 
 <p>
 Click on the row that contains your user, and then click the "Permissions" tab:
 </p>
-{{ show_image(page.images["7-amazon-IAM-users-colin.png"]) }}
+{{ show_image(im7_amazon_iam_users_colin) }}
 
 <p>
 Next, click "Attach Policy" and in the filter, type "S3" and select the "AmazonS3FullAccess" policy:
 </p>
-{{ show_image(page.images["8-amazon-IAM-attach-policy.png"]) }}
+{{ show_image(im8_amazon_iam_attach_policy) }}
 
 <p>
 Finally, click "Attach Policy". Now you have a user with read/write access to S3 services.
@@ -88,7 +109,7 @@ Note that if you're using a Gnome environment, the application will probably be 
 
 Launch the application:
 </p>
-{{ show_image(page.images["16-deja-dup-overview.png"]) }}
+{{ show_image(im16_deja_dup_overview) }}
 
 <p>
 Go ahead and configure the folders you want to save and ignore (note: dot-prefixed folders are <i>not</i> ignored by default. You might want to think about ignoring redundant folders like {{ inline_code("~/.cache") }} to save space and bandwidth).
@@ -97,23 +118,23 @@ Go ahead and configure the folders you want to save and ignore (note: dot-prefix
 <p>
 Then click the "Storage Location" section and configure it for Amazon S3. Use the S3 Access Key you noted previously.
 </p>
-{{ show_image(page.images["17-deja-dup-storage-location.png"]) }}
+{{ show_image(im17_deja_dup_storage_location) }}
 
 <p>
 Return to the overview and click "Back Up Now..." to initiate the backup process. Here you'll have to enter the Secret Access Key as well.
 </p>
-{{ show_image(page.images["18-deja-dup-first-run-1.png"]) }}
+{{ show_image(im18_deja_dup_first_run_1) }}
 
 
 <p>
 If the permissions were correctly configured, you should be prompted to choose an optional passphrase with which to encrypt your backup. My understanding is that the data is encrypted before it reaches AWS and the passphrase is never shared with Amazon, which means only you posess the key to decrypt your backup (so don't lose your key!)
 </p>
-{{ show_image(page.images["19-deja-dup-first-run-2.png"]) }}
+{{ show_image(im19_deja_dup_first_run_2) }}
 
 <p>
 It's possible that the first backup won't show any sign of completing - the progress bar will be full, but it will still say "uploading". However, you can tell if it truly is finished by looking at the bucket in Amazon S3 and seeing that the very last difftar isn't 25 mb like all the rest:
 </p>
-{{ show_image(page.images["20-backup-complete.png"]) }}
+{{ show_image(im20_backup_complete) }}
 
 
 {{ heading("Switching to Lower Cost Storage (Optional)") }}
@@ -123,17 +144,17 @@ These changes will cause accesses to your data to take 2-3 seconds instead of be
 
 To do this, return to the Console Home (or click on the "Services" dropdown at the top of the page) and click on "S3":
 </p>
-{{ show_image(page.images["9-amazon-AWS-S3-link.png"]) }}
+{{ show_image(im9_amazon_aws_s3_link) }}
 
 <p>
 Click on "Properties" to see something like the following:
 </p>
-{{ show_image(page.images["11-amazon-S3-bucket-properties-2.png"]) }}
+{{ show_image(im11_amazon_s3_bucket_properties) }}
 
 <p>
 Expand the "Lifecycle" section, and then click "Add rule":
 </p>
-{{ show_image(page.images["12-amazon-S3-lifecycle-rule1-2.png"]) }}
+{{ show_image(im12_amazon_s3_lifecycle_rule1_2) }}
 
 <p>
 Stick with the defaults for step 1 (i.e. apply to the whole bucket) and click "Configure Rule".
@@ -142,17 +163,17 @@ Check the "Transition to the Standard - Infrequent Access Storage Class" box and
 You could instead check the "Archive to the Glacier Storage Class" option, which offers even cheaper storage but at the additional cost of 3-5 hours of latency and a <i>significantly</i> higher read cost (DON'T do this unless you're sure you understand the pricing.
 {{ offsite_link("https://medium.com/@karppinen/how-i-ended-up-paying-150-for-a-single-60gb-download-from-amazon-glacier-6cb77b288c3e#.pqzerjta6", "Here's") }} a cautionary tale from somebody who paid $150 to restore 60 GB of data from Amazon Glacier Storage).
 </p>
-{{ show_image(page.images["13-amazon-S3-lifecycle-rule2.png"]) }}
+{{ show_image(im13_amazon_s3_lifecycle_rule2) }}
 
 <p>
 After completing the above, click "Review", give the rule some name and then click "Create and Activate Rule".
 </p>
-{{ show_image(page.images["14-amazon-S3-lifecycle-rule3.png"]) }}
+{{ show_image(im14_amazon_s3_lifecycle_rule3) }}
 
 <p>
 Don't forget to click "Save"!
 </p>
-{{ show_image(page.images["15-amazon-S3-lifecycle-save.png"]) }}
+{{ show_image(im15_amazon_s3_lifecycle_save) }}
 
 <p>
 Well that's it. The first backup may take a long time, but further backups are done incrementally. If you explore the Deja Dup tool, you'll see settings for automating further backups, etc. If you aren't happy with the default bucket name or its geographic location (US North), Juan Domenech explains how to change that over {{ offsite_link("http://blog.domenech.org/2013/01/backing-up-ubuntu-using-deja-dup-backup-and-aws-s3.html", "here") }}. I hope this tutorial was helpful!

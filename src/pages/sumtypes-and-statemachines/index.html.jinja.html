@@ -1,7 +1,8 @@
 {% from 'base.html' import heading, offsite_link, show_image %}
-{{ page.set_title("Sum types and state machines in C++17") }}
-
 {% extends 'blog_entry.html' %}
+{% set page_info.title = "Sum types and state machines in C++17" %}
+
+{% set statevariant = get_image("statevariant.svg") %}
 
 {% block entry_content %}
 <p>
@@ -325,7 +326,7 @@ When compared to a virtual dispatch approach, we <em>still</em> saved one word
 by avoiding any vtable pointers.
 </p>
 
-{{ show_image(page.images["statevariant.svg"], caption="Possible memory layout of the State type.") }}
+{{ show_image(statevariant, caption="Possible memory layout of the State type.") }}
 
 <p>
 Finally, we might add more events, like a CoinInserted event.
@@ -434,7 +435,7 @@ the FetchingItem state (especially within the context of exceptions, if applicab
 {{ heading("In closing") }}
 <p>
 This loose framework should work for many scenarios. The library code, along with examples,
-is available {{ onsite_link(page.other["fsm.h"], "here") }}, and has also been extended to
+is available {{ onsite_link("fsm.h"|path_from_here, "here") }}, and has also been extended to
 support callbacks whenever a state is entered or exited (for when RAII isn't
 applicable). If you want to make use of variants, but are stuck on a non-C++17
 codebase, take a look at the fantastic {{ offsite_link("https://github.com/mpark/variant/tree/single-header/", "mpark") }} library:

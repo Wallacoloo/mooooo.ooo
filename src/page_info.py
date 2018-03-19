@@ -364,8 +364,8 @@ class Image(Page):
             # Width and Height are stored as attributes on the root SVG element.
             tree = ElementTree.parse(self.src_filename)
             root = tree.getroot()
-            width = int(root.attrib["width"].replace("pt", ""))
-            height = int(root.attrib["height"].replace("pt", ""))
+            width = int(float(root.attrib["width"].replace("pt", "").replace("mm", "")))
+            height = int(float(root.attrib["height"].replace("pt", "").replace("mm", "")))
             return (width, height)
         elif get_ext(self.intermediate_path) in VID_EXTENSIONS:
             cmd = "ffprobe -show_entries stream=height,width -v error -of flat=s=_ %s" %self.src_filename
