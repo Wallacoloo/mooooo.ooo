@@ -3,6 +3,11 @@ from page_info import config
 
 import jsonpickle, sys
 
+def rm_anchor(url):
+    if '.anchor.' in url:
+        url = url.split(".anchor.")[0]
+    return url
+
 if __name__ == "__main__":
     if len(sys.argv) != 3:
         print("Usage: %s <input .build> <.rtdeps>" %sys.argv[0])
@@ -19,13 +24,15 @@ if __name__ == "__main__":
             for d in build['rtdeps'] ]
     # actual Make code to include the .alldeps
     include_alldeps = "\n".join(
-        "include {}.alldeps".format(d)
+        "include {}.alldeps".format(rm_anchor(d))
         for d in rtdeps)
     builddir_deps = [d
         .replace(config['build']['intermediate'], config['build']['output'])
         for d in rtdeps]
     call_rt_deps = " ".join("$(call GET_RT_DEPS_{dep},{build_path} $(1))"
-            .format(dep=d, build_path=build_path) for d in builddir_deps)
+            .format(dep=rm_anchor(d), build_path=build_path) for d in builddir_deps)
+    anchors = "\n".join("{build_path}.anchor.{anchor}: {build_path}".format(
+        build_path=build_path, anchor=a) for a in build['anchors'])
     output = """
 ifndef INCL_{out_path}
 #include guard
@@ -39,6 +46,8 @@ $(if $(filter {build_path},$(1)), \\
     {build_path} {call_rt_deps} \\
 )
 endef
+# Which anchors this file provides at runtime
+{anchors}
 endif # include guard
 """.format(**globals())
     out_file = open(out_path, 'w+')

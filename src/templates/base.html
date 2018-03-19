@@ -82,6 +82,10 @@
 {% macro onsite_link(path, label="", anchor="", class="") %}
 {# Use whenever a-href'ing to another page OR in-page heading #}
 {% do page_info.rtdeps.add(path|to_build_path) %}
+{% if anchor %}
+{% set path = path + "#" + anchor %}
+{% endif %}
+{% do page_info.rtdeps.add(path.replace("#", ".anchor.")|to_build_path) %}
 <a class="{{ class }}" href="{{ path|to_rel_path }}">{{ label }}</a>{% endmacro %}
 
 {% macro mailto_link(address, label="", class="", subject="", body="") %}
@@ -166,12 +170,10 @@ img
 									{{ offsite_link(social.twitter_url, class="twitter fa fa-twitter") }}
 							{% endif %}
 					</div>
-					{# TODO
 					<p class="footer-legal">
 							Unless otherwise stated, all code snippets, artwork or writings hosted on this website are released into the public domain.
 							{{ onsite_link("about/index.html"|path_from_root, "More info", anchor="License / Attributions"|into_tag) }}.
 					</p>
-					#}
 			</footer>
 			{% endblock %}
 		</body>

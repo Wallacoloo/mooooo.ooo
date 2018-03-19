@@ -180,7 +180,6 @@ class Page(object):
             build_path = self.build_path,
             rtdeps = set(),
             srcdeps = set(),
-            anchors = set(),
             **src_srcinfo,
         )
     @property
@@ -190,6 +189,7 @@ class Page(object):
         return dict(
             intermediate_path = self.intermediate_path,
             build_path = self.build_path,
+            anchors = set(),
         )
 
     def get_build(self):
@@ -212,6 +212,7 @@ class JinjaPage(Page):
             desc = "",
             comments = dict(),
             page_type = Page,
+            anchors = set(),
             **self.base_src_info
         )
 
@@ -334,6 +335,7 @@ class JinjaPage(Page):
         build = self.base_build_info
         build['content'] = rendered
         build['rtdeps'] = jinja_info['rtdeps']
+        build['anchors'] = jinja_info['anchors']
 
         return build
 
