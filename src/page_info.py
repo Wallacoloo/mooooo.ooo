@@ -220,7 +220,7 @@ class JinjaPage(Page):
             title = "",
             desc = "",
             comments = dict(),
-            type = JinjaPage,
+            type = Page,
             **self.base_src_info
         )
 

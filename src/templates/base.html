@@ -139,14 +139,14 @@ img
 			{% block body %}
 			<header class="nav-header">
 					{# Derivative templates are expected to
-						{% set is_page_xxx = True %} for at least one page #}
+						{% set page_info.page_type = T %} based on their type #}
 					<ul class="nav-ul">
-							<li class="nav-li-blog{{ " active" if page_info.type == HomePage else ""}}">
+							<li class="nav-li-blog{{ " active" if page_info.page_type == HomePage else ""}}">
 									{{ onsite_link("index.html"|path_from_root, "Blog") }}
 							</li>
 							<li class="filler">
 							</li>
-							<li class="nav-li-about{{ " active" if page_info.type == AboutPage else "" }}">
+							<li class="nav-li-about{{ " active" if page_info.page_type == AboutPage else "" }}">
 									{{ onsite_link("about/index.html"|path_from_root, "About") }}
 							</li>
 					</ul>
@@ -169,7 +169,7 @@ img
 					{# TODO
 					<p class="footer-legal">
 							Unless otherwise stated, all code snippets, artwork or writings hosted on this website are released into the public domain.
-							{{ onsite_link(pages["about"], "More info", anchor="License / Attributions"|into_tag) }}.
+							{{ onsite_link("about/index.html"|path_from_root, "More info", anchor="License / Attributions"|into_tag) }}.
 					</p>
 					#}
 			</footer>
