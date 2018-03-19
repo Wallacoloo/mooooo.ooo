@@ -57,12 +57,9 @@ def filter_into_tag(value):
     >>> filter_into_tag("Hello, This is Arnold")
     "hello-this-is-arnold"
     """
-    # Replace punctuation with hyphens
-    value = value.replace(" ", "-").replace("/", "-").replace(",", "-") \
-        .replace(".", "-").replace("!", "-").replace(";", "-") \
-        .replace(":", "-").strip()
-    # Preserve only alphanumerics and hyphens
-    value = "".join(char.lower() for char in value if char.lower() in "abcdefghijklmnopqrstuvwxyz0123456789-")
+    valid = 'abcdefghijklmnopqrstuvwxyz0123456789'
+    # Make lowercase and replace illegal chars with hyphens
+    value = "".join([c if c in valid else '-' for c in value.lower()])
     # Squash pairs of hyphens
     while len(value) != len(value.replace("--", "-")):
             value = value.replace("--", "-")
