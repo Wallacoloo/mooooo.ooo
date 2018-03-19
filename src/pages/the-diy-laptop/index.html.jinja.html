@@ -1,10 +1,35 @@
 {% from 'base.html' import heading %}
-{{ page.set_title("The DIY Laptop") }}
-
 {% extends 'blog_entry.html' %}
+{% set page_info.title = "The DIY Laptop" %}
+
+{% set end_result_1 = get_image("end-result-1.jpg") %}
+{% set digital_trends_nuc = get_image("digital-trends-nuc-5i5ryk.jpg") %}
+{% set amazon_lapdock = get_image("amazon-lapdock.jpg") %}
+{% set lapdock_power_load = get_image("lapdock-power-load.jpg") %}
+{% set voltage_vs_power = get_image("voltage-vs-power.png") %}
+{% set battery_to_nuc_1 = get_image("battery-to-nuc-1.jpg") %}
+{% set battery_to_nuc_2 = get_image("battery-to-nuc-2.jpg") %}
+{% set battery_to_nuc_3 = get_image("battery-to-nuc-3.jpg") %}
+{% set battery_to_nuc_4 = get_image("battery-to-nuc-4.jpg") %}
+{% set mounting_bracket_openscad = get_image("mounting-bracket-openscad.png") %}
+{% set mounting_bracket_on_bed = get_image("mounting-bracket-on-bed.jpg") %}
+{% set bracket_attach_nuc_1 = get_image("bracket-attach-nuc-1.jpg") %}
+{% set bracket_attach_nuc_2 = get_image("bracket-attach-nuc-2.jpg") %}
+{% set bracket_attach_nuc_3 = get_image("bracket-attach-nuc-3.jpg") %}
+{% set bracket_attach_nuc_4 = get_image("bracket-attach-nuc-4.jpg") %}
+{% set bracket_attach_lapdock = get_image("bracket-attach-lapdock.jpg") %}
+{% set power_routing_solder = get_image("power-routing-solder.jpg") %}
+{% set power_routing_access_1 = get_image("power-routing-access-1.jpg") %}
+{% set power_routing_access_2 = get_image("power-routing-access-2.jpg") %}
+{% set power_routing_candidate_location = get_image("power-routing-candidate-location.jpg") %}
+{% set power_routing_drilling = get_image("power-routing-drilling.jpg") %}
+{% set power_routing_insertion = get_image("power-routing-insertion.jpg") %}
+{% set power_routing_closed_housing = get_image("power-routing-closed-housing.jpg") %}
+{% set no_signal_hdmi = get_image("no-signal-hdmi.jpg") %}
+
 {% block entry_content %}
 
-{{ show_image(page.images["end-result-1.jpg"], caption="The end result of this experiment.") }}
+{{ show_image(end_result_1, caption="The end result of this experiment.") }}
 
 {# Plan:
 Background: Why a DIY laptop.
@@ -31,7 +56,7 @@ There's a fair amount of talk about "DIY laptops", but everyone interprets the p
 Enter Intel's NUC (I spent a good 2 months with research before deciding upon the NUC, but I'm skipping all the ideas I ditched for the sake of brevity).
 </p>
 
-{{ show_image("digital-trends-nuc-5i5ryk.jpg",
+{{ show_image(digital_trends_nuc,
 caption="The Intel NUC 5i5RYK. Source (along with an in-depth review): " +
 offsite_link("http://www.digitaltrends.com/desktop-computer-reviews/intel-nuc-core-i5-nuc5i5ryk-review/attachment/intel-nuc-core-i5-nuc5i5ryk-mini-pc-review-front-ports/", "Digital Trends") + ".") }}
 
@@ -53,7 +78,7 @@ laptop.
 And... enter Motorola's failed Lapdock project:
 </p>
 
-{{ show_image("amazon-lapdock.jpg", caption="Source: " + offsite_link("https://www.amazon.com/AT-Laptop-Dock-Motorola-ATRIX/dp/B004M17D62", "Amazon product page") + ".") }}
+{{ show_image(amazon_lapdock, caption="Source: " + offsite_link("https://www.amazon.com/AT-Laptop-Dock-Motorola-ATRIX/dp/B004M17D62", "Amazon product page") + ".") }}
 
 <p>
 The Lapdock provides all the components I listed previously, plus a pair of (weak) speakers and exposes all those peripherals over a single USB connection + one HDMI connection. It was originally designed to be paired with a specific Motorola phone model, but that's irrelevant - it can be connected to <em>anything</em>.
@@ -72,14 +97,14 @@ This part was new to me - batteries are an intimidating thing when it comes to s
 I figured Motorola, being a fairly reputable company, had the proper protections very close to the cells, if not actually integrated into the batteries, so I just attached clips right near the base of the bus that transmits power from the battery circuitboard to the main circuit board, made a mental note of where my (electrical-)fire extinguisher was, attached an "adjustable load", and measured the voltage across the load as I adjusted it.
 </p>
 
-{{ show_image(page.images["lapdock-power-load.jpg"], caption="A low-precision \"adjustable load\" for the hapless engineer.") }}
+{{ show_image(lapdock_power_load, caption="A low-precision \"adjustable load\" for the hapless engineer.") }}
 
 <p>
 I approximated the maximum power supply by adjusting the load between 12 ohms and 3 ohms, measuring the voltage across the load after 30 seconds and using Ohm's {{ inline_code("P=V^2/R") }} relationship.
 I stopped at 35 W as a precaution (it's enough for my application), but presumably one can extrapolate further based on these results plotted below.
 </p>
 
-{{ show_image("voltage-vs-power.png", caption="Voltage vs. Power measured at full-charge with ambient temperature around 25 C.") }}
+{{ show_image(voltage_vs_power, caption="Voltage vs. Power measured at full-charge with ambient temperature around 25 C.") }}
 
 <p>
 I don't know much about battery chemistry, but if we model the battery and its control circuitry as a {{ offsite_link("https://en.wikipedia.org/wiki/Th%C3%A9venin's_theorem", "Thevenin circuit") }},  we can infer that over 4 W are dissipated in the surrounding circuitry when the load reaches 35 W (i.e. 89% efficiency).
@@ -96,10 +121,10 @@ Hence, it wouldn't be unexpected if it's really designed for ~11.5 V, as the bat
 So in the spirit of error margins, or rather, <em>against</em> that spirit, I figured I'd at least <em>try</em> connecting the lapdock's power supply directly to the NUC before trying to find where to hack on a voltage regulator.
 </p>
 
-{{ show_image("battery-to-nuc-1.jpg", caption="I only had green wire...") }}
-{{ show_image("battery-to-nuc-2.jpg", caption="That blue light looks promising...") }}
-{{ show_image("battery-to-nuc-3.jpg", caption="Tidy things up &amp; connect HDMI + USB...") }}
-{{ show_image("battery-to-nuc-4.jpg") }}
+{{ show_image(battery_to_nuc_1, caption="I only had green wire...") }}
+{{ show_image(battery_to_nuc_2, caption="That blue light looks promising...") }}
+{{ show_image(battery_to_nuc_3, caption="Tidy things up &amp; connect HDMI + USB...") }}
+{{ show_image(battery_to_nuc_4) }}
 
 <p>
 Lo and behold, it works!*
@@ -120,7 +145,7 @@ I considered gluing a VESA mount onto the Lapdock, but I felt that might become 
 Instead, I decided to create a set of "J"-shaped brackets that would fit around the lip of the lid and hold via a combination of gravity (when the lid is opened) and friction (when the lid is closed).
 </p>
 
-{{ show_image("mounting-bracket-openscad.png",
+{{ show_image(mounting_bracket_openscad,
 caption="A CAD model of the bracket, made with " +
 offsite_link("http://www.openscad.org/", "OpenSCAD") +
 ". " +
@@ -136,13 +161,13 @@ These brackets have holes at the end that are larger than the screws holding the
 Since I have access to a 3d printer, I figured it would make sense to use one to fabricate a prototype.
 </p>
 
-{{ show_image("mounting-bracket-on-bed.jpg") }}
+{{ show_image(mounting_bracket_on_bed) }}
 
 <p>
 These brackets attach to the NUC like so:
 </p>
 
-{{ show_image("bracket-attach-nuc-1.jpg", "bracket-attach-nuc-2.jpg", "bracket-attach-nuc-3.jpg", "bracket-attach-nuc-4.jpg",
+{{ show_image(bracket_attach_nuc_1, bracket_attach_nuc_2, bracket_attach_nuc_3, bracket_attach_nuc_4,
 columns=2,
 caption="Notice how there are two bracket sizes; the longer brackets connect to the top of the lapdock, whereas the shorter one clamps to the side.") }}
 
@@ -150,7 +175,7 @@ caption="Notice how there are two bracket sizes; the longer brackets connect to 
 Then the whole thing fits snugly around the lapdock, and it still closes comfortably.
 </p>
 
-{{ show_image("bracket-attach-lapdock.jpg") }}
+{{ show_image(bracket_attach_lapdock) }}
 
 {# TODO: show an image of the lapdock closed w/ the brackets #}
 
@@ -169,7 +194,7 @@ An improvement would be to solder a permanent connection inside the lapdock and 
 So I re-opened the lapdock and soldered wires onto the <em>main</em> board this time, right near the point where its delivered over the ribbon cable.
 </p>
 
-{{ show_image("power-routing-solder.jpg", caption="The two lanes on each edge of the connector carry power (i.e. 2 carry positive voltage and 2 carry ground). <b>Be sure to unplug the ribbon cable before doing this so there's no possibility of shorting the battery</b>.") }}
+{{ show_image(power_routing_solder, caption="The two lanes on each edge of the connector carry power (i.e. 2 carry positive voltage and 2 carry ground). <b>Be sure to unplug the ribbon cable before doing this so there's no possibility of shorting the battery</b>.") }}
 
 {# TODO: show the other end of the power cable here (requires taking another photo) #}
 
@@ -179,37 +204,37 @@ This area of the lapdock can be difficult to access.
 Most of the disassembly is straightforward, but note that there is a screw on either end of the rotating plastic piece that holds the connectors hidden under a cap that must be removed:
 </p>
 
-{{ show_image("power-routing-access-1.jpg", caption="The small plastic cover is glued on top of each screw and must be pried off.") }}
+{{ show_image(power_routing_access_1, caption="The small plastic cover is glued on top of each screw and must be pried off.") }}
 
 <p>
 Also, <em>some</em> Lapdock versions have an extra piece of plastic that serves to hide a seam. It can be removed just by pulling with force:
 </p>
 
-{{ show_image("power-routing-access-2.jpg") }}
+{{ show_image(power_routing_access_2) }}
 
 <p>
 Finally, the connector panel should look like this when it's opened:
 </p>
 
-{{ show_image("power-routing-candidate-location.jpg") }}
+{{ show_image(power_routing_candidate_location) }}
 
 <p>
 For my version, there was a large enough gap inside the housing that we could fit another connector. So, start drilling:
 </p>
 
-{{ show_image("power-routing-drilling.jpg", caption="A 7/32\" bit seemed to be the perfect fit." ) }}
+{{ show_image(power_routing_drilling, caption="A 7/32\" bit seemed to be the perfect fit." ) }}
 
 <p>
 Then just insert the other end of the connector:
 </p>
 
-{{ show_image("power-routing-insertion.jpg") }}
+{{ show_image(power_routing_insertion) }}
 
 <p>
 And finally, route the wires out the gap in the side of the housing and close it up like so:
 </p>
 
-{{ show_image("power-routing-closed-housing.jpg") }}
+{{ show_image(power_routing_closed_housing) }}
 
 {# TODO: show the cable that connects this to the NUC #}
 
@@ -355,7 +380,7 @@ funny looks and silly questions every week. And its the <em>only</em>
 laptop that will ever give you this display when you power it down:
 </p>
 
-{{ show_image("no-signal-hdmi.jpg") }}
+{{ show_image(no_signal_hdmi) }}
 
 {% endblock %}
 
