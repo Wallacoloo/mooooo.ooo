@@ -9,7 +9,15 @@ def get_unparsed_commits(filename):
     """Returns an array of commit dicts, where each entry looks like:
     { 'author': '<name>', 'date': '<date>', 'message': '<message>' }
     """
-    proc = subprocess.Popen(["git", "log", '--pretty=format:{%n  "author": "%aN",%n  "date": "%cD",%n  "message": "%s"%n},', "--", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen([
+            'git',
+            'log',
+            '--follow',
+            '--pretty=format:{%n  "author": "%aN",%n  "date": "%cD",%n  "message": "%s"%n},',
+            "--",
+            filename],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE)
     stdout, stderr = proc.communicate()
     if stderr:
         raise RuntimeError("git log error:", stderr)
