@@ -1,8 +1,12 @@
 {% from 'fullscreen_graphics.html' import bg_video, bg_audio %}
-{{ page.set_desc("Colin likes to dance") }}
-{{ page.set_title("Colin.swf") }}
-
 {% extends 'fullscreen_graphics.html' %}
+{% set page_info.desc = "Colin likes to dance" %}
+{% set page_info.title = "Colin.swf" %}
+
+{% set main_video = get_image("cw2.webm") %}
+{# Extras/hiddens #}
+{% do page_info.rtdeps.add('colin.webm'|path_from_here|to_build_path) %}
+{% do page_info.rtdeps.add('cw1.webm'|path_from_here|to_build_path) %}
 
 {% block extra_style %}
 body
@@ -13,9 +17,7 @@ body
 {% endblock %}
 
 {% block page_content %}
-<!-- {{ bg_video(page.images["colin.webm"]) }} -->
-<!-- {{ bg_video(page.images["cw1.webm"]) }} -->
-{{ bg_video(page.images["cw2.webm"]) }}
+{{ bg_video(main_video) }}
 {% endblock %}
 
 {#

@@ -1,11 +1,11 @@
 {% from 'fullscreen_graphics.html' import show_bg_image, show_image, bg_audio %}
-{{ page.set_desc("♪Shadilay♪") }}
-{{ page.set_title("♪Shadilay♪") }}
-{% set dancing_pepe=page.images["dancing-pepe.gif"] %}
-{{ add_srcdep(dancing_pepe) }}
-{% set kekistan=page.images["kekistan-bordered.jpg"] %}
-
 {% extends 'fullscreen_graphics.html' %}
+{% set page_info.desc = "♪Shadilay♪" %}
+{% set page_info.title = "♪Shadilay♪" %}
+{% set dancing_pepe = get_image("dancing-pepe.gif") %}
+{% set kekistan = get_image("kekistan-bordered.jpg") %}
+{% set main_audio = get_audio("shadilay_loop.ogg") %}
+
 
 {% block extra_style %}
 body
@@ -49,6 +49,6 @@ body
 {% block page_content %}
 {{ show_bg_image(dancing_pepe, "bg-pepe") }}
 {{ show_image(kekistan, "fg-kekistan") }}
-{{ bg_audio(page.audio["shadilay_loop.ogg"]) }}
+{{ bg_audio(main_audio) }}
 {% endblock %}
 

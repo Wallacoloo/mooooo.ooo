@@ -4,27 +4,25 @@ the site presents a fullscreen image/video, possibly with sound #}
 {% extends 'blank_html.html' %}
 
 {% macro show_bg_image(image, class="bg-image") %}
-{{ add_rtdep(image) }}
-<div class="{{ class }}" style="background-image: url({{ image.path|to_rel_path }});"></div>
+{% do page_info.rtdeps.add(image.intermediate_path|to_build_path) %}
+<div class="{{ class }}" style="background-image: url({{ image.intermediate_path|to_rel_path }});"></div>
 {% endmacro %}
 
 {% macro show_image(image, class="") %}
-{{ add_srcdep(image) }}
-{{ add_rtdep(image) }}
-<img class="{{ class }}" src="{{ image.path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px"/>
+{% do page_info.rtdeps.add(image.intermediate_path|to_build_path) %}
+<img class="{{ class }}" src="{{ image.intermediate_path|to_rel_path }}" width="{{ image.size.0 }}px" height="{{ image.size.1 }}px"/>
 {% endmacro %}
 
 {% macro bg_audio(audio) %}
-{{ add_rtdep(audio) }}
-<audio src="{{ audio.path|to_rel_path }}" autoplay loop>
+{% do page_info.rtdeps.add(audio.intermediate_path|to_build_path) %}
+<audio src="{{ audio.intermediate_path|to_rel_path }}" autoplay loop>
 </audio>
 {% endmacro %}
 
 {% macro bg_video(video, class="bg-image") %}
-{{ add_srcdep(video) }}
-{{ add_rtdep(video) }}
+{% do page_info.rtdeps.add(video.intermediate_path|to_build_path) %}
 <video class="{{ class }}"  width="{{ video.size.0 }}" height="{{ video.size.1 }}" autoplay loop>
-<source src="{{ video.path|to_rel_path }}" type="video/webm">
+<source src="{{ video.intermediate_path|to_rel_path }}" type="video/webm">
 </video>
 {% endmacro %}
 

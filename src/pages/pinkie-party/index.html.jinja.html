@@ -1,8 +1,11 @@
 {% from 'fullscreen_graphics.html' import show_bg_image, bg_audio %}
-{{ page.set_desc("Pinkie Pie likes to party") }}
-{{ page.set_title("Pinkie.Party()") }}
-
 {% extends 'fullscreen_graphics.html' %}
+{% set page_info.desc = "Pinkie Pie likes to party" %}
+{% set page_info.title = "Pinkie.Party()" %}
+
+{% set pinkie_box = get_image("pinkie_box.gif") %}
+{% set tarzan_and_jane_loop = get_audio("tarzan_and_jane_loop.ogg") %}
+
 
 {% block extra_style %}
 body
@@ -12,8 +15,8 @@ body
 {% endblock %}
 
 {% block page_content %}
-{{ show_bg_image(page.images["pinkie_box.gif"]) }}
-{{ bg_audio(page.audio["tarzan_and_jane_loop.ogg"]) }}
+{{ show_bg_image(pinkie_box) }}
+{{ bg_audio(tarzan_and_jane_loop) }}
 {% endblock %}
 
 {% block footer %}

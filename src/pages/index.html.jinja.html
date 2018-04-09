@@ -12,6 +12,11 @@
 	get_srcinfo('the-diy-laptop/index.html'),
 	get_srcinfo('deja-dup-s3-backups/index.html'),
 ] %}
+{# Extras/hiddens #}
+{% do page_info.rtdeps.add('colin-dance/index.html'|path_from_here|to_build_path) %}
+{% do page_info.rtdeps.add('pinkie-party/index.html'|path_from_here|to_build_path) %}
+{% do page_info.rtdeps.add('shadilay-party/index.html'|path_from_here|to_build_path) %}
+{% do page_info.rtdeps.add('twi-dance/index.html'|path_from_here|to_build_path) %}
 
 
 

@@ -290,6 +290,7 @@ class JinjaPage(Page):
         # TODO: replace with get_resource
         env.globals["get_page"] = get_resource
         env.globals["get_image"] = get_srcinfo
+        env.globals["get_audio"] = get_srcinfo
         env.filters["into_tag"] = filter_into_tag
         env.filters["friendly_date"] = filter_friendly_date
         env.filters["highlight_code"] = highlight_code
