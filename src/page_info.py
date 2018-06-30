@@ -214,6 +214,7 @@ class JinjaPage(Page):
         )
 
         def to_build_path(abs_path):
+            # TODO: result should be an absolute/canonical path!
             return abs_path.replace(config['build']['intermediate'],
                     config['build']['output'])
         def path_from_root(path):
@@ -235,7 +236,10 @@ class JinjaPage(Page):
             else:
                 anchor = ""
             # Remove any stem that is common to (abs_path, build_path).
-            parts_out, parts_abs = src_info.intermediate_path.split("/"), abs_path.split("/")
+            if abs_path.startswith(config['build']['output']):
+                parts_out, parts_abs = src_info.build_path.split("/"), abs_path.split("/")
+            else:
+                parts_out, parts_abs = src_info.intermediate_path.split("/"), abs_path.split("/")
             while parts_out and parts_abs and parts_out[0] == parts_abs[0]:
                 del parts_out[0]
                 del parts_abs[0]
